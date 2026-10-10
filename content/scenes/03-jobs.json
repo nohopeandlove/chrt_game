@@ -1,0 +1,35 @@
+{
+  "id": "jobs",
+  "title": "Сцена 3 — Поиск вакансий",
+  "background": "laptop",
+  "nodes": [
+    { "id": "intro", "type": "think", "text": "Резюме готово. Теперь — самое интересное. Время искать работу." },
+    {
+      "id": "board",
+      "type": "screen",
+      "screen": "jobs",
+      "source": "vacancies.json",
+      "gate": {
+        "note": "Порядок проверок обязателен: ловушки и мошенники отсекаются раньше специальности, иначе игрок с неподходящей специальностью не увидит урок про банковскую карту.",
+        "order": ["trap", "scam", "specialty", "secretWord"]
+      },
+      "coverLetter": {
+        "label": "Сопроводительное письмо",
+        "placeholder": "Расскажите о себе и о том, почему вам интересна эта вакансия",
+        "note": "Секретное слово ищется в тексте письма без учёта регистра и падежа."
+      },
+      "repeat": true,
+      "exitOn": "секретное слово найдено и специальность подходит"
+    },
+    { "id": "award-attentive", "type": "award", "achievement": "attentive", "when": "secretWordFoundOnFirstTry" },
+    { "id": "award-not-fooled", "type": "award", "achievement": "not-fooled", "when": "openedBothScams && cardNotEntered" },
+    {
+      "id": "chapter-4",
+      "type": "chapter",
+      "number": 4,
+      "title": "Тестовое задание",
+      "text": "Теперь время показать свои знания на практике!"
+    },
+    { "id": "to-test", "type": "goto", "scene": "test" }
+  ]
+}

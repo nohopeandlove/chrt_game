@@ -1,0 +1,117 @@
+{
+  "id": "resume",
+  "title": "Сцена 2 — Резюме",
+  "background": "hero-room",
+  "nodes": [
+    {
+      "id": "intro",
+      "type": "think",
+      "text": "Портфолио готово. Теперь осталось сделать резюме. Без него ни одно собеседование не состоится. Главное — быть честным и оформить всё аккуратно."
+    },
+    {
+      "id": "form",
+      "type": "screen",
+      "screen": "resume",
+      "form": {
+        "blocks": [
+          {
+            "id": "contacts",
+            "title": "Контактная информация",
+            "fields": [
+              { "id": "lastName", "label": "Фамилия", "type": "text", "required": true },
+              { "id": "firstName", "label": "Имя", "type": "text", "required": true },
+              { "id": "middleName", "label": "Отчество", "type": "text", "toggle": "нет отчества" },
+              { "id": "age", "label": "Возраст", "type": "number" },
+              { "id": "email", "label": "Email", "type": "email" },
+              { "id": "phone", "label": "Номер телефона", "type": "tel" },
+              { "id": "social", "label": "Профили социальных сетей", "type": "text" }
+            ]
+          },
+          {
+            "id": "goal",
+            "title": "Профессиональная цель",
+            "fields": [{ "id": "goal", "label": "Кем и где хотите работать", "type": "textarea" }]
+          },
+          {
+            "id": "experience",
+            "title": "Опыт работы",
+            "note": "Правка 7: у выпускника опыта обычно нет — переключатель убирает блок и подсказывает, чем его заменить.",
+            "toggle": {
+              "id": "noExperience",
+              "label": "Опыта работы пока нет",
+              "hint": "Ничего страшного. Впишите производственную практику, стажировку, подработку или учебные проекты — работодателю важно увидеть, что вы уже что-то делали руками."
+            },
+            "fields": [
+              { "id": "company", "label": "Название компании", "type": "text" },
+              { "id": "position", "label": "Позиция", "type": "text" },
+              { "id": "period", "label": "Период работы", "type": "text" },
+              { "id": "stack", "label": "Технологии", "type": "text" },
+              { "id": "duties", "label": "Обязанности и достижения", "type": "textarea" }
+            ]
+          },
+          {
+            "id": "education",
+            "title": "Образование",
+            "fields": [
+              { "id": "school", "label": "Учебное заведение", "type": "text", "default": "ГБПОУ «Челябинский радиотехнический техникум»" },
+              { "id": "specialty", "label": "Специальность", "type": "select", "source": "specialties", "required": true, "note": "Определяет доступные вакансии и набор тестовых заданий." },
+              { "id": "qualification", "label": "Квалификация", "type": "text" },
+              { "id": "year", "label": "Год завершения обучения", "type": "number" }
+            ]
+          },
+          {
+            "id": "skills",
+            "title": "Технические навыки",
+            "note": "Список подставляется из выбранной специальности.",
+            "fields": [{ "id": "skills", "label": "Навыки", "type": "chips", "source": "specialty.skills" }]
+          },
+          {
+            "id": "projects",
+            "title": "Проекты",
+            "fields": [
+              { "id": "projectIdea", "label": "Суть проекта", "type": "textarea" },
+              { "id": "projectStack", "label": "Технологии", "type": "text" },
+              { "id": "projectRole", "label": "Ваша роль в разработке", "type": "text" },
+              { "id": "projectProblems", "label": "Какие проблемы решались", "type": "textarea" },
+              { "id": "projectResult", "label": "Достигнутые результаты", "type": "textarea" }
+            ]
+          },
+          {
+            "id": "extra",
+            "title": "Дополнительная информация",
+            "fields": [
+              { "id": "english", "label": "Уровень английского языка", "type": "select", "options": ["beginner", "intermediate", "advanced", "fluent"] },
+              { "id": "tools", "label": "Инструменты удалённой работы и коммуникации", "type": "text" },
+              { "id": "awards", "label": "Награды и достижения", "type": "textarea" },
+              { "id": "events", "label": "Участие в профессиональных мероприятиях", "type": "text" },
+              { "id": "papers", "label": "Авторские статьи или публикации", "type": "text" },
+              { "id": "hobby", "label": "Интересы и хобби", "type": "text" },
+              { "id": "volunteer", "label": "Волонтёрские проекты и инициативы", "type": "text" }
+            ]
+          },
+          {
+            "id": "softSkills",
+            "title": "Дополнительные навыки и характеристики",
+            "fields": [{ "id": "softSkills", "label": "Список навыков", "type": "chips" }]
+          }
+        ],
+        "actions": ["Сохранить", "Скачать резюме"]
+      }
+    },
+    { "id": "saved", "type": "think", "text": "Резюме сохранено! Заполнено на {resumePercent}%." },
+    { "id": "award-cv", "type": "award", "achievement": "perfect-cv", "when": "resumePercent == 100" },
+    {
+      "id": "next",
+      "type": "think",
+      "text": "Теперь, когда портфолио и резюме готовы, пора сделать следующий шаг — найти вакансию мечты."
+    },
+    {
+      "id": "chapter-3",
+      "type": "chapter",
+      "number": 3,
+      "title": "Поиск работы",
+      "text": "Резюме готово. Теперь — самое интересное. Время искать работу. Поиск работы — это искусство. Нужно найти подходящую вакансию и правильно подать заявку."
+    },
+    { "id": "to-jobs", "type": "goto", "scene": "jobs" }
+  ]
+}

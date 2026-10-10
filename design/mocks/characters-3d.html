@@ -1,0 +1,393 @@
+<meta charset="utf-8">
+<title>Персонажи в 3D</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;900&display=swap">
+<style>
+  :root { --paper:#FFF8E7; --ink:#111; --ink-2:#3D3A36; --ink-3:#7A746B; --yellow:#FFD23F; --red:#E63946; --white:#fff; }
+  body { margin:0; background:var(--paper); color:var(--ink); font-family:Rubik,'Segoe UI',system-ui,sans-serif; font-size:16px; line-height:1.5; -webkit-font-smoothing:antialiased; }
+  .wrap { max-width:1180px; margin:0 auto; padding:28px 24px 48px; display:flex; flex-direction:column; gap:18px; }
+  .eyebrow { align-self:flex-start; padding:6px 12px; background:var(--yellow); border:3px solid var(--ink); font-weight:900; font-size:11px; letter-spacing:.1em; text-transform:uppercase; transform:rotate(-2deg); }
+  h1 { margin:6px 0 0; font-weight:900; font-size:clamp(28px,4vw,42px); line-height:1.05; text-transform:uppercase; letter-spacing:-.01em; text-wrap:balance; }
+  .lede { margin:0; max-width:64ch; color:var(--ink-2); font-weight:500; }
+  .stage { position:relative; border:4px solid var(--ink); box-shadow:6px 6px 0 var(--ink); background:#FFF3D6; aspect-ratio:16/9; min-height:360px; overflow:hidden; }
+  canvas { display:block; width:100%; height:100%; cursor:grab; touch-action:none; }
+  canvas:active { cursor:grabbing; }
+  .hud { position:absolute; left:14px; right:14px; bottom:14px; display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  .hud .spacer { flex:1; }
+  .btn { font:inherit; font-weight:900; font-size:12px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink); background:var(--white); border:3px solid var(--ink); box-shadow:3px 3px 0 var(--ink); padding:8px 12px; cursor:pointer; }
+  .btn:hover { transform:translate(-1px,-1px); box-shadow:4px 4px 0 var(--ink); }
+  .btn[aria-pressed="true"] { background:var(--yellow); }
+  .btn:focus-visible { outline:3px solid var(--red); outline-offset:3px; }
+  .hint { position:absolute; top:12px; right:14px; padding:5px 10px; background:var(--ink); color:var(--yellow); font-weight:900; font-size:10px; letter-spacing:.14em; text-transform:uppercase; }
+  .names { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:8px; font-size:12px; font-weight:500; color:var(--ink-2); text-align:center; }
+  .notes { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px; }
+  .note { background:var(--white); border:3px solid var(--ink); box-shadow:4px 4px 0 var(--ink); padding:14px 16px; font-size:14px; color:var(--ink-2); display:flex; flex-direction:column; gap:6px; }
+  .note b { font-weight:900; font-size:12px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink); }
+  .fallback { position:absolute; inset:0; display:none; place-items:center; padding:24px; text-align:center; font-weight:500; }
+  .stage.is-broken .fallback { display:grid; }
+  @media (max-width:720px) { .names { display:none; } .stage { aspect-ratio:4/3; } }
+</style>
+
+<div class="wrap">
+  <span class="eyebrow">Проба · этап 08</span>
+  <h1>Те же семь персонажей — объёмные</h1>
+  <p class="lede">Голова в полтора роста, тело-бочонок, глаза-точки, три тона света и чернильный контур. Модели не нарисованы, а собраны из шаров и цилиндров по тем же параметрам, что и плоские портреты: цвет волос, причёска, одежда, очки. Потяните сцену мышью, переключите эмоцию.</p>
+
+  <div class="stage" id="stage">
+    <canvas id="c" aria-label="Семь персонажей игры в объёме"></canvas>
+    <span class="hint">потяните, чтобы повернуть</span>
+    <div class="hud" id="hud">
+      <button class="btn" type="button" data-emo="neutral" aria-pressed="true">Спокойствие</button>
+      <button class="btn" type="button" data-emo="smile">Улыбка</button>
+      <button class="btn" type="button" data-emo="joy">Радость</button>
+      <button class="btn" type="button" data-emo="worry">Тревога</button>
+      <button class="btn" type="button" data-emo="stern">Строгость</button>
+      <span class="spacer"></span>
+      <button class="btn" type="button" id="outline" aria-pressed="true">Контур</button>
+    </div>
+    <div class="fallback">Не удалось запустить 3D: в этом браузере нет WebGL или заблокирована загрузка библиотеки.</div>
+  </div>
+
+  <div class="names">
+    <span>Героиня</span><span>Герой</span><span>Ирина Петровна</span><span>Вероника Александровна</span><span>Алина Дмитриевна</span><span>Наталья Сергеевна</span><span>Индира Ринатовна</span>
+  </div>
+
+  <div class="notes">
+    <div class="note"><b>Что это даёт</b><span>Персонажи оживают: покачиваются, поворачивают голову, реагируют на выбор. Эмоции — те же пять, что в игре.</span></div>
+    <div class="note"><b>Что это стоит</b><span>Библиотека Three.js — около 150 КБ к сборке, и нужен WebGL. На проекторах и старых классах может тормозить; в игре останется плоский запасной вариант.</span></div>
+    <div class="note"><b>Как встроится</b><span>Вместо SVG-портрета в сцене — маленький холст с одним персонажем крупным планом. Параметры персонажей, эмоции и сценарий не меняются.</span></div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function () {
+  'use strict';
+  const stage = document.getElementById('stage');
+  if (typeof THREE === 'undefined') { stage.classList.add('is-broken'); return; }
+
+  // Параметры персонажей — те же, что в content/characters.json.
+  const CAST = [
+    { id:'hero-f', style:'buns', fringe:'part', hair:'#D8B27E', hairDark:'#B8925F', brow:'#B08A57', eye:'#1F9FB4', lip:'#D14A3C', cloth:'#E8B4EE', clothDark:'#D293DA', collar:'tee', lashes:true },
+    { id:'hero-m', style:'spiky', fringe:'short', hair:'#4A3327', hairDark:'#33231B', brow:'#3B291F', eye:'#7A5A3A', lip:'#B4574F', cloth:'#5C3340', clothDark:'#472833', collar:'shirt' },
+    { id:'kurator', style:'bob', fringe:'part', hair:'#7A4A22', hairDark:'#5C3517', brow:'#5E3A1C', eye:'#C99A22', lip:'#C77D77', cloth:'#F2EE9E', clothDark:'#DED77C', clothInner:'#FFFDF0', collar:'blazer', lashes:true },
+    { id:'director-college', style:'wavy', fringe:'part', hair:'#B99A6E', hairDark:'#8F7449', brow:'#9A7F55', eye:'#C7A227', lip:'#C4787C', cloth:'#33502F', clothDark:'#263D23', clothInner:'#F4F6EF', collar:'blazer', glasses:'#2E2A33', lashes:true },
+    { id:'hr', style:'braid', fringe:'part', hair:'#3D3438', hairDark:'#2A2427', brow:'#332B2E', eye:'#2E8B3F', lip:'#E0716B', cloth:'#7B27C4', clothDark:'#671FA8', clothInner:'#F1E6FA', collar:'hoodie', lashes:true },
+    { id:'director-company', style:'ponytail', fringe:'bangs', hair:'#B99B72', hairDark:'#94764F', brow:'#9C8058', eye:'#1E8A93', lip:'#CE4A32', cloth:'#7FC0DC', clothDark:'#63A6C4', collar:'shirt', lashes:true },
+    { id:'mentor', style:'bob', fringe:'part', hair:'#241D22', hairDark:'#100C10', brow:'#1D171B', eye:'#3C9A55', lip:'#C63A2C', cloth:'#6B4630', clothDark:'#54351F', clothInner:'#F3EAE2', collar:'blazer', glasses:'#8FB8D6', glassesRound:true, lashes:true }
+  ];
+  const SKIN = '#F7D2BC', SKIN_SHADE = '#E9B99F', INK = '#111111';
+
+  const canvas = document.getElementById('c');
+  let renderer;
+  try {
+    renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+  } catch (e) { stage.classList.add('is-broken'); return; }
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.outputEncoding = THREE.sRGBEncoding;
+
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color('#FFF3D6');
+  const camera = new THREE.PerspectiveCamera(30, 16 / 9, 0.1, 100);
+  camera.position.set(0, 3.4, 15.5);
+  camera.lookAt(0, 1.6, 0);
+
+  scene.add(new THREE.HemisphereLight(0xffffff, 0xe8d6b8, 0.85));
+  const sun = new THREE.DirectionalLight(0xffffff, 0.9);
+  sun.position.set(5, 9, 7);
+  sun.castShadow = true;
+  sun.shadow.mapSize.set(2048, 2048);
+  sun.shadow.camera.left = -12; sun.shadow.camera.right = 12;
+  sun.shadow.camera.top = 8; sun.shadow.camera.bottom = -4;
+  sun.shadow.bias = -0.0005;
+  scene.add(sun);
+
+  const ground = new THREE.Mesh(new THREE.PlaneGeometry(60, 60), new THREE.ShadowMaterial({ opacity: 0.16 }));
+  ground.rotation.x = -Math.PI / 2;
+  ground.receiveShadow = true;
+  scene.add(ground);
+
+  // Три тона света — тун-шейдинг.
+  const grad = new THREE.DataTexture(new Uint8Array([90, 90, 90, 175, 175, 175, 255, 255, 255]), 3, 1, THREE.RGBFormat);
+  grad.minFilter = grad.magFilter = THREE.NearestFilter;
+  grad.needsUpdate = true;
+  const toon = color => new THREE.MeshToonMaterial({ color: new THREE.Color(color), gradientMap: grad });
+  const outlineMat = new THREE.MeshBasicMaterial({ color: INK, side: THREE.BackSide });
+  const outlines = [];
+
+  // Деталь с чернильным контуром: тот же меш, вывернутый и чуть увеличенный.
+  function part(geo, color, o) {
+    o = o || {};
+    const g = new THREE.Group();
+    const m = new THREE.Mesh(geo, toon(color));
+    m.castShadow = true;
+    g.add(m);
+    if (o.outline !== false) {
+      const line = new THREE.Mesh(geo, outlineMat);
+      line.scale.setScalar(1 + (o.ow || 0.045));
+      outlines.push(line);
+      g.add(line);
+    }
+    return g;
+  }
+  function at(obj, x, y, z) { obj.position.set(x, y, z); return obj; }
+
+  function makeHair(c, head) {
+    const h = new THREE.Group();
+    const capLen = c.fringe === 'short' ? 0.46 : 0.54;
+    h.add(part(new THREE.SphereGeometry(1.07, 32, 20, 0, Math.PI * 2, 0, Math.PI * capLen), c.hair));
+
+    if (c.fringe === 'bangs') {
+      const b = part(new THREE.SphereGeometry(0.5, 20, 14), c.hair); b.scale.set(1.9, 0.5, 0.7); at(b, 0, 0.5, 0.72); h.add(b);
+    } else if (c.fringe === 'part') {
+      for (const s of [-1, 1]) {
+        const b = part(new THREE.SphereGeometry(0.42, 20, 14), c.hair); b.scale.set(1.35, 0.5, 0.7);
+        at(b, s * 0.5, 0.55, 0.72); b.rotation.z = -s * 0.35; h.add(b);
+      }
+    }
+
+    // Затылок и бока — замкнутый шар чуть позади головы: лицо выступает из него спереди.
+    const mass = (scaleY, dropY, r) => {
+      const g = part(new THREE.SphereGeometry(r, 32, 22), c.hair, { ow: 0.035 });
+      g.scale.set(1, scaleY, 0.95);
+      at(g, 0, dropY, -0.3);
+      return g;
+    };
+    switch (c.style) {
+      case 'buns':
+        for (const s of [-1, 1]) h.add(at(part(new THREE.SphereGeometry(0.36, 20, 14), c.hair), s * 0.82, 0.78, -0.15));
+        break;
+      case 'spiky':
+        for (let i = 0; i < 5; i++) {
+          const cone = part(new THREE.ConeGeometry(0.2, 0.55, 12), c.hair);
+          const a = (i - 2) * 0.32;
+          at(cone, Math.sin(a) * 0.75, 0.95 + Math.cos(a) * 0.25, -0.1);
+          cone.rotation.z = -a * 1.1;
+          h.add(cone);
+        }
+        break;
+      case 'bob':
+        h.add(mass(1.22, -0.18, 1.08));
+        break;
+      case 'long':
+        h.add(mass(1.7, -0.62, 1.1));
+        break;
+      case 'wavy':
+        h.add(mass(1.45, -0.45, 1.1));
+        for (const s of [-1, 1]) for (let i = 0; i < 3; i++) {
+          const w = part(new THREE.SphereGeometry(0.3, 16, 12), c.hair);
+          at(w, s * (1.12 + (i % 2) * 0.1), -0.2 - i * 0.5, -0.2 + (i % 2) * 0.3);
+          h.add(w);
+        }
+        break;
+      case 'ponytail': {
+        const band = part(new THREE.TorusGeometry(0.2, 0.06, 8, 16), c.hairDark);
+        at(band, 0, 0.35, -0.98);
+        h.add(band);
+        const tail = part(new THREE.CylinderGeometry(0.16, 0.24, 1.3, 14), c.hair);
+        at(tail, 0.05, -0.3, -1.05); tail.rotation.x = -0.35; tail.rotation.z = 0.15;
+        h.add(tail);
+        h.add(at(part(new THREE.SphereGeometry(0.26, 14, 10), c.hair), 0.12, -0.95, -1.15));
+        break;
+      }
+      case 'braid':
+        h.add(mass(1.1, -0.1, 1.08));
+        for (let i = 0; i < 4; i++) {
+          const bead = part(new THREE.SphereGeometry(0.22 - i * 0.02, 14, 10), c.hair);
+          at(bead, -0.74 - i * 0.04, -0.62 - i * 0.36, 0.42 + i * 0.08);
+          h.add(bead);
+        }
+        break;
+    }
+    head.add(h);
+    return h;
+  }
+
+  function makeCharacter(c) {
+    const root = new THREE.Group();
+
+    // ноги и ботинки
+    for (const s of [-1, 1]) {
+      root.add(at(part(new THREE.CylinderGeometry(0.17, 0.17, 0.4, 16), c.clothDark), s * 0.24, 0.22, 0));
+      const shoe = part(new THREE.SphereGeometry(0.22, 16, 12), '#3A2A2A'); shoe.scale.set(1, 0.6, 1.35);
+      root.add(at(shoe, s * 0.24, 0.1, 0.06));
+    }
+    // тело-бочонок
+    root.add(at(part(new THREE.CylinderGeometry(0.46, 0.54, 0.95, 28), c.cloth), 0, 0.9, 0));
+    const belly = part(new THREE.SphereGeometry(0.54, 28, 16), c.cloth); belly.scale.set(1, 0.45, 1);
+    root.add(at(belly, 0, 0.44, 0));
+    // руки
+    for (const s of [-1, 1]) {
+      const arm = part(new THREE.CylinderGeometry(0.13, 0.13, 0.62, 12), c.cloth);
+      at(arm, s * 0.64, 1.0, 0); arm.rotation.z = s * 0.18; root.add(arm);
+      root.add(at(part(new THREE.SphereGeometry(0.15, 12, 10), SKIN), s * 0.7, 0.66, 0));
+    }
+    // воротник
+    if (c.collar === 'hoodie') {
+      const hood = at(part(new THREE.TorusGeometry(0.44, 0.1, 10, 24), c.clothDark), 0, 1.36, 0);
+      hood.rotation.x = Math.PI / 2;
+      root.add(hood);
+    } else if (c.collar === 'blazer') {
+      const v = part(new THREE.ConeGeometry(0.26, 0.5, 3), c.clothInner || '#FFFFFF', { outline: false });
+      at(v, 0, 1.14, 0.44); v.rotation.x = Math.PI; v.rotation.y = Math.PI / 6; root.add(v);
+      for (const s of [-1, 1]) {
+        const lapel = part(new THREE.BoxGeometry(0.22, 0.42, 0.06), c.clothDark, { outline: false });
+        at(lapel, s * 0.22, 1.16, 0.47); lapel.rotation.z = -s * 0.5; root.add(lapel);
+      }
+    } else if (c.collar === 'shirt') {
+      for (const s of [-1, 1]) {
+        const tip = part(new THREE.BoxGeometry(0.2, 0.22, 0.05), c.clothDark, { outline: false });
+        at(tip, s * 0.17, 1.3, 0.46); tip.rotation.z = -s * 0.7; root.add(tip);
+      }
+    }
+
+    // голова
+    const head = new THREE.Group();
+    at(head, 0, 2.2, 0);
+    root.add(head);
+    head.add(part(new THREE.SphereGeometry(1, 36, 26), SKIN));
+    for (const s of [-1, 1]) {
+      const ear = part(new THREE.SphereGeometry(0.17, 12, 10), SKIN); ear.scale.set(0.55, 1, 1);
+      head.add(at(ear, s * 0.99, -0.05, 0));
+    }
+    // глаза-точки
+    const eyes = [];
+    for (const s of [-1, 1]) {
+      const eye = part(new THREE.SphereGeometry(0.13, 16, 12), INK, { outline: false });
+      eye.scale.set(1, 1.4, 0.35); at(eye, s * 0.37, 0.04, 0.93); head.add(eye); eyes.push(eye);
+      const iris = new THREE.Mesh(new THREE.SphereGeometry(0.075, 12, 10), new THREE.MeshBasicMaterial({ color: c.eye }));
+      iris.scale.set(1, 1.3, 0.3); at(iris, s * 0.37, 0.0, 0.985); head.add(iris);
+      const hl = new THREE.Mesh(new THREE.SphereGeometry(0.045, 10, 8), new THREE.MeshBasicMaterial({ color: '#ffffff' }));
+      at(hl, s * 0.37 + 0.05, 0.11, 1.03); head.add(hl);
+      if (c.lashes) {
+        const lash = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.035, 0.03), new THREE.MeshBasicMaterial({ color: INK }));
+        at(lash, s * 0.37, 0.24, 0.96); lash.rotation.z = -s * 0.25; head.add(lash);
+      }
+    }
+    // нос и румянец
+    head.add(at(part(new THREE.SphereGeometry(0.07, 10, 8), SKIN_SHADE, { outline: false }), 0, -0.14, 1.0));
+    for (const s of [-1, 1]) {
+      const blush = new THREE.Mesh(new THREE.CircleGeometry(0.12, 16), new THREE.MeshBasicMaterial({ color: '#F08A8A', transparent: true, opacity: 0.45 }));
+      at(blush, s * 0.62, -0.22, 0.79); blush.lookAt(s * 3, -1, 4); head.add(blush);
+    }
+    // брови
+    const brows = [];
+    for (const s of [-1, 1]) {
+      const brow = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.065, 0.05), new THREE.MeshBasicMaterial({ color: c.brow }));
+      at(brow, s * 0.37, 0.42, 0.9); brow.userData.side = s; head.add(brow); brows.push(brow);
+    }
+    // рот: пять вариантов, показывается один
+    const mouthY = -0.42, mouthZ = 0.92;
+    const arc = (r, tube, flip) => {
+      const m = new THREE.Mesh(new THREE.TorusGeometry(r, tube, 8, 20, Math.PI), new THREE.MeshBasicMaterial({ color: c.lip }));
+      m.rotation.z = flip ? 0 : Math.PI; return m;
+    };
+    const mouths = {
+      neutral: at(arc(0.09, 0.028, false), 0, mouthY + 0.02, mouthZ),
+      smile: at(arc(0.17, 0.032, false), 0, mouthY + 0.05, mouthZ),
+      worry: at(arc(0.12, 0.03, true), 0, mouthY - 0.05, mouthZ),
+      stern: at(new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.05, 0.04), new THREE.MeshBasicMaterial({ color: c.lip })), 0, mouthY, mouthZ),
+      joy: (() => {
+        const g = new THREE.Group();
+        const open = new THREE.Mesh(new THREE.SphereGeometry(0.17, 16, 12), new THREE.MeshBasicMaterial({ color: '#7A2E33' }));
+        open.scale.set(1.1, 0.75, 0.4); g.add(open);
+        const teeth = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.07, 0.06), new THREE.MeshBasicMaterial({ color: '#ffffff' }));
+        at(teeth, 0, 0.07, 0.06); g.add(teeth);
+        g.add(at(arc(0.19, 0.03, false), 0, 0.06, 0.02));
+        return at(g, 0, mouthY, mouthZ);
+      })()
+    };
+    for (const k in mouths) { mouths[k].visible = false; head.add(mouths[k]); }
+
+    makeHair(c, head);
+
+    // очки
+    if (c.glasses) {
+      const gm = new THREE.MeshBasicMaterial({ color: c.glasses });
+      for (const s of [-1, 1]) {
+        const ring = new THREE.Mesh(new THREE.TorusGeometry(0.2, 0.025, 8, c.glassesRound ? 24 : 4), gm);
+        at(ring, s * 0.37, 0.06, 0.98); if (!c.glassesRound) ring.rotation.z = Math.PI / 4; head.add(ring);
+      }
+      head.add(at(new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.03, 0.03), gm), 0, 0.08, 1.0));
+      for (const s of [-1, 1]) {
+        const temple = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.03, 0.7), gm);
+        at(temple, s * 0.6, 0.08, 0.66); head.add(temple);
+      }
+    }
+
+    const ch = { root, head, eyes, brows, mouths, emotion: 'neutral' };
+    setEmotion(ch, 'neutral');
+    return ch;
+  }
+
+  function setEmotion(ch, emo) {
+    ch.emotion = emo;
+    for (const k in ch.mouths) ch.mouths[k].visible = k === emo;
+    const tilt = { neutral: 0, smile: 0.06, joy: 0.14, worry: -0.38, stern: 0.4 }[emo];
+    const lift = { neutral: 0, smile: 0.03, joy: 0.07, worry: 0.06, stern: -0.08 }[emo];
+    for (const b of ch.brows) { b.rotation.z = tilt * b.userData.side; b.position.y = 0.42 + lift; }
+    for (const e of ch.eyes) {
+      e.scale.y = emo === 'joy' ? 0.35 : emo === 'worry' ? 1.6 : 1.4;
+      e.position.y = emo === 'joy' ? 0.12 : 0.04;
+    }
+  }
+
+  const lineup = new THREE.Group();
+  scene.add(lineup);
+  const cast = CAST.map((c, i) => {
+    const ch = makeCharacter(c);
+    ch.root.position.x = (i - 3) * 2.55;
+    lineup.add(ch.root);
+    return ch;
+  });
+
+  // Управление: эмоции, контур, поворот мышью или пальцем.
+  document.getElementById('hud').addEventListener('click', e => {
+    const b = e.target.closest('[data-emo]');
+    if (!b) return;
+    document.querySelectorAll('[data-emo]').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    for (const ch of cast) setEmotion(ch, b.dataset.emo);
+  });
+  const outlineBtn = document.getElementById('outline');
+  outlineBtn.addEventListener('click', () => {
+    const on = outlineBtn.getAttribute('aria-pressed') !== 'true';
+    outlineBtn.setAttribute('aria-pressed', String(on));
+    for (const o of outlines) o.visible = on;
+  });
+
+  let dragging = false, lastX = 0, targetYaw = 0, yaw = 0;
+  canvas.addEventListener('pointerdown', e => { dragging = true; lastX = e.clientX; canvas.setPointerCapture(e.pointerId); });
+  canvas.addEventListener('pointermove', e => { if (!dragging) return; targetYaw += (e.clientX - lastX) * 0.006; lastX = e.clientX; });
+  canvas.addEventListener('pointerup', () => { dragging = false; });
+  canvas.addEventListener('pointercancel', () => { dragging = false; });
+
+  function resize() {
+    const w = canvas.clientWidth, h = canvas.clientHeight;
+    if (canvas.width !== Math.floor(w * renderer.getPixelRatio()) || canvas.height !== Math.floor(h * renderer.getPixelRatio())) {
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+    }
+  }
+
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const clock = new THREE.Clock();
+  function frame() {
+    resize();
+    const t = clock.getElapsedTime();
+    yaw += (targetYaw - yaw) * 0.12;
+    lineup.rotation.y = yaw;
+    if (!reduced) {
+      cast.forEach((ch, i) => {
+        ch.root.position.y = Math.sin(t * 2.1 + i * 0.9) * 0.035;
+        ch.head.rotation.y = Math.sin(t * 0.6 + i) * 0.16;
+        ch.head.rotation.z = Math.sin(t * 0.9 + i * 1.7) * 0.04;
+      });
+    }
+    renderer.render(scene, camera);
+    requestAnimationFrame(frame);
+  }
+  frame();
+})();
+</script>

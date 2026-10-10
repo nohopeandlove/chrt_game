@@ -1,0 +1,975 @@
+<title>Я — специалист</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+
+<style>
+:root{
+  --ground:#EFEDF5;
+  --panel:#FFFFFF;
+  --panel-2:#F7F5FC;
+  --line:#DCD6EC;
+  --line-strong:#C4BBDF;
+  --ink:#191430;
+  --ink-2:#4B4369;
+  --ink-3:#79719A;
+  --accent:#5B3FD6;
+  --accent-soft:#EBE5FF;
+  --warm:#CE5C33;
+  --warm-soft:#FAE7DD;
+  --ok:#197A5E;
+  --ok-soft:#DFF1EA;
+  --warn:#A87510;
+  --warn-soft:#F8EED6;
+  --bad:#B23A2B;
+  --bad-soft:#FBE3DF;
+  --shadow:0 1px 2px rgba(25,20,48,.05), 0 8px 24px -16px rgba(25,20,48,.35);
+  --display:"Unbounded","Trebuchet MS",sans-serif;
+  --body:"Literata",Georgia,"Times New Roman",serif;
+  --mono:"JetBrains Mono","Consolas",monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#131022;
+    --panel:#1B1734;
+    --panel-2:#221D3E;
+    --line:#332C56;
+    --line-strong:#4A4174;
+    --ink:#EEEBF8;
+    --ink-2:#BCB4D8;
+    --ink-3:#8C84AE;
+    --accent:#A992FF;
+    --accent-soft:#2B2354;
+    --warm:#F0895D;
+    --warm-soft:#3B2318;
+    --ok:#54C9A0;
+    --ok-soft:#12312A;
+    --warn:#E2B653;
+    --warn-soft:#332812;
+    --bad:#F0796A;
+    --bad-soft:#3A1D1B;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 28px -18px rgba(0,0,0,.9);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#131022;
+  --panel:#1B1734;
+  --panel-2:#221D3E;
+  --line:#332C56;
+  --line-strong:#4A4174;
+  --ink:#EEEBF8;
+  --ink-2:#BCB4D8;
+  --ink-3:#8C84AE;
+  --accent:#A992FF;
+  --accent-soft:#2B2354;
+  --warm:#F0895D;
+  --warm-soft:#3B2318;
+  --ok:#54C9A0;
+  --ok-soft:#12312A;
+  --warn:#E2B653;
+  --warn-soft:#332812;
+  --bad:#F0796A;
+  --bad-soft:#3A1D1B;
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 28px -18px rgba(0,0,0,.9);
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--ground);
+  color:var(--ink);
+  font-family:var(--body);
+  font-size:16px;
+  line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px 96px}
+.prose{max-width:68ch}
+
+h1,h2,h3,h4{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.15;letter-spacing:-.02em}
+h1{font-size:clamp(38px,6vw,64px);font-weight:700}
+h2{font-size:clamp(24px,3.2vw,32px);font-weight:700}
+h3{font-size:19px;font-weight:600;letter-spacing:-.01em}
+h4{font-size:15px;font-weight:600}
+p{margin:0}
+a{color:var(--accent)}
+
+.eyebrow{
+  font-family:var(--mono);font-size:11px;font-weight:500;
+  text-transform:uppercase;letter-spacing:.16em;color:var(--ink-3);
+}
+
+/* ---------- masthead ---------- */
+.masthead{padding:56px 0 28px;display:flex;flex-direction:column;gap:18px}
+.lede{font-size:19px;color:var(--ink-2);max-width:62ch}
+.lede b{color:var(--ink);font-weight:600}
+.meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.chip{
+  font-family:var(--mono);font-size:12px;letter-spacing:.02em;
+  background:var(--panel);border:1px solid var(--line);border-radius:999px;
+  padding:5px 12px;color:var(--ink-2);
+}
+.chip b{color:var(--ink);font-weight:700}
+
+/* ---------- nav ---------- */
+nav.toc{
+  position:sticky;top:0;z-index:20;
+  background:color-mix(in srgb, var(--ground) 88%, transparent);
+  backdrop-filter:blur(10px);
+  border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+  margin-bottom:56px;
+}
+nav.toc ol{
+  list-style:none;margin:0;padding:10px 0;display:flex;gap:4px;
+  overflow-x:auto;max-width:1120px;margin:0 auto;padding-left:24px;padding-right:24px;
+}
+nav.toc a{
+  display:block;white-space:nowrap;text-decoration:none;
+  font-family:var(--mono);font-size:12px;color:var(--ink-2);
+  padding:5px 10px;border-radius:7px;
+}
+nav.toc a:hover{background:var(--accent-soft);color:var(--accent)}
+
+section{margin-bottom:72px;scroll-margin-top:64px}
+.sec-head{display:flex;flex-direction:column;gap:10px;margin-bottom:26px}
+.sec-head p{color:var(--ink-2);max-width:66ch}
+
+/* ---------- generic blocks ---------- */
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px 24px}
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(228px,1fr))}
+
+figure{margin:0;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:24px 20px 16px;overflow-x:auto}
+figure svg{display:block;width:100%;height:auto;min-width:520px;color:var(--ink-2)}
+figcaption{margin-top:14px;font-size:14px;color:var(--ink-3);max-width:70ch;min-width:520px}
+
+table{border-collapse:collapse;width:100%;font-size:14px;font-family:var(--mono);font-weight:400}
+.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:var(--panel)}
+th{
+  text-align:left;font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.11em;
+  color:var(--ink-3);padding:12px 14px;border-bottom:1px solid var(--line);white-space:nowrap;
+}
+td{padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--ink-2)}
+tr:last-child td{border-bottom:none}
+td.name{color:var(--ink);font-weight:500}
+td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:5px;font-weight:500;white-space:nowrap}
+.t-real{background:var(--ok-soft);color:var(--ok)}
+.t-trap{background:var(--warn-soft);color:var(--warn)}
+.t-scam{background:var(--bad-soft);color:var(--bad)}
+.word{color:var(--accent);font-weight:700}
+
+/* ---------- stat list ---------- */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.stat{background:var(--panel);padding:16px 18px;display:flex;flex-direction:column;gap:4px}
+.stat .k{font-family:var(--mono);font-size:12px;color:var(--accent);letter-spacing:.02em}
+.stat .v{font-size:14px;color:var(--ink-2);line-height:1.5}
+
+/* ---------- cast ---------- */
+.cast{display:flex;flex-direction:column;gap:20px}
+.sheet{
+  background:var(--panel);border:1px solid var(--line);border-radius:16px;
+  display:grid;grid-template-columns:236px 1fr;gap:0;overflow:hidden;
+}
+@media (max-width:760px){.sheet{grid-template-columns:1fr}}
+.sheet .art{
+  border-right:1px solid var(--line);padding:20px 18px;
+  display:flex;flex-direction:column;gap:12px;align-items:center;
+  background:var(--panel-2);
+}
+@media (max-width:760px){.sheet .art{border-right:none;border-bottom:1px solid var(--line)}}
+.portrait{width:100%;max-width:200px;aspect-ratio:5/6;border-radius:12px;overflow:hidden;display:block}
+.portrait svg{width:100%;height:100%;display:block}
+.emos{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.emo{
+  width:44px;height:44px;padding:0;border-radius:9px;cursor:pointer;
+  border:1px solid var(--line);background:var(--panel);overflow:hidden;line-height:0;
+}
+.emo svg{width:100%;height:100%;display:block}
+.emo[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+.emo:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.emo-label{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+
+.sheet .info{padding:22px 24px;display:flex;flex-direction:column;gap:14px}
+.who{display:flex;flex-wrap:wrap;align-items:baseline;gap:10px}
+.who h3{font-family:var(--display)}
+.role{font-family:var(--mono);font-size:12px;color:var(--warm);letter-spacing:.03em}
+.scenes{font-family:var(--mono);font-size:11px;color:var(--ink-3);letter-spacing:.04em}
+.info p{font-size:15px;color:var(--ink-2)}
+.info .voice{
+  border-left:2px solid var(--accent);padding-left:14px;
+  font-style:italic;color:var(--ink);font-size:15px;
+}
+.spec{display:flex;flex-wrap:wrap;gap:18px;margin-top:2px}
+.spec>div{display:flex;flex-direction:column;gap:5px}
+.spec dt{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-3)}
+.spec dd{margin:0;font-size:13px;color:var(--ink-2);font-family:var(--mono)}
+.sw{display:flex;gap:5px}
+.sw i{width:22px;height:22px;border-radius:6px;border:1px solid rgba(0,0,0,.12);display:block}
+.note{
+  font-size:13.5px;color:var(--ink-2);background:var(--accent-soft);
+  border-radius:9px;padding:10px 13px;
+}
+.note b{color:var(--ink)}
+
+/* ---------- timeline ---------- */
+.tl{display:flex;flex-direction:column;gap:0;counter-reset:step}
+.step{
+  display:grid;grid-template-columns:64px 1fr;gap:20px;
+  padding:20px 0;border-top:1px solid var(--line);
+}
+.step:last-child{border-bottom:1px solid var(--line)}
+.step .n{
+  font-family:var(--mono);font-size:13px;font-weight:700;color:var(--accent);
+  padding-top:2px;letter-spacing:.04em;
+}
+.step h3{margin-bottom:6px}
+.step p{font-size:15px;color:var(--ink-2);max-width:64ch}
+.dod{
+  margin-top:9px;font-family:var(--mono);font-size:12.5px;color:var(--ink-3);
+  display:flex;gap:8px;align-items:baseline;
+}
+.dod b{color:var(--ok);font-weight:500;white-space:nowrap}
+
+/* ---------- fix list ---------- */
+.fixes{display:flex;flex-direction:column;gap:0}
+.fix{display:grid;grid-template-columns:112px 1fr;gap:18px;padding:16px 0;border-top:1px solid var(--line)}
+.fix:last-child{border-bottom:1px solid var(--line)}
+.fix .kind{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding-top:3px}
+.k-fact{color:var(--bad)}
+.k-text{color:var(--warn)}
+.k-logic{color:var(--accent)}
+.fix p{font-size:15px;color:var(--ink-2);max-width:70ch}
+.fix p b{color:var(--ink);font-weight:600}
+.fix .where{font-family:var(--mono);font-size:12px;color:var(--ink-3);display:block;margin-top:4px}
+
+ul.plain{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:9px}
+ul.plain li{padding-left:20px;position:relative;font-size:15px;color:var(--ink-2)}
+ul.plain li::before{content:"";position:absolute;left:4px;top:.62em;width:6px;height:6px;border-radius:2px;background:var(--line-strong)}
+ul.plain li b{color:var(--ink);font-weight:600}
+
+.q{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:baseline;padding:14px 0;border-top:1px solid var(--line)}
+.q:last-child{border-bottom:1px solid var(--line)}
+.q .mark{font-family:var(--display);font-size:16px;color:var(--warm);font-weight:700}
+.q p{font-size:15px;color:var(--ink-2)}
+.q b{color:var(--ink);font-weight:600}
+
+footer{border-top:1px solid var(--line);padding-top:24px;color:var(--ink-3);font-size:14px;max-width:70ch}
+
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <span class="eyebrow">ГБПОУ «Челябинский радиотехнический техникум» · образовательный проект И. Р. Ганеевой</span>
+    <h1>Я&nbsp;— специалист</h1>
+    <p class="lede">Игра-симулятор о первых шагах в профессии: от выпускного до первого рабочего дня. Здесь — <b>план разработки</b> и <b>дизайны персонажей</b>, собранные по сценарию из Приложения&nbsp;3.</p>
+    <div class="meta">
+      <span class="chip">жанр <b>визуальная новелла + мини-игры</b></span>
+      <span class="chip">прохождение <b>25–35 мин</b></span>
+      <span class="chip">сцен <b>8</b></span>
+      <span class="chip">вакансий <b>10</b></span>
+      <span class="chip">наборов тестов <b>4</b></span>
+      <span class="chip">персонажей <b>7</b></span>
+    </div>
+  </header>
+
+  <nav class="toc" aria-label="Разделы">
+    <ol>
+      <li><a href="#route">Маршрут игрока</a></li>
+      <li><a href="#systems">Игровые системы</a></li>
+      <li><a href="#jobs">Вакансии</a></li>
+      <li><a href="#cast">Персонажи</a></li>
+      <li><a href="#places">Локации</a></li>
+      <li><a href="#screens">Экраны</a></li>
+      <li><a href="#plan">План работ</a></li>
+      <li><a href="#fixes">Правки к сценарию</a></li>
+      <li><a href="#open">Рамки проекта</a></li>
+    </ol>
+  </nav>
+
+  <!-- ===================== МАРШРУТ ===================== -->
+  <section id="route">
+    <div class="sec-head">
+      <span class="eyebrow">Структура</span>
+      <h2>Маршрут игрока</h2>
+      <p>Игра линейна ровно до собеседования. Дальше появляется единственная петля: провалил разговор с HR — возвращаешься к доске вакансий, но уже с опытом. Это ядро всей механики, и его стоит собрать первым.</p>
+    </div>
+
+    <figure>
+      <svg viewBox="0 0 760 356" role="img" aria-label="Схема маршрута: пролог, портфолио, резюме, вакансии, тестовое задание, собеседование; при успехе — оформление, первый день, финал; при неудаче — возврат к доске вакансий">
+        <defs>
+          <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+          </marker>
+          <marker id="arA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#5B3FD6"/>
+          </marker>
+        </defs>
+
+        <!-- row 1 -->
+        <g fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="30" y="40" width="150" height="52" rx="10"/>
+          <rect x="280" y="40" width="150" height="52" rx="10"/>
+          <rect x="530" y="40" width="150" height="52" rx="10"/>
+          <rect x="530" y="150" width="150" height="52" rx="10"/>
+          <rect x="280" y="150" width="150" height="52" rx="10"/>
+          <rect x="30" y="150" width="150" height="52" rx="10"/>
+          <rect x="30" y="262" width="150" height="52" rx="10"/>
+          <rect x="280" y="262" width="150" height="52" rx="10"/>
+        </g>
+        <rect x="530" y="262" width="150" height="52" rx="10" fill="none" stroke="#5B3FD6" stroke-width="2"/>
+
+        <g font-size="12.5" fill="currentColor" text-anchor="middle" font-family="Literata, Georgia, serif">
+          <text x="105" y="62">Пролог</text><text x="105" y="79" font-size="11" opacity=".72">выпускной</text>
+          <text x="355" y="62">1. Портфолио</text><text x="355" y="79" font-size="11" opacity=".72">комната героя</text>
+          <text x="605" y="62">2. Резюме</text><text x="605" y="79" font-size="11" opacity=".72">форма</text>
+          <text x="605" y="172">3. Вакансии</text><text x="605" y="189" font-size="11" opacity=".72">доска, 10 карточек</text>
+          <text x="355" y="172">4. Тестовое</text><text x="355" y="189" font-size="11" opacity=".72">4 вопроса</text>
+          <text x="105" y="172">5. Собеседование</text><text x="105" y="189" font-size="11" opacity=".72">5 вопросов, HR</text>
+          <text x="105" y="284">6. Оформление</text><text x="105" y="301" font-size="11" opacity=".72">трудовые отношения</text>
+          <text x="355" y="284">7. Первый день</text><text x="355" y="301" font-size="11" opacity=".72">задача от наставника</text>
+          <text x="605" y="284" fill="#5B3FD6" font-weight="600">Финал</text><text x="605" y="301" font-size="11" fill="#5B3FD6" opacity=".8">итоги и достижения</text>
+        </g>
+
+        <!-- arrows row1 -->
+        <g stroke="currentColor" stroke-width="1.5" fill="none" marker-end="url(#ar)">
+          <path d="M180,66 H272"/>
+          <path d="M430,66 H522"/>
+          <path d="M680,92 V116 H605 V142"/>
+          <path d="M530,176 H438"/>
+          <path d="M280,176 H188"/>
+          <path d="M70,202 V254"/>
+          <path d="M180,288 H272"/>
+          <path d="M430,288 H522"/>
+        </g>
+        <!-- retry loop -->
+        <path d="M140,202 V232 H605 V210" fill="none" stroke="#5B3FD6" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#arA)"/>
+
+        <g font-family="JetBrains Mono, monospace" font-size="10.5" fill="currentColor" opacity=".85" text-anchor="middle">
+          <text x="226" y="58">стиль поведения</text>
+          <text x="476" y="58">качество портфолио</text>
+          <text x="484" y="168">слово ✓ + профиль ✓</text>
+          <text x="234" y="168">тест пройден</text>
+          <text x="355" y="227" fill="#5B3FD6">собеседование не удалось → «Новые попытки»</text>
+          <text x="226" y="280">оффер</text>
+          <text x="476" y="280">рабочий день закрыт</text>
+        </g>
+        <g font-family="JetBrains Mono, monospace" font-size="10.5" fill="currentColor" opacity=".85">
+          <text x="616" y="110">специальность</text>
+          <text x="78" y="232" text-anchor="end">успех</text>
+        </g>
+      </svg>
+      <figcaption>Сплошные стрелки — основной путь, пунктир — единственный возврат в игре. Всё, что игрок накопил (профиль, портфолио, шкалы), при возврате сохраняется: меняется только доступный набор вакансий и реплики HR.</figcaption>
+    </figure>
+
+    <figure style="margin-top:16px">
+      <svg viewBox="0 0 640 452" role="img" aria-label="Схема проверки отклика на вакансию: ловушка, мошенники, соответствие специальности, секретное слово — и только затем приглашение на тестовое задание">
+        <g fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="30" y="10" width="210" height="44" rx="9"/>
+          <rect x="30" y="84" width="210" height="44" rx="9"/>
+          <rect x="30" y="158" width="210" height="44" rx="9"/>
+          <rect x="30" y="232" width="210" height="44" rx="9"/>
+          <rect x="30" y="306" width="210" height="44" rx="9"/>
+        </g>
+        <rect x="30" y="380" width="210" height="44" rx="9" fill="none" stroke="#5B3FD6" stroke-width="2"/>
+
+        <rect x="330" y="84" width="290" height="44" rx="9" fill="none" stroke="currentColor" stroke-width="1.2" opacity=".55"/>
+        <rect x="330" y="158" width="290" height="44" rx="9" fill="none" stroke="#B23A2B" stroke-width="1.6"/>
+        <rect x="330" y="232" width="290" height="44" rx="9" fill="none" stroke="currentColor" stroke-width="1.2" opacity=".55"/>
+        <rect x="330" y="306" width="290" height="44" rx="9" fill="none" stroke="currentColor" stroke-width="1.2" opacity=".55"/>
+
+        <g font-family="Literata, Georgia, serif" font-size="12.5" fill="currentColor">
+          <text x="46" y="38">Игрок нажал «Откликнуться»</text>
+          <text x="46" y="112">Это вакансия-ловушка?</text>
+          <text x="46" y="186">Просят данные карты?</text>
+          <text x="46" y="260">Специальность подходит?</text>
+          <text x="46" y="334">Секретное слово в письме?</text>
+          <text x="46" y="408" fill="#5B3FD6" font-weight="600">Приглашение на тестовое</text>
+          <text x="346" y="105" opacity=".8">«Опыт в охране от 100 лет»</text>
+          <text x="346" y="120" opacity=".8" font-size="11">или «вакансия уже закрыта»</text>
+          <text x="346" y="179" fill="#B23A2B" font-weight="600">Стоп. Это мошенники</text>
+          <text x="346" y="194" fill="#B23A2B" font-size="11" opacity=".85">карту не вводим — экран-предупреждение</text>
+          <text x="346" y="253" opacity=".8">«Кажется, ваша специальность</text>
+          <text x="346" y="268" opacity=".8">нам не подходит»</text>
+          <text x="346" y="327" opacity=".8">«Рекомендуем внимательнее</text>
+          <text x="346" y="342" opacity=".8">прочитать описание вакансии»</text>
+        </g>
+
+        <g stroke="currentColor" stroke-width="1.5" fill="none" marker-end="url(#ar)">
+          <path d="M135,54 V76"/>
+          <path d="M135,128 V150"/>
+          <path d="M135,202 V224"/>
+          <path d="M135,276 V298"/>
+        </g>
+        <path d="M135,350 V372" stroke="#5B3FD6" stroke-width="1.8" fill="none" marker-end="url(#arA)"/>
+        <g stroke="currentColor" stroke-width="1.3" fill="none" marker-end="url(#ar)" opacity=".7">
+          <path d="M240,106 H322"/>
+          <path d="M240,254 H322"/>
+          <path d="M240,328 H322"/>
+        </g>
+        <path d="M240,180 H322" stroke="#B23A2B" stroke-width="1.6" fill="none" marker-end="url(#ar)"/>
+
+        <g font-family="JetBrains Mono, monospace" font-size="10" fill="currentColor" opacity=".8">
+          <text x="144" y="70">нет</text><text x="144" y="144">нет</text>
+          <text x="144" y="218">да</text><text x="144" y="292">да</text>
+          <text x="144" y="366" fill="#5B3FD6">да</text>
+          <text x="262" y="99">да</text><text x="262" y="173" fill="#B23A2B">да</text>
+          <text x="262" y="247">нет</text><text x="262" y="321">нет</text>
+        </g>
+      </svg>
+      <figcaption>Порядок проверок важен: ловушки и мошенники отсекаются до всех остальных условий, иначе игрок с «неподходящей специальностью» никогда не увидит урок про банковскую карту — а это самая ценная часть сцены.</figcaption>
+    </figure>
+  </section>
+
+  <!-- ===================== СИСТЕМЫ ===================== -->
+  <section id="systems">
+    <div class="sec-head">
+      <span class="eyebrow">Механики</span>
+      <h2>Игровые системы</h2>
+      <p>В сценарии уже прописаны эффекты выборов — их достаточно, чтобы собрать компактную модель состояния. Никакой «прокачки»: шкалы влияют на реплики и на итоговый отчёт, а не блокируют прогресс.</p>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><span class="k">profile</span><span class="v">Имя, пол персонажа, специальность из резюме. Специальность — единственный жёсткий фильтр в игре: она решает, какие вакансии откликаются.</span></div>
+      <div class="stat"><span class="k">style</span><span class="v">Стиль поведения из пролога: активный · неуверенный · расслабленный. Переключает тон внутренних монологов во всех последующих сценах.</span></div>
+      <div class="stat"><span class="k">approach</span><span class="v">Подход к портфолио: ответственный · сбалансированный · поверхностный. Влияет на количество положительных откликов работодателей.</span></div>
+      <div class="stat"><span class="k">energy · mood</span><span class="v">Энергия и настроение, ±1…±3 за выбор. Чисто нарративные: меняют выражение лица героя и подсказки на экране.</span></div>
+      <div class="stat"><span class="k">confidence · reputation</span><span class="v">Уверенность и репутация. Растут на собеседовании и в первом рабочем дне, попадают в финальный отчёт.</span></div>
+      <div class="stat"><span class="k">law · responsibility</span><span class="v">Знание трудовых отношений (+3 за сцену 6), ответственность, осознанность, риск ошибок — итоги сцены оформления.</span></div>
+    </div>
+
+    <div class="grid g2" style="margin-top:16px">
+      <div class="panel">
+        <h3>Скоринг собеседования</h3>
+        <p style="color:var(--ink-2);font-size:15px;margin-top:8px">Пять вопросов, каждый ответ даёт <span class="chip" style="padding:1px 7px">+1</span> <span class="chip" style="padding:1px 7px">0</span> <span class="chip" style="padding:1px 7px">−1</span>. Решает большинство, а не сумма — так игрок с одним провальным ответом не теряет всю сцену.</p>
+        <ul class="plain" style="margin-top:12px">
+          <li><b>Большинство +1</b> → «Ждём вас завтра!» → сцена 6</li>
+          <li><b>Большинство 0</b> → «Мы рассмотрим вашу кандидатуру» → мягкий отказ, петля</li>
+          <li><b>Большинство −1</b> → «Свяжемся, если появится вакансия» → петля, HR запоминает</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h3>Достижения</h3>
+        <p style="color:var(--ink-2);font-size:15px;margin-top:8px">Четыре из сценария плюс три предложенных — они закрывают моменты, которые иначе никак не отмечаются.</p>
+        <ul class="plain" style="margin-top:12px">
+          <li>«Юридически подкован» — мини-тест без ошибок</li>
+          <li>«Закон и порядок» / «Гибкий работник» — выбор ТД или ГПХ</li>
+          <li>«Права? Не слышал…» — подписал не читая</li>
+          <li>🏅 «Первый рабочий день» — финал сцены 7</li>
+          <li><b>+ «Внимательный читатель»</b> — секретное слово с первой попытки</li>
+          <li><b>+ «Меня не проведёшь»</b> — открыл обе мошеннические вакансии и не ввёл карту</li>
+          <li><b>+ «Резюме на пять»</b> — форма заполнена на 100%</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== ВАКАНСИИ ===================== -->
+  <section id="jobs">
+    <div class="sec-head">
+      <span class="eyebrow">Контент сцены 3</span>
+      <h2>Доска вакансий</h2>
+      <p>Шесть настоящих вакансий с секретными словами, две вакансии-шутки и две мошеннические. Соотношение удачное: игрок обязательно наткнётся хотя бы на одну ловушку, пока ищет свою.</p>
+    </div>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Вакансия</th><th>Компания</th><th class="num">Оклад</th><th>Тип</th><th>Слово</th><th>Кому подходит</th></tr></thead>
+        <tbody>
+          <tr><td class="name">Full-stack разработчик</td><td>Тыблоко</td><td class="num">100 000 ₽</td><td><span class="tag t-real">реальная</span></td><td class="word">шиншилла</td><td>программирование</td></tr>
+          <tr><td class="name">Техник по защите информации</td><td>ИнфоГард</td><td class="num">90 000 ₽</td><td><span class="tag t-real">реальная</span></td><td class="word">кабачок</td><td>информационная безопасность</td></tr>
+          <tr><td class="name">Системный администратор</td><td>Инженерный центр</td><td class="num">90 000 ₽</td><td><span class="tag t-real">реальная</span></td><td class="word">дикобраз</td><td>сети и системное админ.</td></tr>
+          <tr><td class="name">Frontend разработчик</td><td>WebStudio</td><td class="num">80 000 ₽</td><td><span class="tag t-real">реальная</span></td><td class="word">цвет</td><td>программирование</td></tr>
+          <tr><td class="name">Сетевой инженер</td><td>NetCorp</td><td class="num">75 000 ₽</td><td><span class="tag t-real">реальная</span></td><td class="word">напиток</td><td>сети и системное админ.</td></tr>
+          <tr><td class="name">Специалист по рекламе</td><td>Reklamist</td><td class="num">70 000 ₽</td><td><span class="tag t-real">реальная</span></td><td class="word">дизайн</td><td>реклама</td></tr>
+          <tr><td class="name">Охранник</td><td>Семёрочка</td><td class="num">15 000 ₽</td><td><span class="tag t-trap">ловушка</span></td><td>—</td><td>«опыт от 100 лет»</td></tr>
+          <tr><td class="name">Дворник</td><td>ЖКХ</td><td class="num">10 000 ₽</td><td><span class="tag t-trap">ловушка</span></td><td>—</td><td>вакансия уже закрыта</td></tr>
+          <tr><td class="name">Удалённая работа</td><td>Международная компания</td><td class="num">150 000 ₽</td><td><span class="tag t-scam">мошенники</span></td><td>—</td><td>требует данные карты</td></tr>
+          <tr><td class="name">Быстрый заработок</td><td>Финансовая группа</td><td class="num">200 000 ₽</td><td><span class="tag t-scam">мошенники</span></td><td>—</td><td>требует карту и CVV</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:14px;color:var(--ink-3);margin-top:12px;max-width:70ch">Тестовых заданий четыре, а не десять: реклама · разработка (Full-stack и Frontend) · защита информации · админ и сети. По четыре вопроса в каждом — как в сценарии.</p>
+  </section>
+
+  <!-- ===================== ПЕРСОНАЖИ ===================== -->
+  <section id="cast">
+    <div class="sec-head">
+      <span class="eyebrow">Арт-байбл</span>
+      <h2>Персонажи</h2>
+      <p>Все семь — говорящие головы: фронтальный погрудный портрет на фоне локации, как в визуальных новеллах. Портреты ниже — не картинки, а параметрический SVG: силуэт причёски, палитра и набор эмоций описаны данными, поэтому эмоция переключается сменой трёх фигур, а весь актёрский состав весит меньше одного PNG.</p>
+    </div>
+    <div class="cast" id="cast-list"></div>
+    <div class="note" style="margin-top:20px;max-width:76ch">
+      <b>Чем это отличается от картинок в PDF.</b> В сценарии портреты собраны в разных аватар-генераторах: у них не совпадают пропорции, толщина контура и уровень детализации, а эмоция у каждого ровно одна. Здесь силуэты, цвета глаз, волос и одежды сохранены — персонажи узнаются, — но приведены к общей сетке лица и получили по пять состояний. Если позже найдётся художник, растровые арты встанут на то же место без единой правки в коде сцен.
+    </div>
+  </section>
+
+  <!-- ===================== ЛОКАЦИИ ===================== -->
+  <section id="places">
+    <div class="sec-head">
+      <span class="eyebrow">Фоны</span>
+      <h2>Локации</h2>
+      <p>Растровые фоны из PDF уходят: вместо них — живые SVG-сцены, собранные так же, как портреты. Слои описаны данными, поэтому каждый фон можно оживить одной-двумя петлями анимации, а весит он килобайты и не мылится на проекторе. Анимация всегда фоновая и всегда останавливается при <span style="font-family:var(--mono);font-size:13px">prefers-reduced-motion</span>.</p>
+    </div>
+    <div class="grid g3">
+      <div class="panel"><h4>Актовый зал</h4><p style="font-size:14px;color:var(--ink-2);margin-top:6px">Пролог. Охра, гирлянды, ряды кресел. <b style="color:var(--accent)">Анимация:</b> падающее конфетти и подброшенные конфедератки.</p></div>
+      <div class="panel"><h4>Комната героя</h4><p style="font-size:14px;color:var(--ink-2);margin-top:6px">Сцены 1–2, ночь. <b style="color:var(--accent)">Анимация:</b> мерцающий монитор, редкие фары за окном, дыхание неоновой полоски.</p></div>
+      <div class="panel"><h4>Экран ноутбука</h4><p style="font-size:14px;color:var(--ink-2);margin-top:6px">Сцены 3–5: доска вакансий, тест, звонок с HR. <b style="color:var(--accent)">Анимация:</b> курсор, индикатор загрузки, точки «печатает».</p></div>
+      <div class="panel"><h4>Отдел кадров</h4><p style="font-size:14px;color:var(--ink-2);margin-top:6px">Сцена 6: стол, две папки договоров. <b style="color:var(--accent)">Анимация:</b> папки приподнимаются под курсором, страницы перелистываются.</p></div>
+      <div class="panel"><h4>Открытый офис</h4><p style="font-size:14px;color:var(--ink-2);margin-top:6px">Сцена 7, дневной свет. <b style="color:var(--accent)">Анимация:</b> облака за окном, стикеры на доске, стрелка часов.</p></div>
+      <div class="panel"><h4>Кухня</h4><p style="font-size:14px;color:var(--ink-2);margin-top:6px">Перерыв в сцене 7. <b style="color:var(--accent)">Анимация:</b> пар над кружкой.</p></div>
+      <div class="panel"><h4>Город на закате</h4><p style="font-size:14px;color:var(--ink-2);margin-top:6px">Финал. <b style="color:var(--accent)">Анимация:</b> медленный параллакс силуэтов и уходящее солнце — единственная сюжетная анимация в игре.</p></div>
+    </div>
+    <div class="note" style="margin-top:16px;max-width:76ch">
+      <b>Почему не картинки.</b> Растровый фон 1920×1080 — это 300–600 КБ на сцену и семь запросов при загрузке в компьютерном классе. Те же семь сцен в SVG укладываются в объём одной картинки, масштабируются на любой проектор и правятся без графического редактора. Заодно снимается вопрос о правах на изображения из PDF.
+    </div>
+  </section>
+
+  <!-- ===================== ЭКРАНЫ ===================== -->
+  <section id="screens">
+    <div class="sec-head">
+      <span class="eyebrow">Интерфейс</span>
+      <h2>Экраны</h2>
+      <p>Девять типов экранов покрывают весь сценарий. Пять из них — один и тот же диалоговый экран с разным содержимым, поэтому объём работы меньше, чем кажется.</p>
+    </div>
+    <div class="grid g3">
+      <div class="panel"><h4>Главное меню</h4><p style="font-size:14px;color:var(--ink-2);margin-top:6px">Название, выбор персонажа (Ж/М), ввод имени, «продолжить» из сохранения.</p></div>
+      <div class="panel"><h4>Диалог</h4><p style="font-size:14px;color:var(--ink-2);margin-top:6px">Фон, портрет, имя, текст с побуквенным выводом, до трёх вариантов ответа.</p></div>
+      <div class="panel"><h4>Заставка главы</h4><p style="font-size:14px;color:var(--ink-2);margin-top:6px">Полноэкранный текст «Глава N» между сценами.</p></div>
+      <div class="panel"><h4>Конструктор резюме</h4><p style="font-size:14px;color:var(--ink-2);margin-top:6px">Форма из семи блоков, процент заполнения, кнопки «Сохранить» и «Скачать».</p></div>
+      <div class="panel"><h4>Доска вакансий</h4><p style="font-size:14px;color:var(--ink-2);margin-top:6px">Карточки, «Подробнее», описание, поле сопроводительного письма, «Откликнуться».</p></div>
+      <div class="panel"><h4>Письмо</h4><p style="font-size:14px;color:var(--ink-2);margin-top:6px">Приглашение на тестовое: конверт, текст, кнопка «Перейти к заданию».</p></div>
+      <div class="panel"><h4>Тест</h4><p style="font-size:14px;color:var(--ink-2);margin-top:6px">Вопрос, варианты, реплика героя после ответа, «Завершить тест».</p></div>
+      <div class="panel"><h4>Карточка знания</h4><p style="font-size:14px;color:var(--ink-2);margin-top:6px">Всплывающая плашка «📘 Получено знание», собирается в справочник.</p></div>
+      <div class="panel"><h4>Итоги</h4><p style="font-size:14px;color:var(--ink-2);margin-top:6px">Финальная таблица, достижения, кнопка «Пройти заново».</p></div>
+    </div>
+  </section>
+
+  <!-- ===================== ПЛАН ===================== -->
+  <section id="plan">
+    <div class="sec-head">
+      <span class="eyebrow">Порядок работ</span>
+      <h2>План разработки</h2>
+      <p>Этапы идут в порядке, в котором игра становится проходимой: сначала сквозной путь на плейсхолдерах, потом наполнение. После этапа&nbsp;3 её уже можно показывать студентам.</p>
+    </div>
+    <div class="tl">
+      <div class="step"><div class="n">00</div><div>
+        <h3>Препродакшн</h3>
+        <p>Эта страница, вычитка сценария, решение по правкам ниже. Весь текст сценария переносится в JSON: сцены, реплики, выборы, эффекты — чтобы преподаватель мог править формулировки без программиста.</p>
+        <div class="dod"><b>Сделано</b><span>сценарий в JSON, все правки применены, валидатор проходит без замечаний</span></div>
+      </div></div>
+      <div class="step"><div class="n">01</div><div>
+        <h3>Ядро новеллы</h3>
+        <p>Движок сцен: фон, портрет, реплика, варианты, применение эффектов к состоянию, сохранение в браузере. Вертикальный срез — пролог и сцена 1 целиком, с настоящими текстами. Стек: Vite и TypeScript без UI-фреймворка, сборка 26 КБ в сжатом виде.</p>
+        <div class="dod"><b>Сделано</b><span>от выпускного до готового портфолио проходится без правок кода</span></div>
+      </div></div>
+      <div class="step"><div class="n">02</div><div>
+        <h3>Конструктор резюме</h3>
+        <p>Форма из сценария и рядом с ней живой документ — тот самый, который уходит на печать. Выбор специальности пишется в профиль и дальше решает, какие вакансии откликнутся. Блок «Опыт работы» сворачивается честным «опыта пока нет» с подсказкой, чем его заменить, и счётчик заполнения перестаёт требовать невозможного.</p>
+        <div class="dod"><b>Сделано</b><span>резюме сохраняется, печатается и попадает в профиль игрока</span></div>
+      </div></div>
+      <div class="step"><div class="n">03</div><div>
+        <h3>Доска вакансий и отклики</h3>
+        <p>Десять карточек, полные описания, форма отклика и гейт из второй схемы: ловушки, мошенники, специальность, секретное слово. Самая содержательная сцена — и первая, которую стоит проверить на студентах.</p>
+        <div class="dod"><b>Сделано</b><span>все четыре исхода отклика проверены, форма карты у мошенников заблокирована</span></div>
+      </div></div>
+      <div class="step"><div class="n">04</div><div>
+        <h3>Тестовые задания</h3>
+        <p>Четыре набора по четыре вопроса, реплика героя после каждого ответа, два исхода. Тексты исходов переписываются под специальность — сейчас во всех наборах фигурирует реклама.</p>
+        <div class="dod"><b>Сделано</b><span>каждая специальность ведёт к своему набору; провал возвращает к вакансиям</span></div>
+      </div></div>
+      <div class="step"><div class="n">05</div><div>
+        <h3>Собеседование</h3>
+        <p>Пять вопросов HR, скоринг по большинству, три исхода и ветка «Новые попытки» с возвратом к доске вакансий.</p>
+        <div class="dod"><b>Сделано</b><span>петля отработана: провал → новая вакансия → успех</span></div>
+      </div></div>
+      <div class="step"><div class="n">06</div><div>
+        <h3>Трудовые отношения</h3>
+        <p>Диалог с директором и наставником, четыре карточки знаний, интерактив с отпуском и больничным, сравнение двух папок ТД/ГПХ, мини-тест на три вопроса. Образовательное ядро всего проекта — здесь важнее всего точность формулировок.</p>
+        <div class="dod"><b>Сделано</b><span>папки договоров, мини-тест с разбором ошибок, формулировки обновлены под 2023 год</span></div>
+      </div></div>
+      <div class="step"><div class="n">07</div><div>
+        <h3>Первый день и финал</h3>
+        <p>Знакомство с командой, мини-задание от наставника (свой вариант под каждую специальность), обед, достижение, финальная таблица итогов.</p>
+        <div class="dod"><b>Сделано</b><span>игра проходится от меню до титров</span></div>
+      </div></div>
+      <div class="step"><div class="n">08</div><div>
+        <h3>Арт</h3>
+        <p>Семь персонажей × пять эмоций и семь анимированных SVG-локаций. Звука в игре не будет — решение принято, и это снимает и вопрос лицензий на музыку, и проблему включённых колонок в классе.</p>
+        <div class="dod"><b>Сделано</b><span>семь локаций, все анимированы; ни одного плейсхолдера</span></div>
+      </div></div>
+      <div class="step"><div class="n">09</div><div>
+        <h3>Полировка и запуск</h3>
+        <p>Телефоны и проекторы, управление с клавиатуры, контраст текста, сборка и размещение в разделе «Содействие трудоустройству», пилот на одной группе, правки по итогам.</p>
+        <div class="dod"><b>Частично</b><span>телефон, клавиатура и сборка готовы; размещение на сайте и пилот с группой — за техникумом</span></div>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- ===================== ПРАВКИ ===================== -->
+  <section id="fixes">
+    <div class="sec-head">
+      <span class="eyebrow">Этап 00 · применено</span>
+      <h2>Правки к сценарию</h2>
+      <p>Всё, что нашлось при разборе Приложения 3. Все десять правок внесены в тексты игры; оригинальный сценарий сохранён отдельно, чтобы разницу можно было предъявить.</p>
+    </div>
+    <div class="fixes">
+      <div class="fix"><span class="kind k-fact">факт</span><div>
+        <p><b>ФСС больше нет.</b> С 1 января 2023 года ПФР и ФСС объединены в Социальный фонд России. В блоке про больничный стоит заменить название фонда — студенты пойдут искать «ФСС» и не найдут.</p>
+        <span class="where">сцена 6, реплика про оплату больничного</span>
+      </div></div>
+      <div class="fix"><span class="kind k-fact">факт</span><div>
+        <p><b>По ГПХ больничный сейчас возможен.</b> С 2023 года исполнители по договорам ГПХ застрахованы на случай временной нетрудоспособности: пособие положено, если за предыдущий год за человека уплачено достаточно взносов. Категоричное «по ГПХ нет больничного» стоит смягчить — иначе выпускник примет неверное решение в реальной ситуации.</p>
+        <span class="where">сцена 6, сравнение договоров и реплика Индиры Ринатовны</span>
+      </div></div>
+      <div class="fix"><span class="kind k-logic">логика</span><div>
+        <p><b>Форма банковской карты не должна работать.</b> В мошеннических вакансиях сценарий предлагает форму ввода карты, а предупреждение показывает после ввода. Безопаснее показывать его с первого символа, а поля сделать бутафорскими — без сохранения и без реальной маски карты. Тренировать ввод реквизитов «понарошку» — ровно та привычка, от которой сцена и должна отучать.</p>
+        <span class="where">вакансии 9 и 10</span>
+      </div></div>
+      <div class="fix"><span class="kind k-text">текст</span><div>
+        <p><b>Итог теста везде про рекламу.</b> Во всех четырёх наборах итоговые формулировки одинаковы: «понимание маркетинга» и «более глубокое понимание рекламы» — даже у программиста, безопасника и админа. Нужны свои тексты на каждый набор.</p>
+        <span class="where">сцена 4, все наборы</span>
+      </div></div>
+      <div class="fix"><span class="kind k-logic">логика</span><div>
+        <p><b>Две «Главы 6».</b> После собеседования экран объявляет «Глава 6. Первый день на работе», но следующая сцена — оформление в отделе кадров, и уже за ней идёт «Глава 7. Первый рабочий день». Стало: глава 6 — «Оформление», глава 7 — «Первый рабочий день».</p>
+        <span class="where">переход между сценами 5 и 6</span>
+      </div></div>
+      <div class="fix"><span class="kind k-logic">логика</span><div>
+        <p><b>Наталья Сергеевна — и директор, и HR.</b> В сцене 6 она директор компании, в сцене 7 подписана как «HR Наталья Сергеевна», а HR-менеджер с собеседования (рисунок 7) остался без имени. Стало: HR-менеджер — Алина Дмитриевна, Наталья Сергеевна остаётся директором компании.</p>
+        <span class="where">сцены 5–7</span>
+      </div></div>
+      <div class="fix"><span class="kind k-text">текст</span><div>
+        <p><b>«Рад видеть нового человека».</b> Реплика Индиры Ринатовны в сцене 7 — в мужском роде. Нужно «Рада».</p>
+        <span class="where">сцена 7, приветствие наставника</span>
+      </div></div>
+      <div class="fix"><span class="kind k-text">текст</span><div>
+        <p><b>Задача про пустую строку.</b> Вопрос звучит «нужно проверить, не пустая ли строка», а правильный вариант проверяет обратное — что строка пустая. Формулировку стоит выровнять, иначе внимательный студент решит, что верного ответа нет.</p>
+        <span class="where">сцена 4, набор для разработчиков, задача 4</span>
+      </div></div>
+      <div class="fix"><span class="kind k-logic">логика</span><div>
+        <p><b>Первое задание — только для программиста.</b> В сцене 7 наставник просит «починить скрипт». Для рекламщика, безопасника и админа нужны свои мини-задания — иначе финал ломает выбранную специальность.</p>
+        <span class="where">сцена 7, мини-задание</span>
+      </div></div>
+      <div class="fix"><span class="kind k-logic">логика</span><div>
+        <p><b>Опыт работы у выпускника.</b> Форма резюме требует «период работы, технологии, достижения», но у вчерашнего студента опыта обычно нет. Нужен вариант «опыта нет» с подсказкой писать практику, стажировку и учебные проекты.</p>
+        <span class="where">сцена 2, блок «Опыт работы»</span>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- ===================== ВОПРОСЫ ===================== -->
+  <section id="open">
+    <div class="sec-head">
+      <span class="eyebrow">Рамки проекта</span>
+      <h2>Что уже решено</h2>
+      <p>Игра — статичная сборка без сервера: сохранение в браузере, размещение обычной выгрузкой файлов, работа с телефона и с проектора.</p>
+    </div>
+    <div class="stats" style="margin-bottom:26px">
+      <div class="stat"><span class="k">без сервера</span><span class="v">Статистика прохождений не собирается, бэкенда нет. Прогресс живёт в браузере студента.</span></div>
+      <div class="stat"><span class="k">без звука</span><span class="v">Ни музыки, ни звуков интерфейса. Отпадает вопрос лицензий и колонок в классе.</span></div>
+      <div class="stat"><span class="k">фоны рисуем сами</span><span class="v">Анимированный SVG вместо растровых картинок из PDF. Права на исходные изображения больше не нужны.</span></div>
+      <div class="stat"><span class="k">сценарий правим</span><span class="v">Все десять правок ниже применяются в текстах игры. Оригинал сценария сохраняется отдельно.</span></div>
+    </div>
+    <h3 style="margin-bottom:4px">Осталось два вопроса</h3>
+    <div class="q"><span class="mark">01</span><div><p><b>Точный список специальностей ЧРТ.</b> На него завязан фильтр вакансий. Пока в контенте стоят четыре условные группы — программирование, информационная безопасность, сети и администрирование, реклама. Нужен реальный перечень выпускных специальностей, чтобы разложить по ним шесть вакансий и четыре набора тестов.</p></div></div>
+    <div class="q"><span class="mark">02</span><div><p><b>Имя HR-менеджера.</b> В сценарии его нет, а персонаж ведёт целую сцену. В текстах поставлено рабочее имя <b>Алина Дмитриевна</b> — если оно не подходит, замена займёт одну строку в файле персонажей.</p></div></div>
+  </section>
+
+  <footer>
+    Источник: образовательный проект «Эффективный механизм аккумуляции и систематизации знаний студентов о старте в трудовой деятельности», автор — Ганеева Индира Ринатовна, ГБПОУ «Челябинский радиотехнический техникум», 2025. Сценарий игры — Приложение 3, страницы 18–58.
+  </footer>
+</div>
+
+<script>
+/* ============================================================
+   Параметрический портрет. Один SVG собирается из данных:
+   силуэт причёски, палитра, одежда, аксессуары, эмоция.
+   Ровно этот код переезжает в игру как модуль портретов.
+   ============================================================ */
+
+const SKIN  = '#F7D2BC', SKIN_SH = '#E9B99F', SKIN_LN = '#C68F71';
+const LINE  = '#3B2C43';
+
+function hairBack(c){
+  const h = c.hair, d = c.hairDark;
+  switch(c.style){
+    case 'buns':
+      return `<rect x="72" y="60" width="156" height="140" rx="78" fill="${h}"/>
+        <circle cx="76" cy="78" r="37" fill="${h}"/><circle cx="224" cy="78" r="37" fill="${h}"/>
+        <circle cx="76" cy="78" r="22" fill="${d}" opacity=".35"/><circle cx="224" cy="78" r="22" fill="${d}" opacity=".35"/>`;
+    case 'spiky':
+      return `<path d="M96,96 L92,44 L124,80 L142,38 L160,80 L188,44 L196,84 Z" fill="${h}"/>
+        <rect x="76" y="62" width="148" height="120" rx="74" fill="${h}"/>`;
+    case 'bob':
+      return `<rect x="62" y="58" width="176" height="200" rx="88" fill="${h}"/>
+        <path d="M74,150 C 70,196 74,232 80,252" stroke="${d}" stroke-width="4" fill="none" opacity=".45"/>
+        <path d="M226,150 C 230,196 226,232 220,252" stroke="${d}" stroke-width="4" fill="none" opacity=".45"/>`;
+    case 'wavy':
+      return `<rect x="46" y="54" width="208" height="252" rx="100" fill="${h}"/>
+        <circle cx="56" cy="150" r="30" fill="${h}"/><circle cx="244" cy="150" r="30" fill="${h}"/>
+        <circle cx="62" cy="228" r="32" fill="${h}"/><circle cx="238" cy="228" r="32" fill="${h}"/>
+        <path d="M66,120 C 52,168 56,224 70,268" stroke="${d}" stroke-width="5" fill="none" opacity=".4"/>
+        <path d="M234,120 C 248,168 244,224 230,268" stroke="${d}" stroke-width="5" fill="none" opacity=".4"/>`;
+    case 'long':
+      return `<rect x="58" y="56" width="184" height="278" rx="92" fill="${h}"/>
+        <path d="M72,130 C 62,190 64,268 72,320" stroke="${d}" stroke-width="5" fill="none" opacity=".38"/>
+        <path d="M228,130 C 238,190 236,268 228,320" stroke="${d}" stroke-width="5" fill="none" opacity=".38"/>`;
+    case 'ponytail':
+      return `<path d="M88,150 C 52,192 46,258 60,308 C 68,332 96,330 100,306 C 84,256 90,196 110,166 Z" fill="${h}"/>
+        <path d="M84,190 C 68,232 68,278 78,306" stroke="${d}" stroke-width="4" fill="none" opacity=".4"/>
+        <rect x="74" y="58" width="152" height="146" rx="76" fill="${h}"/>`;
+    case 'braid':
+      return `<rect x="74" y="56" width="152" height="176" rx="76" fill="${h}"/>
+        <ellipse cx="96" cy="244" rx="24" ry="20" fill="${h}"/>
+        <ellipse cx="92" cy="278" rx="22" ry="19" fill="${h}"/>
+        <ellipse cx="95" cy="310" rx="19" ry="17" fill="${h}"/>
+        <path d="M76,244 h40 M72,278 h40 M78,310 h34" stroke="${d}" stroke-width="3" opacity=".45"/>`;
+  }
+  return '';
+}
+
+function hairFront(c){
+  const h = c.hair, l = c.hairLight;
+  const fringe = {
+    part:  'M72,132 C 76,84 108,56 150,56 C 194,56 224,82 230,132 C 216,96 190,86 154,94 C 120,102 92,116 72,132 Z',
+    bangs: 'M74,128 C 76,80 110,56 150,56 C 190,56 224,80 226,128 C 212,104 184,94 150,94 C 116,94 88,104 74,128 Z',
+    short: 'M78,118 C 82,76 112,54 150,54 C 188,54 218,76 222,118 C 210,90 186,82 150,82 C 114,82 90,90 78,118 Z'
+  }[c.fringe];
+  const shine = c.fringe === 'short'
+    ? `<path d="M112,80 C 128,68 148,66 166,72" stroke="${l}" stroke-width="4" fill="none" opacity=".5" stroke-linecap="round"/>`
+    : `<path d="M104,98 C 122,80 148,72 172,76" stroke="${l}" stroke-width="5" fill="none" opacity=".45" stroke-linecap="round"/>`;
+  return `<path d="${fringe}" fill="${h}"/>${shine}`;
+}
+
+function clothes(c){
+  const a = c.cloth, b = c.clothDark, inner = c.clothInner || '#FBF8FF';
+  const base = `<path d="M12,360 C 18,304 58,274 106,262 C 118,284 128,292 150,292 C 172,292 182,284 194,262 C 242,274 282,304 288,360 Z" fill="${a}"/>`;
+  let extra = '';
+  if(c.collar === 'shirt'){
+    extra = `<path d="M106,262 L150,296 L124,306 L100,272 Z" fill="${b}"/>
+             <path d="M194,262 L150,296 L176,306 L200,272 Z" fill="${b}"/>`;
+  } else if(c.collar === 'blazer'){
+    extra = `<path d="M104,262 C 118,290 132,308 150,318 L150,360 L92,360 C 92,318 96,286 104,262 Z" fill="${inner}"/>
+             <path d="M196,262 C 182,290 168,308 150,318 L150,360 L208,360 C 208,318 204,286 196,262 Z" fill="${inner}"/>
+             <path d="M106,262 C 122,292 138,312 150,320 L122,332 L96,286 Z" fill="${b}"/>
+             <path d="M194,262 C 178,292 162,312 150,320 L178,332 L204,286 Z" fill="${b}"/>`;
+  } else if(c.collar === 'hoodie'){
+    extra = `<path d="M100,264 C 122,294 178,294 200,264 C 214,270 218,280 210,288 C 184,314 116,314 90,288 C 82,280 86,270 100,264 Z" fill="${b}"/>
+             <path d="M134,300 L130,342" stroke="${inner}" stroke-width="5" stroke-linecap="round"/>
+             <path d="M166,300 L170,342" stroke="${inner}" stroke-width="5" stroke-linecap="round"/>`;
+  } else {
+    extra = `<path d="M106,262 C 120,288 180,288 194,262 C 186,278 168,288 150,288 C 132,288 120,278 106,262 Z" fill="${b}" opacity=".55"/>`;
+  }
+  return base + extra;
+}
+
+function sideFeatures(c, emo){
+  const brow = {
+    neutral:  'M158,120 Q176,111 194,117',
+    smile:    'M158,116 Q176,106 194,113',
+    joy:      'M157,111 Q176,100 195,108',
+    worry:    'M158,113 Q176,116 194,126',
+    stern:    'M158,127 Q176,118 194,110'
+  }[emo];
+
+  let eye;
+  if(emo === 'joy'){
+    eye = `<path d="M160,155 Q176,140 192,155" fill="none" stroke="${LINE}" stroke-width="4.2" stroke-linecap="round"/>`;
+  } else {
+    const wide = emo === 'worry' ? 14.5 : 13.5;
+    eye = `<ellipse cx="176" cy="152" rx="17" ry="${wide}" fill="#FDFBFF"/>
+      <circle cx="177" cy="152.5" r="9.6" fill="${c.eye}"/>
+      <circle cx="177" cy="152.5" r="4.4" fill="#231B2E"/>
+      <circle cx="181.5" cy="148" r="3.1" fill="#fff" opacity=".92"/>
+      <path d="M158,147 Q176,135 194,146" fill="none" stroke="${LINE}" stroke-width="3.4" stroke-linecap="round"/>`;
+    if(c.lashes){
+      eye += `<path d="M194,144 l6,-4 M189,138 l4,-6" stroke="${LINE}" stroke-width="2.6" stroke-linecap="round" fill="none"/>`;
+    }
+  }
+  return `<path d="${brow}" fill="none" stroke="${c.brow}" stroke-width="7" stroke-linecap="round"/>${eye}`;
+}
+
+function mouth(c, emo){
+  const lip = c.lip, dark = '#7A2E33';
+  switch(emo){
+    case 'joy':
+      return `<path d="M126,200 Q150,195 174,200 Q170,230 150,232 Q130,230 126,200 Z" fill="${dark}"/>
+              <path d="M130,201 Q150,197 170,201 Q168,210 150,211 Q132,210 130,201 Z" fill="#fff"/>
+              <path d="M126,200 Q150,195 174,200" fill="none" stroke="${lip}" stroke-width="4" stroke-linecap="round"/>`;
+    case 'smile':
+      return `<path d="M128,202 Q150,222 172,202 Q150,212 128,202 Z" fill="${lip}"/>`;
+    case 'worry':
+      return `<path d="M133,212 Q150,201 167,212" fill="none" stroke="${lip}" stroke-width="4.5" stroke-linecap="round"/>`;
+    case 'stern':
+      return `<path d="M132,207 L168,207" stroke="${lip}" stroke-width="4.5" stroke-linecap="round"/>`;
+    default:
+      return c.lips
+        ? `<path d="M130,204 Q140,197 150,201 Q160,197 170,204 Q160,214 150,214 Q140,214 130,204 Z" fill="${lip}"/>`
+        : `<path d="M134,204 Q150,212 166,204" fill="none" stroke="${lip}" stroke-width="4" stroke-linecap="round"/>`;
+  }
+}
+
+function glasses(c){
+  const col = c.glasses;
+  const lens = c.glassesTint || 'none';
+  return `<g fill="${lens}" stroke="${col}" stroke-width="4.5" opacity=".95">
+      <rect x="96" y="130" width="52" height="40" rx="${c.glassesRound ? 16 : 7}"/>
+      <rect x="152" y="130" width="52" height="40" rx="${c.glassesRound ? 16 : 7}"/>
+    </g>
+    <g stroke="${col}" stroke-width="4.5" fill="none">
+      <path d="M148,146 h4"/><path d="M96,142 l-14,-5"/><path d="M204,142 l14,-5"/>
+    </g>`;
+}
+
+function avatar(c, emo, crop){
+  const box = crop ? '68 62 164 164' : '0 0 300 360';
+  const feat = sideFeatures(c, emo);
+  return `<svg viewBox="${box}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${c.name}, ${EMO_RU[emo]}">
+    <rect x="0" y="0" width="300" height="360" fill="${c.bg}"/>
+    ${hairBack(c)}
+    <path d="M126,204 L126,292 C 126,302 174,302 174,292 L174,204 Z" fill="${SKIN}"/>
+    <path d="M126,204 C 134,228 166,228 174,204 L174,214 C 166,236 134,236 126,214 Z" fill="${SKIN_SH}"/>
+    ${clothes(c)}
+    <ellipse cx="84" cy="160" rx="11" ry="16" fill="${SKIN}"/>
+    <ellipse cx="216" cy="160" rx="11" ry="16" fill="${SKIN}"/>
+    <path d="M150,64 C 106,64 82,98 82,148 C 82,198 112,234 150,234 C 188,234 218,198 218,148 C 218,98 194,64 150,64 Z" fill="${SKIN}"/>
+    <path d="M150,64 C 106,64 82,98 82,148 C 88,116 112,96 150,96 C 188,96 212,116 218,148 C 218,98 194,64 150,64 Z" fill="${SKIN_SH}" opacity=".35"/>
+    <g>${feat}</g>
+    <g transform="translate(300,0) scale(-1,1)">${feat}</g>
+    <path d="M150,158 C 143,178 140,187 149,189 C 155,190 159,187 161,183" fill="none" stroke="${SKIN_LN}" stroke-width="3" stroke-linecap="round"/>
+    ${mouth(c, emo)}
+    ${hairFront(c)}
+    ${c.glasses ? glasses(c) : ''}
+  </svg>`;
+}
+
+const EMO_RU = {neutral:'спокойствие', smile:'улыбка', joy:'радость', worry:'тревога', stern:'строгость'};
+
+const CAST = [
+  {
+    id:'hero-f', name:'Героиня', role:'Игрок · женский персонаж', scenes:'все сцены',
+    style:'buns', fringe:'part', hair:'#D8B27E', hairDark:'#B8925F', hairLight:'#EFD5AC',
+    brow:'#B08A57', eye:'#1F9FB4', lip:'#D14A3C', lips:true, lashes:true,
+    cloth:'#E8B4EE', clothDark:'#D293DA', collar:'tee', bg:'#F3E8F6',
+    signature:'smile',
+    about:'Выпускница техникума. Именно её глазами игрок проходит путь от актового зала до первого рабочего дня. Характер задаёт сам игрок в прологе — от энтузиазма до «отдохну пару недель».',
+    voice:'«Чтобы устроиться на работу, нужно понять, что я умею и что могу показать работодателю».',
+    design:'Два пучка и розовая футболка из оригинала. Портрет должен читаться как ровесник игрока — никаких пиджаков до сцены 7.'
+  },
+  {
+    id:'hero-m', name:'Герой', role:'Игрок · мужской персонаж', scenes:'все сцены',
+    style:'spiky', fringe:'short', hair:'#4A3327', hairDark:'#33231B', hairLight:'#6B4C3A',
+    brow:'#3B291F', eye:'#7A5A3A', lip:'#B4574F', lips:false, lashes:false,
+    cloth:'#5C3340', clothDark:'#472833', collar:'shirt', bg:'#EFE7EC',
+    signature:'joy',
+    about:'Тот же путь, тот же текст: пол выбирается в главном меню и меняет только портрет и согласования в репликах. Все ветки, эффекты и достижения одинаковы.',
+    voice:'«Вот и всё. Годы учёбы позади. Столько сил, столько воспоминаний…»',
+    design:'Тёмная рубашка и короткая ёжиком стрижка. Держим одинаковый возраст и рост кадра с героиней — портреты меняются местами в одном и том же слоте.'
+  },
+  {
+    id:'kurator', name:'Ирина Петровна', role:'Куратор группы', scenes:'пролог',
+    style:'bob', fringe:'part', hair:'#7A4A22', hairDark:'#5C3517', hairLight:'#A97040',
+    brow:'#5E3A1C', eye:'#C99A22', lip:'#C77D77', lips:true, lashes:true,
+    cloth:'#F2EE9E', clothDark:'#DED77C', clothInner:'#FFFDF0', collar:'blazer', bg:'#F6F3E4',
+    signature:'smile',
+    about:'Провожает выпускников и первой реагирует на выбор игрока в прологе. Единственный персонаж, который отвечает на все три варианта — и на энтузиазм, и на растерянность, и на «отдохну».',
+    voice:'«Это нормально. Главное — не бояться пробовать. Всё постепенно станет понятнее».',
+    design:'Каре и светло-жёлтый пиджак. Тёплая, поддерживающая: даже в варианте с вздохом она не осуждает.'
+  },
+  {
+    id:'director-college', name:'Вероника Александровна', role:'Директор техникума', scenes:'пролог',
+    style:'wavy', fringe:'part', hair:'#B99A6E', hairDark:'#8F7449', hairLight:'#DCC49B',
+    brow:'#9A7F55', eye:'#C7A227', lip:'#C4787C', lips:true, lashes:true,
+    cloth:'#33502F', clothDark:'#263D23', clothInner:'#F4F6EF', collar:'blazer', bg:'#E9EFE7',
+    signature:'neutral',
+    about:'Одна реплика на всю игру — торжественная точка выпускного. Появляется вторым планом, сразу после куратора.',
+    voice:'«Теперь вы готовы к взрослой жизни. Успехов вам в профессии и в жизни!»',
+    design:'Объёмные волны, прямоугольные очки, тёмно-зелёный пиджак. Самый официальный персонаж — она задаёт верхнюю планку формальности, от которой дальше всё смягчается.',
+    glasses:'#2E2A33'
+  },
+  {
+    id:'hr', name:'Алина Дмитриевна', role:'HR-менеджер', scenes:'сцена 5',
+    style:'braid', fringe:'part', hair:'#3D3438', hairDark:'#2A2427', hairLight:'#5C4F55',
+    brow:'#332B2E', eye:'#2E8B3F', lip:'#E0716B', lips:true, lashes:true,
+    cloth:'#7B27C4', clothDark:'#671FA8', clothInner:'#F1E6FA', collar:'hoodie', bg:'#F0E9F8',
+    signature:'neutral',
+    about:'Ведёт все пять вопросов собеседования и произносит итог. Её реакции — единственная обратная связь игрока о том, как он держится в разговоре: от «видно, что вы серьёзно относитесь к делу» до сомнительной пометки в блокноте.',
+    voice:'«Представьте: вам дают задачу, которую вы не знаете, как выполнить. Что будете делать?»',
+    design:'Коса и фиолетовое худи из оригинала — образ «своей» компании, а не строгого кадровика. В сценарии у неё нет имени и её путают с директором Натальей Сергеевной: имя стоит дать до озвучки реплик.'
+  },
+  {
+    id:'director-company', name:'Наталья Сергеевна', role:'Директор компании', scenes:'сцена 6',
+    style:'ponytail', fringe:'bangs', hair:'#B99B72', hairDark:'#94764F', hairLight:'#DCC5A2',
+    brow:'#9C8058', eye:'#1E8A93', lip:'#CE4A32', lips:true, lashes:true,
+    cloth:'#7FC0DC', clothDark:'#63A6C4', collar:'shirt', bg:'#E6F1F6',
+    signature:'stern',
+    about:'Объясняет трудовой договор, отпуск, больничный и разницу с ГПХ. Несёт всё образовательное ядро проекта — самый большой объём текста в игре и самая высокая цена неточной формулировки.',
+    voice:'«Взрослая жизнь начинается не с зарплаты, а с понимания своих прав».',
+    design:'Хвост с ободком, голубая рубашка. Деловая, но не холодная: строгое состояние ей нужно ровно один раз — когда игрок отвечает «главное — зарплата, остальное не важно».'
+  },
+  {
+    id:'mentor', name:'Индира Ринатовна', role:'Наставник', scenes:'сцены 6–7',
+    style:'bob', fringe:'part', hair:'#241D22', hairDark:'#100C10', hairLight:'#4E4148',
+    brow:'#1D171B', eye:'#3C9A55', lip:'#C63A2C', lips:true, lashes:true,
+    cloth:'#6B4630', clothDark:'#54351F', clothInner:'#F3EAE2', collar:'blazer', bg:'#F2ECE8',
+    signature:'joy',
+    about:'Камео автора проекта. Задаёт директору наивные вопросы («а если я простужусь, мне скажут работай, герой?») — и тем самым вытаскивает из неё объяснения, которые иначе звучали бы как лекция. В сцене 7 встречает героя на рабочем месте и даёт первое задание.',
+    voice:'«Да, а ещё с кофе и дедлайнами. Добро пожаловать в команду!»',
+    design:'Чёрные волосы до плеч, светло-голубые очки, коричневая косуха. Единственный персонаж, которому позволено шутить: улыбка — её состояние по умолчанию.',
+    glasses:'#8FB8D6', glassesRound:true, glassesTint:'#DCEAF4'
+  }
+];
+
+const EMOS = ['neutral','smile','joy','worry','stern'];
+
+const host = document.getElementById('cast-list');
+host.innerHTML = CAST.map(c => `
+  <article class="sheet" data-id="${c.id}">
+    <div class="art">
+      <span class="portrait" data-big="${c.id}">${avatar(c, c.signature)}</span>
+      <div class="emos">
+        ${EMOS.map(e => `<button class="emo" type="button" data-char="${c.id}" data-emo="${e}"
+            aria-pressed="${e === c.signature}" title="${EMO_RU[e]}" aria-label="${c.name}: ${EMO_RU[e]}">${avatar(c, e, true)}</button>`).join('')}
+      </div>
+      <span class="emo-label" data-label="${c.id}">${EMO_RU[c.signature]}</span>
+    </div>
+    <div class="info">
+      <div class="who">
+        <h3>${c.name}</h3>
+        <span class="role">${c.role}</span>
+        <span class="scenes">${c.scenes}</span>
+      </div>
+      <p>${c.about}</p>
+      <p class="voice">${c.voice}</p>
+      <p style="font-size:14px">${c.design}</p>
+      <div class="spec">
+        <div>
+          <dt>палитра</dt>
+          <dd class="sw">
+            <i style="background:${c.hair}" title="волосы"></i>
+            <i style="background:${c.eye}" title="глаза"></i>
+            <i style="background:${c.cloth}" title="одежда"></i>
+            <i style="background:${c.lip}" title="губы"></i>
+            <i style="background:${c.bg}" title="фон карточки"></i>
+          </dd>
+        </div>
+        <div><dt>силуэт</dt><dd>${c.style}</dd></div>
+        <div><dt>эмоций</dt><dd>${EMOS.length}</dd></div>
+        <div><dt>аксессуары</dt><dd>${c.glasses ? 'очки' : '—'}</dd></div>
+      </div>
+    </div>
+  </article>`).join('');
+
+host.addEventListener('click', e => {
+  const btn = e.target.closest('.emo');
+  if(!btn) return;
+  const c = CAST.find(x => x.id === btn.dataset.char);
+  const emo = btn.dataset.emo;
+  host.querySelector(`[data-big="${c.id}"]`).innerHTML = avatar(c, emo);
+  host.querySelector(`[data-label="${c.id}"]`).textContent = EMO_RU[emo];
+  btn.closest('.emos').querySelectorAll('.emo')
+     .forEach(b => b.setAttribute('aria-pressed', String(b === btn)));
+});
+</script>

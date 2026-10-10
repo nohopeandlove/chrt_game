@@ -1,0 +1,8 @@
+node_modules/
+dist/
+*.local
+.DS_Store
+
+# собранный холст с набросками — пересобирается из design/mocks/build.py
+design/mocks/ya-specialist-ui-directions.html
+.idea/

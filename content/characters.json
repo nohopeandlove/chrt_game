@@ -1,0 +1,94 @@
+{
+  "note": "Портреты собираются кодом из этих параметров. style — силуэт причёски, fringe — линия роста волос, collar — крой одежды. Эмоции: neutral, smile, joy, worry, stern.",
+  "items": [
+    {
+      "id": "hero-f",
+      "name": "{playerName}",
+      "role": "Игрок, женский персонаж",
+      "playable": true,
+      "defaultEmotion": "smile",
+      "portrait": {
+        "style": "buns", "fringe": "part",
+        "hair": "#D8B27E", "hairDark": "#B8925F", "hairLight": "#EFD5AC", "brow": "#B08A57",
+        "eye": "#1F9FB4", "lip": "#D14A3C", "lips": true, "lashes": true,
+        "cloth": "#E8B4EE", "clothDark": "#D293DA", "collar": "tee", "bg": "#F3E8F6"
+      }
+    },
+    {
+      "id": "hero-m",
+      "name": "{playerName}",
+      "role": "Игрок, мужской персонаж",
+      "playable": true,
+      "defaultEmotion": "joy",
+      "portrait": {
+        "style": "spiky", "fringe": "short",
+        "hair": "#4A3327", "hairDark": "#33231B", "hairLight": "#6B4C3A", "brow": "#3B291F",
+        "eye": "#7A5A3A", "lip": "#B4574F", "lips": false, "lashes": false,
+        "cloth": "#5C3340", "clothDark": "#472833", "collar": "shirt", "bg": "#EFE7EC"
+      }
+    },
+    {
+      "id": "kurator",
+      "name": "Ирина Петровна",
+      "role": "Куратор группы",
+      "defaultEmotion": "smile",
+      "portrait": {
+        "style": "bob", "fringe": "part",
+        "hair": "#7A4A22", "hairDark": "#5C3517", "hairLight": "#A97040", "brow": "#5E3A1C",
+        "eye": "#C99A22", "lip": "#C77D77", "lips": true, "lashes": true,
+        "cloth": "#F2EE9E", "clothDark": "#DED77C", "clothInner": "#FFFDF0", "collar": "blazer", "bg": "#F6F3E4"
+      }
+    },
+    {
+      "id": "director-college",
+      "name": "Вероника Александровна",
+      "role": "Директор техникума",
+      "defaultEmotion": "neutral",
+      "portrait": {
+        "style": "wavy", "fringe": "part",
+        "hair": "#B99A6E", "hairDark": "#8F7449", "hairLight": "#DCC49B", "brow": "#9A7F55",
+        "eye": "#C7A227", "lip": "#C4787C", "lips": true, "lashes": true,
+        "cloth": "#33502F", "clothDark": "#263D23", "clothInner": "#F4F6EF", "collar": "blazer", "bg": "#E9EFE7",
+        "glasses": "#2E2A33"
+      }
+    },
+    {
+      "id": "hr",
+      "name": "Алина Дмитриевна",
+      "role": "HR-менеджер",
+      "note": "Имя рабочее: в сценарии персонаж безымянный. См. docs/changes.md, правка 5.",
+      "defaultEmotion": "neutral",
+      "portrait": {
+        "style": "braid", "fringe": "part",
+        "hair": "#3D3438", "hairDark": "#2A2427", "hairLight": "#5C4F55", "brow": "#332B2E",
+        "eye": "#2E8B3F", "lip": "#E0716B", "lips": true, "lashes": true,
+        "cloth": "#7B27C4", "clothDark": "#671FA8", "clothInner": "#F1E6FA", "collar": "hoodie", "bg": "#F0E9F8"
+      }
+    },
+    {
+      "id": "director-company",
+      "name": "Наталья Сергеевна",
+      "role": "Директор компании",
+      "defaultEmotion": "neutral",
+      "portrait": {
+        "style": "ponytail", "fringe": "bangs",
+        "hair": "#B99B72", "hairDark": "#94764F", "hairLight": "#DCC5A2", "brow": "#9C8058",
+        "eye": "#1E8A93", "lip": "#CE4A32", "lips": true, "lashes": true,
+        "cloth": "#7FC0DC", "clothDark": "#63A6C4", "collar": "shirt", "bg": "#E6F1F6"
+      }
+    },
+    {
+      "id": "mentor",
+      "name": "Индира Ринатовна",
+      "role": "Наставник",
+      "defaultEmotion": "joy",
+      "portrait": {
+        "style": "bob", "fringe": "part",
+        "hair": "#241D22", "hairDark": "#100C10", "hairLight": "#4E4148", "brow": "#1D171B",
+        "eye": "#3C9A55", "lip": "#C63A2C", "lips": true, "lashes": true,
+        "cloth": "#6B4630", "clothDark": "#54351F", "clothInner": "#F3EAE2", "collar": "blazer", "bg": "#F2ECE8",
+        "glasses": "#8FB8D6", "glassesRound": true, "glassesTint": "#DCEAF4"
+      }
+    }
+  ]
+}
