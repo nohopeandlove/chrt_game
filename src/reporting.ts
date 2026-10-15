@@ -41,7 +41,7 @@ export function recordOutcome(state: GameState, category: TaskCategory, earned: 
 export function percentage(outcome: TaskOutcome | undefined): number | null {
   return outcome ? Math.round(outcome.earned / outcome.possible * 100) : null;
 }
-export function latest(analytics: Analytics, category: TaskCategory): TaskOutcome | undefined {
+export function latest(analytics: Pick<Analytics, 'outcomes'>, category: TaskCategory): TaskOutcome | undefined {
   return analytics.outcomes.filter(o => o.category === category).at(-1);
 }
 export function recommendations(a: Analytics): string[] {

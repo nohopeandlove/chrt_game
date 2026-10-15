@@ -1,0 +1,23 @@
+# Run together with compose.yaml on a server with a domain pointing to it.
+services:
+  game:
+    environment:
+      COOKIE_SECURE: "true"
+  proxy:
+    image: caddy:2-alpine
+    environment:
+      GAME_DOMAIN: "${GAME_DOMAIN:?Set GAME_DOMAIN to your hostname in .env}"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      - game
+    restart: unless-stopped
+volumes:
+  caddy-data:
+  caddy-config:

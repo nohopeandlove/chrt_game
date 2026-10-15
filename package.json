@@ -6,6 +6,7 @@
   "description": "Игра-симулятор «Я — специалист»: от выпускного до первого рабочего дня",
   "scripts": {
     "dev": "vite",
+    "start": "node server/app.mjs",
     "build": "vite build",
     "preview": "vite preview",
     "content": "node tools/validate.mjs",

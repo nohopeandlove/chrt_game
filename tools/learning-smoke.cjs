@@ -27,10 +27,8 @@ const assert = require('node:assert/strict');
  assert.equal(await page.locator('.panel__announcement').textContent(),before);
  // Reopen if the dialog's focused close button was activated by Enter.
  if (!(await page.getByRole('dialog').isVisible())) await page.getByRole('button',{name:'Кабинет и результаты',exact:true}).click();
- const downloadPromise=page.waitForEvent('download');
- await page.getByRole('button',{name:'Скачать результаты без личных данных'}).click();
- const dl=await downloadPromise; const fs=require('node:fs'); const report=JSON.parse(fs.readFileSync(await dl.path(),'utf8'));
- assert.equal(report.baseline,3); assert.ok(!JSON.stringify(report).includes('Учебный профиль')); assert.ok(!('resume' in report));
+ assert.equal(await page.locator('input[type=file]').count(),0);
+ assert.equal(await page.getByRole('button',{name:/Скачать|Импорт|Экспорт/}).count(),0);
  await page.keyboard.press('Escape');
  await page.getByRole('button',{name:'Крупный текст',exact:true}).click();
  await page.getByRole('button',{name:'Контраст',exact:true}).click();
@@ -43,7 +41,7 @@ const assert = require('node:assert/strict');
  await page.getByText('Маршрут и входная / итоговая диагностика',{exact:true}).click();
  assert.ok((await page.getByRole('dialog').innerText()).includes('3/3'));
  await page.keyboard.press('Escape');
- console.log('PASS: orientation, baseline, persistence, journal, anonymous export, settings, dialog keyboard');
+ console.log('PASS: orientation, baseline, persistence, journal, no student file controls, settings, dialog keyboard');
  // Use the real screen modules with fresh UI/state, independent of narrative pacing.
  await page.evaluate(async()=>{
    const {UI}=await import('/src/ui.ts'); const {newGame}=await import('/src/state.ts');

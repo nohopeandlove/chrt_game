@@ -6,3 +6,10 @@ dist/
 # собранный холст с набросками — пересобирается из design/mocks/build.py
 design/mocks/ya-specialist-ui-directions.html
 .idea/
+
+# Server data and private local configuration
+data/
+.env
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal

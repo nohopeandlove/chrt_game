@@ -1,7 +1,8 @@
+import { syncStatus } from '../sync.ts';
 import { analyticsHtml } from '../reporting.ts';
 import { save } from '../state.ts';
 import { playSound } from '../sound.ts';
-import { assessment, reportHtml, downloadReport } from '../learning.ts';
+import { assessment, reportHtml } from '../learning.ts';
 import { achievements } from '../content.ts';
 import type { GameState, ResultRow } from '../types.ts';
 import type { UI } from '../ui.ts';
@@ -46,15 +47,14 @@ export async function runFinal(ui: UI, state: GameState, title: string, rows: Re
                   .join('')}
               </ul>
             </section>
-            <section class="learning-summary"><h3>Личный кабинет · результаты</h3>${analyticsHtml(state.analytics)}<details class="report-details"><summary>Маршрут и диагностика</summary>${reportHtml(state)}</details><p>Откройте «Кабинет и результаты» в верхней панели для отчёта с ФИО / кодом, группой и экспорта CSV.</p>
+            <section class="learning-summary"><h3>Личный кабинет · результаты</h3>${analyticsHtml(state.analytics)}<details class="report-details"><summary>Маршрут и диагностика</summary>${reportHtml(state)}</details><p>Откройте «Кабинет и результаты» в верхней панели для просмотра прогресса и статуса автоматического сохранения.</p>
               <h3>Мой следующий шаг</h3><p>Выберите действие после игры: дополнить резюме реальным проектом, проверить одну вакансию или обсудить условия договора с преподавателем. Объясните, что измените после разбора ошибок.</p>
-              <button class="btn" type="button" data-export>Скачать результаты без личных данных</button>
+              <p data-sync-status role="status">${escapeHtml(syncStatus())}</p>
             </section>
             <div class="final__actions">
               <button class="btn btn--primary" type="button" data-restart>${escapeHtml(action)}</button>
             </div>
           </div>`;
-        host.querySelector('[data-export]')?.addEventListener('click', () => downloadReport(state));
         const restart = host.querySelector<HTMLButtonElement>('[data-restart]');
         restart?.addEventListener('click', () => resolve());
         restart?.focus();

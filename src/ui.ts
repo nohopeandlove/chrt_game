@@ -21,6 +21,7 @@ export interface ChoiceInput {
 }
 
 export interface MenuResult {
+  group: string;
   name: string;
   gender: 'm' | 'f';
 }
@@ -360,10 +361,11 @@ export class UI {
             placeholder="Псевдоним" autocomplete="off" required>
         </label>
 
+<label class="menu__field"><span>Учебная группа (если есть)</span><input class="menu__input" name="group" maxlength="40" autocomplete="off" placeholder="Например, ИС-21"></label>
         <div class="menu__actions">
           <button class="btn btn--primary" type="submit">Начать</button>
         </div>
-        <p class="menu__privacy">Для учебного резюме используйте вымышленные контакты. Данные остаются в этом браузере.</p>
+        <p class="menu__privacy">Начав игру, вы передаёте преподавателю на этот сервер учебный код / псевдоним, группу, ответы и баллы. Для учебного резюме используйте вымышленные контакты: они не отправляются.</p>
         <p class="menu__error" role="alert" hidden>Введите имя — оно будет звучать в репликах.</p>
       </form>`;
 
@@ -384,7 +386,7 @@ export class UI {
         }
         this.overlay.hidden = true;
         this.overlay.innerHTML = '';
-        resolve({ name, gender: data.get('gender') === 'm' ? 'm' : 'f' });
+        resolve({ name, group: String(data.get('group') ?? '').trim().slice(0,40), gender: data.get('gender') === 'm' ? 'm' : 'f' });
       });
 
       form.querySelector<HTMLButtonElement>('[data-action="delete-save"]')?.addEventListener('click', () => {

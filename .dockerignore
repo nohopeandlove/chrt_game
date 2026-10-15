@@ -5,3 +5,9 @@ dist
 assets/reference
 design
 docs
+data
+.env
+.env.*
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm

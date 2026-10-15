@@ -53,6 +53,7 @@ export function save(state: GameState): void {
     // Игра остаётся доступной, но предупреждаем о потере прогресса.
     document.dispatchEvent(new Event('game-save-unavailable'));
   }
+  document.dispatchEvent(new CustomEvent('game-saved', { detail: state }));
 }
 
 export function load(): GameState | null {

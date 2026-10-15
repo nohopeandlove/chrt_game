@@ -1,6 +1,5 @@
+import { syncStatus } from './sync.ts';
 import { dashboard } from './dashboard.ts';
-import { makeReport } from './reporting.ts';
-import type { StudentReport } from './reporting.ts';
 import { playSound, setSound, soundEnabled } from './sound.ts';
 import { scenes } from './content.ts';
 import { save } from './state.ts';
@@ -61,7 +60,7 @@ export async function orientation(ui: UI, state: GameState): Promise<void> {
       <h3>Как проходит игра</h3>
       <p>Восемь этапов: выпускной → портфолио → резюме → вакансии → тестовое → собеседование → договор → первый рабочий день. Читайте реплики, выбирайте действия и разбирайте обратную связь. Таймера нет: темп выбираете вы.</p>
       <p>Входная и итоговая диагностика содержат разные ситуации по трём общим темам: безопасный поиск работы, резюме и условия договора. В финале вы примените знания к новым примерам. Баллы не подтверждают профессиональную квалификацию. Диагностику можно пропустить.</p>
-      <details><summary>Управление, доступность и сохранение</summary><p>Tab — переход по кнопкам; Enter — нажатие; Enter или пробел — следующая реплика; цифры — выбор ответа в диалоге. В верхней панели доступны журнал, крупный текст, контраст и отключение анимации. Можно сделать перерыв: «Продолжить» возвращает к началу текущей главы.</p><p>Используйте вымышленное имя и учебные данные в резюме. Прогресс хранится только в этом браузере, без отправки преподавателю. При очистке данных браузера он исчезнет; если сохранение недоступно, появится предупреждение.</p></details>
+      <details><summary>Управление, доступность и сохранение</summary><p>Tab — переход по кнопкам; Enter — нажатие; Enter или пробел — следующая реплика; цифры — выбор ответа в диалоге. В верхней панели доступны журнал, крупный текст, контраст и отключение анимации. Можно сделать перерыв: «Продолжить» возвращает к началу текущей главы.</p><p>Используйте вымышленное имя и учебные данные в резюме. Позиция в игре хранится в браузере. Учебные результаты, код / ФИО и группа автоматически сохраняются на сервере для преподавателя. При очистке данных браузера он исчезнет; если сохранение недоступно, появится предупреждение.</p></details>
       <details><summary>Границы модели и преподавателю</summary><p>Компании, вакансии, суммы и ситуации — учебные примеры. «Секретное слово» — условность для тренировки внимательного чтения; требование 100% в тестовом — правило игры, а не норма найма. Повторная попытка после отказа разрешена. Игра не заменяет проверку работодателя и юридическую консультацию.</p><p>Для занятия: короткое обсуждение опыта → игра в своём темпе → разбор решений → итоговая диагностика и личный план. Откройте <a href="https://github.com/nohopeandlove/chrt_game/blob/main/docs/METHODICAL.md" target="_blank" rel="noopener noreferrer">методичку для преподавателя</a> и <a href="https://github.com/nohopeandlove/chrt_game/blob/main/docs/CRITERIA.md" target="_blank" rel="noopener noreferrer">описание соответствия критериям</a>.</p></details>
       <div class="learning-actions"><button class="btn btn--primary" data-assess>Пройти входную диагностику</button><button class="btn" data-skip>Перейти к истории</button></div>
     </article>`;
@@ -118,20 +117,7 @@ export function reportHtml(state: GameState): string {
     <p>Шкалы персонажа и достижения — игровые показатели, а не психологическая диагностика и не отметка. Результаты остаются на устройстве.</p>`;
 }
 
-export function downloadReport(state: GameState): void {
-  const report = {
-    ...makeReport(state),
-    note: 'Учебные результаты; без имени, резюме, контактов и решений о найме. Повторные попытки сохранены.',
-    ...state.learning
-  };
-  const url = URL.createObjectURL(new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' }));
-  const a = document.createElement('a');
-  a.href = url; a.download = 'ya-specialist-results.json'; a.click();
-  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
-}
-
 export function installLearningTools(root: HTMLElement, getState: () => GameState | null): void {
-  const reports = new Map<string, StudentReport>();
   const tools = document.createElement('aside');
   tools.className = 'learning-tools';
   tools.setAttribute('aria-label', 'Прогресс и настройки доступности');
@@ -146,6 +132,9 @@ export function installLearningTools(root: HTMLElement, getState: () => GameStat
   dialog.className = 'learning-dialog';
   dialog.setAttribute('aria-labelledby', 'journal-title');
   root.append(dialog);
+  document.addEventListener('server-sync-status', () => {
+    root.querySelectorAll<HTMLElement>('[data-sync-status]').forEach(el => { el.textContent = syncStatus(); });
+  });
   tools.querySelectorAll<HTMLButtonElement>('[data-setting]').forEach(button => {
     const setting = button.dataset['setting'] ?? '';
     let active = setting === 'still' && matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -172,7 +161,7 @@ export function installLearningTools(root: HTMLElement, getState: () => GameStat
   });
   tools.querySelector('[data-journal]')?.addEventListener('click', () => {
     const state = getState();
-    dashboard(dialog, state, state ? reportHtml(state) : '', () => { if (state) downloadReport(state); }, reports);
+    dashboard(dialog, state, state ? reportHtml(state) : '');
     dialog.showModal();
   });
   document.addEventListener('game-save-unavailable', () => {

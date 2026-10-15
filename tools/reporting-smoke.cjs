@@ -1,7 +1,6 @@
 // Integration checks for real task instrumentation, offline reports and audio controls.
 const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const assert = require('node:assert/strict');
-const fs = require('node:fs');
 let browser;
 (async()=>{
  browser=await chromium.launch({executablePath:process.env.BROWSER_EXECUTABLE || undefined,args:process.env.BROWSER_NO_SANDBOX==='1'?['--no-sandbox']:[]});
@@ -75,37 +74,19 @@ let browser;
  await page.getByRole('heading',{name:'Личный кабинет студента',exact:true}).waitFor();
  assert.ok((await page.locator('.metric-grid').innerText()).includes('50%'));
  assert.ok((await page.locator('.metric-grid').innerText()).includes('100%'));
- const anonDownload=page.waitForEvent('download');await page.getByRole('button',{name:'Скачать JSON-отчёт',exact:true}).click();
- const anon=JSON.parse(fs.readFileSync(await(await anonDownload).path(),'utf8'));
- assert.equal(anon.analytics.fullName,'');assert.equal(anon.analytics.group,'');assert.ok(!JSON.stringify(anon).includes('PRIVATE NICKNAME'));assert.ok(!('resume' in anon));
- await page.locator('[data-identify]').check();const namedDownload=page.waitForEvent('download');await page.getByRole('button',{name:'Скачать JSON-отчёт',exact:true}).click();
- const named=JSON.parse(fs.readFileSync(await(await namedDownload).path(),'utf8'));assert.equal(named.analytics.fullName,'Иванова Мария');assert.equal(named.diagnostics.baseline,1);
- console.log('PASS: real vacancy error recorded, metrics rendered, anonymous default and explicit identified export');
- await page.getByRole('button',{name:'Отчёт для преподавателя',exact:true}).click();
- const second=structuredClone(named);second.analytics.sessionId='second-session';second.analytics.fullName='=HYPERLINK("bad")';second.analytics.group='@SUM(1)';second.analytics.outcomes=[];
- await page.locator('[data-import]').setInputFiles([
-   {name:'first.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(named))},
-   {name:'second.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(second))},
-   {name:'bad.json',mimeType:'application/json',buffer:Buffer.from('{broken')}
- ]);
- await page.locator('[data-import-status]').filter({hasText:'Принято файлов: 2.'}).waitFor();
- assert.equal(await page.locator('.report-table tbody tr').count(),2);
- assert.ok((await page.locator('.report-table tbody tr').nth(1).innerText()).includes('Нет данных'));
- // Same session replaces, never double-counts a student.
- await page.locator('[data-import]').setInputFiles({name:'again.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(named))});
- await page.locator('[data-import-status]').filter({hasText:'Принято файлов: 1.'}).waitFor();assert.equal(await page.locator('.report-table tbody tr').count(),2);
- const csvDownload=page.waitForEvent('download');await page.getByRole('button',{name:'Экспорт таблицы в CSV',exact:true}).click();
- const csv=fs.readFileSync(await(await csvDownload).path(),'utf8');assert.equal(csv.charCodeAt(0),0xFEFF);assert.ok(csv.includes('Иванова Мария'));assert.ok(csv.includes("'@SUM(1)"));assert.ok(csv.includes("'=HYPERLINK"));assert.ok(csv.includes('Нет данных'));
- await page.locator('[data-detail="0"]').click();await page.getByRole('heading',{name:'Отчёт: Иванова Мария',exact:true}).waitFor();
- console.log('PASS: teacher imports 2 reports, rejects invalid JSON, deduplicates sessions, preserves missing data and exports safe UTF-8 CSV');
+ assert.equal(await page.locator('input[type=file]').count(),0);
+ assert.equal(await page.getByRole('button',{name:/Скачать|Импорт|Экспорт|Отчёт для преподавателя/}).count(),0);
+ const csv=await page.evaluate(async()=>{const {makeReport,reportsCsv}=await import('/src/reporting.ts');return reportsCsv([makeReport(JSON.parse(localStorage.getItem('ya-specialist/save/v1')),true)]);});
+ assert.ok(csv.includes('Иванова Мария'));assert.ok(csv.includes('Не указано секретное слово'));
+ console.log('PASS: actual metrics, vacancy errors, CSV data and absence of all student file controls');
  // Malformed imports and an XSS-shaped name cannot inject markup.
  const safety=await page.evaluate(async()=>{const {parseReport,csvCell,restoreAnalytics}=await import('/src/reporting.ts');let rejected=false;try{parseReport(JSON.stringify({format:'ya-specialist-report-v2',analytics:{sessionId:'x',startedAt:new Date().toISOString(),events:[],outcomes:[{category:'test',at:new Date().toISOString(),earned:99,possible:4}]}}))}catch{rejected=true}return {rejected,cells:['=1','  +1','-1','@x','\tbad','safe;"text'].map(csvCell),old:restoreAnalytics(undefined).outcomes.length};});
  assert.equal(safety.rejected,true);assert.equal(safety.old,0);assert.ok(safety.cells.slice(0,5).every(c=>c.startsWith('"\'')));
  await page.setViewportSize({width:320,height:740});
  const teacherBounds=await page.getByRole('dialog').evaluate(el=>({scroll:el.scrollWidth,client:el.clientWidth}));assert.ok(teacherBounds.scroll<=teacherBounds.client+1,JSON.stringify(teacherBounds));
- await page.getByRole('button',{name:'Студент',exact:true}).click();
+
  const studentBounds=await page.getByRole('dialog').evaluate(el=>({scroll:el.scrollWidth,client:el.clientWidth}));assert.ok(studentBounds.scroll<=studentBounds.client+1,JSON.stringify(studentBounds));
- console.log('PASS: student/teacher dashboards fit 320px viewport with contained table scrolling');
+ console.log('PASS: student dashboard fits 320px viewport with contained table scrolling');
  assert.deepEqual(errors,[]);console.log('PASS: invalid scores rejected, legacy metadata supported, CSV edge cases protected, no browser errors');
  await browser.close();
 })().catch(async e=>{console.error(e);if(browser)await browser.close();process.exitCode=1});
