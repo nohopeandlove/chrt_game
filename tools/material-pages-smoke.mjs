@@ -15,6 +15,24 @@ try {
  }
  for(const slug of ['hosting','deploy','start'])assert.equal((await fetch(`${server.base}/materials/${slug}/`)).status,404);
  await page.goto(server.base);
+ const aboutLink=page.locator('.menu__footer a');
+ assert.equal(await aboutLink.innerText(),'Об электронном образовательном ресурсе');
+ assert.equal(await aboutLink.getAttribute('href'),'/about/');
+ await page.locator('[name=playerName]').fill('Не потерять ввод');
+ const popupPromise=page.waitForEvent('popup');await aboutLink.click();const about=await popupPromise;
+ await about.waitForLoadState();
+ assert.equal(await about.locator('h1').innerText(),'Об электронном образовательном ресурсе');
+ assert.equal(await about.getByRole('heading',{name:'Методические указания',exact:true}).count(),1);
+ assert.equal(await about.getByRole('heading',{name:'Соответствие конкурсным критериям',exact:true}).count(),1);
+ assert.equal(await about.locator('table').last().locator('tbody tr').count(),7);
+ assert.equal(await about.locator('a[href^="/materials/"]').count(),0);
+ assert.doesNotMatch(await about.locator('article').innerText(),/Docker|GitHub|npm |SQLite|TEACHER_SETUP_CODE|TypeScript/);
+ for(const width of [320,390,1280]) {
+  await about.setViewportSize({width,height:850});
+  assert.ok(await about.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),`about/${width}`);
+ }
+ await about.close();assert.equal(await page.locator('[name=playerName]').inputValue(),'Не потерять ввод');
+ assert.equal((await fetch(server.base+'/about',{redirect:'manual'})).status,302);
  await page.getByRole('button',{name:'Версия для слабовидящих',exact:true}).click();
  assert.equal(await page.locator('dialog[open]').count(),0);
  await page.locator('[name=playerName]').fill('Настройки не блокируют игру');

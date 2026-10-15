@@ -366,6 +366,7 @@ export class UI {
           <button class="btn btn--primary" type="submit">Начать</button>
         </div>
         <p class="menu__privacy">Начав игру, вы передаёте преподавателю на этот сервер учебный код / псевдоним, группу, ответы и баллы. Для учебного резюме используйте вымышленные контакты: они не отправляются.</p>
+        <footer class="menu__footer"><a href="/about/" target="_blank" rel="noopener noreferrer">Об электронном образовательном ресурсе</a></footer>
         <p class="menu__error" role="alert" hidden>Введите имя — оно будет звучать в репликах.</p>
       </form>`;
 

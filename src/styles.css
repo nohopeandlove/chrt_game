@@ -1034,3 +1034,7 @@ html.vision-contrast :is(.vision-panel,.vision-panel button) { background:var(--
 html[data-vision-images="gray"] :is(.stage__bg,.stage__portrait,.hero__art) { filter:grayscale(1)!important; }
 html[data-vision-images="hidden"] :is(.stage__bg,.stage__portrait,.hero__art) { visibility:hidden; }
 @media(max-width:600px) { .vision-top { gap:18px; } .vision-panel { padding-inline:8px; } .vision-panel .vision-group { display:block; } .vision-group legend { float:none; margin-bottom:8px; } .vision-options { gap:10px; } .vision-range { min-width:0; flex-basis:100%; } }
+
+.menu__footer { width:100%; margin-top:16px; padding-top:20px; border-top:1px solid #cbd6e5; text-align:center; }
+.menu__footer a { display:inline-block; padding:10px 4px; color:var(--ink); text-underline-offset:4px; overflow-wrap:anywhere; }
+.menu__footer a:focus-visible { outline:3px solid var(--ink); outline-offset:3px; }

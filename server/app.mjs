@@ -147,6 +147,7 @@ const server=http.createServer(async(req,res)=>{
   const url=new URL(req.url,'http://localhost');
   if(url.pathname.startsWith('/api/'))return await api(req,res,url);
   if(!['GET','HEAD'].includes(req.method))throw new Failure(405,'Метод не поддерживается.');
+  if(url.pathname==='/about'){res.writeHead(302,{Location:'/about/'});return res.end();}
   if(url.pathname==='/teacher'){res.writeHead(302,{Location:'/teacher/'});return res.end();}
   const path=posix.normalize(decodeURIComponent(url.pathname));
   if(path === '/materials' || path.startsWith('/materials/')) {
