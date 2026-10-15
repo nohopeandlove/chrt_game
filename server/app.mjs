@@ -52,12 +52,15 @@ function body(req) {
   req.on('error',()=>reject(new Failure(400,'Ошибка чтения запроса.')));
  });
 }
-function teacher(req) {
- const raw = (req.headers.cookie || '').split(';').map(v=>v.trim()).find(v=>v.startsWith('teacher_session='))?.split('=')[1] || '';
- const session=sessions.get(hash(raw));
- if(!session || session.expires < Date.now()) throw new Failure(401,'Войдите как преподаватель.');
- return hash(raw);
+function teacherSession(req) {
+ const values=(req.headers.cookie || '').split(';').map(v=>v.trim()).filter(v=>v.startsWith('teacher_session=')).map(v=>v.slice('teacher_session='.length));
+ for(const raw of values) {
+  const sessionHash=hash(raw),session=sessions.get(sessionHash);
+  if(session && session.expires > Date.now())return {raw,hash:sessionHash,expires:session.expires};
+ }
+ throw new Failure(401,'Войдите как преподаватель.');
 }
+function teacher(req) { return teacherSession(req).hash; }
 function queryFilter(url) {
  const group=(url.searchParams.get('group') || '').slice(0,40);
  const q=(url.searchParams.get('q') || '').slice(0,100);
@@ -70,8 +73,11 @@ async function api(req,res,url) {
  }
  if(url.pathname==='/api/health' && req.method==='GET') return json(res,200,{ok:true});
  if(url.pathname==='/api/teacher/status' && req.method==='GET') {
-  let authenticated=false;try{teacher(req);authenticated=true;}catch{}
-  return json(res,200,{configured:!!db.prepare('SELECT id FROM admin').get(),authenticated});
+  let session;try{session=teacherSession(req);}catch{}
+  // Upgrade cookies from older versions, which only covered /api/teacher.
+  // Preserve the original server-side expiration; no new session is created.
+  const headers=session?{'Set-Cookie':[cookie(session.raw,Math.max(1,Math.floor((session.expires-Date.now())/1000))),legacyCookie]}:{};
+  return json(res,200,{configured:!!db.prepare('SELECT id FROM admin').get(),authenticated:!!session},headers);
  }
  if(url.pathname==='/api/teacher/setup' && req.method==='POST') {
   limited(req,'setup',10,15*60_000);

@@ -73,6 +73,20 @@ try {
  await page.locator('[name=code]').fill((await readFile(join(server.data,'setup-code'),'utf8')).trim());
  await page.locator('[name=username]').fill('test-teacher');await page.locator('[name=password]').fill('Test-only-password-2026');await page.getByRole('button',{name:'Создать учётную запись'}).click();
  await page.getByRole('heading',{name:'Результаты студентов',exact:true}).waitFor();
+ assert.equal(await page.getByRole('link',{name:'Методические указания',exact:true}).count(),0);
+ assert.equal(await page.getByRole('link',{name:'Соответствие критериям',exact:true}).count(),0);
+ assert.equal(await page.getByRole('link',{name:'Об электронном образовательном ресурсе',exact:true}).getAttribute('href'),'/about/');
+ // Reproduce an existing login from before HTML materials used root cookies.
+ const active=(await page.context().cookies()).find(c=>c.name==='teacher_session');
+ await page.context().clearCookies();
+ await page.context().addCookies([{name:active.name,value:active.value,domain:'127.0.0.1',path:'/api/teacher',httpOnly:true,sameSite:'Strict'}]);
+ await page.reload();await page.getByRole('heading',{name:'Результаты студентов',exact:true}).waitFor();
+ assert.ok((await page.context().cookies()).some(c=>c.name==='teacher_session' && c.path==='/'));
+ await page.getByRole('link',{name:'Описание аналитики',exact:true}).click();
+ assert.ok(page.url().endsWith('/materials/analytics/'));
+ assert.equal(await page.locator('h1').count(),1);
+ assert.equal(await page.getByRole('link',{name:'Методические указания',exact:true}).count(),0);
+ assert.equal(await page.getByRole('link',{name:'Соответствие критериям',exact:true}).count(),0);
  for(const slug of ['methodical','criteria','analytics']) {
   assert.equal((await page.goto(`${server.base}/materials/${slug}/`)).status(),200);
   assert.equal(await page.locator('h1').count(),1);
