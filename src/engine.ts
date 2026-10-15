@@ -1,3 +1,4 @@
+import { recordAttempt } from './learning.ts';
 import { character, scenes, achievements as allAchievements } from './content.ts';
 import { applyOption, award, save } from './state.ts';
 import { fill } from './text.ts';
@@ -23,6 +24,7 @@ export class Engine {
 
   private async playScene(scene: Scene): Promise<string | null> {
     this.ui.setBackground(scene.background);
+    if (!this.state.learning.visited.includes(scene.id)) this.state.learning.visited.push(scene.id);
     // Сцену всегда начинаем сначала: узлы короткие, а сохранение хранит сцену.
     this.state.scene = scene.id;
     this.state.nodeIndex = 0;
@@ -131,7 +133,7 @@ export class Engine {
         }
         if (node.type === 'quiz' && node.questions && node.results) {
           if (node.prompt) await this.speak('say', node.prompt);
-          const result = await runQuiz(this.ui, node.questions, node.results);
+          const result = await runQuiz(this.ui, node.questions, node.results, (correct, total) => recordAttempt(this.state, 'Трудовые отношения', correct, total));
           if (result) {
             applyOption(this.state, { text: '', ...(result.effects ? { effects: result.effects } : {}) });
             save(this.state);

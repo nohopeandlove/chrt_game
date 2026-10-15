@@ -43,6 +43,9 @@ export class UI {
   constructor(root: HTMLElement) {
     this.root = root;
     this.build();
+    document.addEventListener('accessibility-updated', () => {
+      if (document.documentElement.classList.contains('a11y-still')) this.stopTyping();
+    });
   }
 
   private build(): void {
@@ -54,7 +57,7 @@ export class UI {
       <div class="dock">
         <div class="panel" hidden>
           <span class="panel__speaker"></span>
-          <p class="panel__line" aria-live="polite"></p>
+          <p class="panel__line"></p><span class="sr-only panel__announcement" aria-live="polite" aria-atomic="true"></span>
           <span class="panel__hint" aria-hidden="true">дальше</span>
         </div>
         <div class="choices" hidden></div>
@@ -100,6 +103,7 @@ export class UI {
     this.setPortrait(input.kind === 'say' ? input.who : undefined, input.emotion);
 
     this.panel.hidden = false;
+    this.q('.panel__announcement').textContent = `${input.name ?? input.who?.name ?? ""}. ${input.text}`;
     this.panel.dataset['kind'] = input.kind;
     this.speaker.textContent =
       input.kind === 'say' && input.who ? (input.name ?? input.who.name) : '';
@@ -121,6 +125,7 @@ export class UI {
       };
       const onClick = (): void => advance();
       const onKey = (e: KeyboardEvent): void => {
+        if (document.querySelector('dialog[open]') || (e.target instanceof HTMLElement && e.target.closest('.learning-tools'))) return;
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
           advance();
@@ -135,7 +140,7 @@ export class UI {
   private type(text: string): void {
     this.stopTyping();
     this.fullText = text;
-    if (REDUCED.matches) {
+    if (REDUCED.matches || document.documentElement.classList.contains('a11y-still')) {
       this.line.textContent = text;
       this.hint.classList.add('is-ready');
       return;
@@ -173,6 +178,7 @@ export class UI {
         .join('');
 
       const onKey = (e: KeyboardEvent): void => {
+        if (document.querySelector('dialog[open]') || (e.target instanceof HTMLElement && e.target.closest('.learning-tools'))) return;
         const n = Number(e.key);
         if (Number.isInteger(n) && n >= 1 && n <= input.options.length) {
           e.preventDefault();
@@ -239,6 +245,7 @@ export class UI {
         resolve();
       };
       const onKey = (e: KeyboardEvent): void => {
+        if (document.querySelector('dialog[open]') || (e.target instanceof HTMLElement && e.target.closest('.learning-tools'))) return;
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
           done();
@@ -341,16 +348,17 @@ export class UI {
         </fieldset>
 
         <label class="menu__field">
-          <span>Как вас зовут</span>
+          <span>Как к вам обращаться (можно псевдоним)</span>
           <input class="menu__input" name="playerName" type="text" maxlength="24"
-            placeholder="Имя" autocomplete="off" required>
+            placeholder="Псевдоним" autocomplete="off" required>
         </label>
 
         <div class="menu__actions">
           <button class="btn btn--primary" type="submit">Начать</button>
           ${hasSave ? '<button class="btn" type="button" data-action="continue">Продолжить</button>' : ''}
         </div>
-        <p class="menu__error" hidden>Введите имя — оно будет звучать в репликах.</p>
+        <p class="menu__privacy">Для учебного резюме используйте вымышленные контакты. Данные остаются в этом браузере.</p>
+        <p class="menu__error" role="alert" hidden>Введите имя — оно будет звучать в репликах.</p>
       </form>`;
 
     return new Promise<MenuResult | 'continue'>(resolve => {

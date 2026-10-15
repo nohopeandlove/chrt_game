@@ -1,3 +1,4 @@
+import { recordAttempt } from '../learning.ts';
 import { tests } from '../content.ts';
 import { fill } from '../text.ts';
 import type { GameState, TestSet } from '../types.ts';
@@ -73,6 +74,7 @@ export async function runTest(ui: UI, state: GameState): Promise<void> {
           const correct = set.questions.filter((q, i) => answers[i] === q.correct).length;
           const passed = correct === set.questions.length;
           state.flags['testPassed'] = passed;
+          recordAttempt(state, set.title, correct, set.questions.length);
           const verdict = passed ? set.pass : set.fail;
           host.innerHTML = `
             <div class="curtain curtain--response">
@@ -80,6 +82,7 @@ export async function runTest(ui: UI, state: GameState): Promise<void> {
               <p class="curtain__title">${escapeHtml(verdict.text)}</p>
               <p class="curtain__text">Верных ответов: ${correct} из ${set.questions.length}</p>
               <p class="curtain__text curtain__text--hero">${escapeHtml(verdict.hero)}</p>
+              <details class="learning-review"><summary>Разбор ответов и что повторить</summary><ol>${set.questions.map((q, i) => `<li><b>${escapeHtml(q.text)}</b><p>Ваш ответ: ${escapeHtml(q.options[answers[i] ?? -1] ?? 'Нет ответа')}</p><p>${answers[i] === q.correct ? 'Верно.' : 'Нужно повторить.'} Правильный ответ: ${escapeHtml(q.options[q.correct] ?? '')}</p></li>`).join('')}</ol><p>Сопоставьте ответы с описанием вакансии и материалами по специальности. После отказа можно попробовать снова; это учебная тренировка.</p></details>
               <button class="curtain__go" type="button" data-next>${passed ? 'Дальше' : 'Понятно'}</button>
             </div>`;
           const next = host.querySelector<HTMLButtonElement>('[data-next]');

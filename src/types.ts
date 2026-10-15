@@ -218,7 +218,21 @@ export interface Scene {
   nodes: Node[];
 }
 
+export interface LearningAttempt {
+  topic: string;
+  correct: number;
+  total: number;
+}
+
+export interface LearningProgress {
+  visited: string[];
+  attempts: LearningAttempt[];
+  baseline: number | null;
+  final: number | null;
+}
+
 export interface GameState {
+  learning: LearningProgress;
   playerName: string;
   gender: 'm' | 'f';
   specialty: string | null;

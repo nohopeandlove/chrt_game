@@ -1,3 +1,4 @@
+import { assessment, reportHtml, downloadReport } from '../learning.ts';
 import { achievements } from '../content.ts';
 import type { GameState, ResultRow } from '../types.ts';
 import type { UI } from '../ui.ts';
@@ -5,6 +6,7 @@ import { escapeHtml } from './shared.ts';
 
 /** Финальный экран: таблица итогов, достижения, «Пройти заново». */
 export async function runFinal(ui: UI, state: GameState, title: string, rows: ResultRow[], action: string): Promise<void> {
+  if (state.learning.final === null) await assessment(ui, state, 'final');
   await ui.screen(
     host =>
       new Promise<void>(resolve => {
@@ -38,10 +40,15 @@ export async function runFinal(ui: UI, state: GameState, title: string, rows: Re
                   .join('')}
               </ul>
             </section>
+            <section class="learning-summary"><h3>Учебный результат</h3>${reportHtml(state)}
+              <h3>Мой следующий шаг</h3><p>Выберите действие после игры: дополнить резюме реальным проектом, проверить одну вакансию или обсудить условия договора с преподавателем. Объясните, что измените после разбора ошибок.</p>
+              <button class="btn" type="button" data-export>Скачать результаты без личных данных</button>
+            </section>
             <div class="final__actions">
               <button class="btn btn--primary" type="button" data-restart>${escapeHtml(action)}</button>
             </div>
           </div>`;
+        host.querySelector('[data-export]')?.addEventListener('click', () => downloadReport(state));
         const restart = host.querySelector<HTMLButtonElement>('[data-restart]');
         restart?.addEventListener('click', () => resolve());
         restart?.focus();

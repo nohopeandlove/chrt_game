@@ -1,10 +1,11 @@
 import type { GameState, Option, Scale } from './types.ts';
-import { FIRST_SCENE } from './content.ts';
+import { FIRST_SCENE, scenes } from './content.ts';
 
 const SAVE_KEY = 'ya-specialist/save/v1';
 
 export function newGame(playerName: string, gender: 'm' | 'f'): GameState {
   return {
+    learning: { visited: [], attempts: [], baseline: null, final: null },
     playerName,
     gender,
     specialty: null,
@@ -47,7 +48,8 @@ export function save(state: GameState): void {
   try {
     localStorage.setItem(SAVE_KEY, JSON.stringify(state));
   } catch {
-    // Приватный режим или запрет на хранилище — игра продолжается без сохранения.
+    // Игра остаётся доступной, но предупреждаем о потере прогресса.
+    document.dispatchEvent(new Event('game-save-unavailable'));
   }
 }
 
@@ -56,9 +58,20 @@ export function load(): GameState | null {
     const raw = localStorage.getItem(SAVE_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw) as Partial<GameState>;
-    if (!parsed.playerName || !parsed.scene) return null;
+    if (typeof parsed.playerName !== 'string' || typeof parsed.scene !== 'string' || !scenes.has(parsed.scene)) return null;
+    if (!Array.isArray(parsed.achievements) || !Array.isArray(parsed.rejectedJobs) ||
+        !parsed.scales || !parsed.flags || !parsed.interview || !parsed.resume) return null;
     // Старое сохранение может не знать новых полей — дополняем значениями по умолчанию.
-    return { ...newGame(parsed.playerName, parsed.gender ?? 'f'), ...parsed } as GameState;
+    const state = { ...newGame(parsed.playerName, parsed.gender ?? 'f'), ...parsed } as GameState;
+    state.learning = {
+      visited: Array.isArray(parsed.learning?.visited) ? [...new Set(parsed.learning.visited.filter(x => typeof x === 'string' && scenes.has(x)))] : [],
+      attempts: Array.isArray(parsed.learning?.attempts) ? parsed.learning.attempts.filter(x =>
+        typeof x?.topic === 'string' && Number.isInteger(x.correct) && Number.isInteger(x.total) &&
+        x.total > 0 && x.correct >= 0 && x.correct <= x.total) : [],
+      baseline: Number.isInteger(parsed.learning?.baseline) && Number(parsed.learning?.baseline) >= 0 && Number(parsed.learning?.baseline) <= 3 ? parsed.learning!.baseline : null,
+      final: Number.isInteger(parsed.learning?.final) && Number(parsed.learning?.final) >= 0 && Number(parsed.learning?.final) <= 3 ? parsed.learning!.final : null
+    };
+    return state;
   } catch {
     return null;
   }

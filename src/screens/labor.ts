@@ -68,7 +68,7 @@ function folder(c: CompareColumn, index: number): string {
  * Мини-тест с немедленной проверкой: после ответа видно, где ошибка.
  * Возвращает подходящий результат по числу верных ответов.
  */
-export async function runQuiz(ui: UI, questions: TestQuestion[], results: QuizResult[]): Promise<QuizResult | null> {
+export async function runQuiz(ui: UI, questions: TestQuestion[], results: QuizResult[], onResult?: (correct: number, total: number) => void): Promise<QuizResult | null> {
   let correct = 0;
 
   await ui.screen(
@@ -131,6 +131,7 @@ export async function runQuiz(ui: UI, questions: TestQuestion[], results: QuizRe
       })
   );
 
+  onResult?.(correct, questions.length);
   return pickResult(results, correct, questions.length);
 }
 
