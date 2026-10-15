@@ -16,28 +16,37 @@ try {
  for(const slug of ['hosting','deploy','start'])assert.equal((await fetch(`${server.base}/materials/${slug}/`)).status,404);
  await page.goto(server.base);
  await page.getByRole('button',{name:'Версия для слабовидящих',exact:true}).click();
- await page.locator('.vision-dialog [name=size]').selectOption('26');
- await page.locator('.vision-dialog [name=font]').selectOption('serif');
- await page.locator('.vision-dialog [name=spacing]').selectOption('wide');
- await page.locator('.vision-dialog [name=lines]').selectOption('wide');
- for(const palette of ['light','dark','yellow','default']) {
-  await page.locator('.vision-dialog [name=palette]').selectOption(palette);
+ assert.equal(await page.locator('dialog[open]').count(),0);
+ await page.locator('[name=playerName]').fill('Настройки не блокируют игру');
+ for(const mode of ['gray','hidden','color']) {
+  await page.locator(`[data-vision-key=images][data-value=${mode}]`).click();
+  assert.equal(await page.locator('html').getAttribute('data-vision-images'),mode);
+  const style=await page.locator('.stage__bg').evaluate(e=>({visibility:getComputedStyle(e).visibility,filter:getComputedStyle(e).filter}));
+  if(mode==='hidden')assert.equal(style.visibility,'hidden');
+  if(mode==='gray')assert.equal(style.filter,'grayscale(1)');
+ }
+ await page.locator('.vision-panel [name=size]').evaluate(e=>{e.value='200';e.dispatchEvent(new Event('input',{bubbles:true}));});
+ await page.locator('[data-vision-key=font][data-value=serif]').click();
+ await page.locator('[data-vision-key=spacing][data-value=wide]').click();
+ await page.locator('[data-vision-key=lines][data-value=wide]').click();
+ for(const palette of ['light','dark','yellow','blue','cream','default']) {
+  await page.locator(`[data-vision-key=palette][data-value=${palette}]`).click();
   for(const width of [320,390,1280]) {
    await page.setViewportSize({width,height:850});
    assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),`${palette}/${width}`);
    if(palette!=='default') {
-    const colors=await page.locator('.vision-dialog').evaluate(e=>({bg:getComputedStyle(e).backgroundColor,fg:getComputedStyle(e).color}));
-    assert.equal(colors.bg,palette==='light'?'rgb(255, 255, 255)':'rgb(0, 0, 0)');
-    assert.equal(colors.fg,palette==='light'?'rgb(0, 0, 0)':palette==='dark'?'rgb(255, 255, 255)':'rgb(255, 235, 59)');
+    const colors=await page.locator('.learning-tools').evaluate(e=>({bg:getComputedStyle(e).backgroundColor,fg:getComputedStyle(e).color}));
+    assert.equal(colors.bg,palette==='light'?'rgb(255, 255, 255)':palette==='blue'?'rgb(204, 232, 255)':palette==='cream'?'rgb(255, 240, 201)':'rgb(0, 0, 0)');
+    assert.equal(colors.fg,palette==='light'?'rgb(0, 0, 0)':palette==='dark'?'rgb(255, 255, 255)':palette==='blue'?'rgb(6, 52, 94)':palette==='cream'?'rgb(59, 41, 20)':'rgb(255, 235, 59)');
    }
   }
  }
- await page.keyboard.press('Escape');
+ await page.locator('[data-collapse]').click();
  assert.equal(await page.getByRole('button',{name:'Версия для слабовидящих',exact:true}).evaluate(e=>e===document.activeElement),true);
- await page.reload();assert.equal(await page.locator('body').evaluate(e=>getComputedStyle(e).fontSize),'26px');
+ await page.reload();assert.equal(await page.locator('body').evaluate(e=>getComputedStyle(e).fontSize),'36px');
  await page.getByRole('button',{name:'Версия для слабовидящих',exact:true}).click();
- assert.equal(await page.locator('.vision-dialog [name=font]').inputValue(),'serif');
- await page.locator('.vision-dialog [data-reset]').click();assert.equal(await page.locator('body').evaluate(e=>getComputedStyle(e).fontSize),'18px');await page.keyboard.press('Escape');
+ assert.equal(await page.locator('[data-vision-key=font][data-value=serif]').getAttribute('aria-pressed'),'true');
+ await page.locator('.vision-panel [data-reset]').click();assert.equal(await page.locator('body').evaluate(e=>getComputedStyle(e).fontSize),'18px');await page.locator('[data-collapse]').click();
  await page.locator('[name=playerName]').fill('Тест');await page.getByRole('button',{name:'Начать',exact:true}).click();
  assert.equal(await page.locator('a[href^="/materials/"]').count(),0);
  assert.doesNotMatch(await page.locator('.learning-intro').innerText(),/Docker|GitHub|TEACHER_SETUP_CODE|npm |SQLite/);
@@ -54,5 +63,5 @@ try {
  }
  await page.goto(server.base+'/teacher/');await page.getByRole('button',{name:'Выйти',exact:true}).click();await page.getByRole('heading',{name:'Вход преподавателя'}).waitFor();
  await page.goto(server.base+'/materials/methodical/');assert.ok(page.url().endsWith('/teacher/'));
- console.log('PASS: accessibility sizes/fonts/spacing/four palettes, persistence, reset, mobile fit and keyboard focus; teacher-only materials, traversal protection, private pages unavailable after logout, no deployment pages or student technical links');
+ console.log('PASS: accessibility sizes/fonts/spacing/six palettes, persistence, reset, mobile fit and keyboard focus; teacher-only materials, traversal protection, private pages unavailable after logout, no deployment pages or student technical links');
 }finally{if(browser)await browser.close();await server.close();}

@@ -986,10 +986,6 @@ body.teacher-page { height: auto; min-height: 100dvh; overflow: auto; }
 
 /* User-controlled readable type and high-contrast surfaces. */
 body { font-size: var(--vision-size,18px); font-family: var(--vision-font,system-ui,sans-serif); line-height: var(--vision-lines,1.6); letter-spacing: var(--vision-spacing,normal); }
-.vision-settings { display:grid; gap:18px; }
-.vision-dialog { width:min(680px,96vw); }
-.vision-dialog h2 { font-size:1.4em; line-height:1.3; }
-.vision-settings select { width:100%; font:inherit; height:auto; padding:12px; }
 html.vision-large :is(.panel__line,.choice__text,.input,.menu__input,.quiz__text,.curtain__text,.btn,.quiz__options,.learning-question,.letter textarea) { font-size:1em; }
 html.vision-large .learning-tools button { font-size:16px; }
 html.vision-contrast { --vision-bg:#fff; --vision-fg:#000; --vision-accent:#000; }
@@ -1007,3 +1003,34 @@ html.vision-contrast input { accent-color:var(--vision-fg); }
 html.vision-large .results th { white-space:normal; }
 
 :is(.panel__line,.choice__text,p,li,label,.input,.menu__input,.quiz__text,textarea) { line-height:var(--vision-lines,1.6); letter-spacing:var(--vision-spacing,normal); }
+
+/* Accessibility settings form an inline part of the top toolbar. */
+.learning-tools { max-height:60dvh; overflow-y:auto; align-content:start; }
+.vision-panel { flex:1 0 100%; min-width:0; width:100%; padding:16px 4px 8px; border-top:1px solid currentColor; font:16px/1.5 system-ui,sans-serif; letter-spacing:normal; }
+.vision-panel[hidden] { display:none; }
+.vision-top { display:flex; align-items:center; flex-wrap:wrap; gap:16px 28px; }
+.vision-group { border:0; padding:0; margin:0; min-width:0; display:flex; align-items:center; flex-wrap:wrap; gap:10px; }
+.vision-group legend { float:left; margin-right:12px; padding:0; font-weight:500; }
+.vision-options { display:flex; flex-wrap:wrap; gap:8px; }
+.vision-panel button { min-height:44px; padding:8px 14px; font-size:16px!important; flex:0 1 auto!important; border:1px solid currentColor; border-radius:3px; }
+.vision-panel button[aria-pressed="true"] { outline:3px solid currentColor; outline-offset:2px; font-weight:800; }
+.vision-panel .vision-swatch { width:44px; height:44px; padding:0; border-radius:50%; font-weight:800; font-size:24px!important; }
+.vision-panel [data-swatch="default"] { background:#f3f6fb!important; color:#23344d!important; }
+.vision-panel [data-swatch="light"] { background:#fff!important; color:#000!important; }
+.vision-panel [data-swatch="dark"] { background:#000!important; color:#fff!important; }
+.vision-panel [data-swatch="yellow"] { background:#000!important; color:#ffeb3b!important; }
+.vision-panel [data-swatch="blue"] { background:#cce8ff!important; color:#06345e!important; }
+.vision-panel [data-swatch="cream"] { background:#fff0c9!important; color:#3b2914!important; }
+html.vision-contrast .vision-swatch span { color:inherit!important; }
+.vision-range { display:block; min-width:220px; flex:1 1 260px; }
+.vision-range-track { display:flex; align-items:center; gap:12px; }
+.vision-range input { width:100%; min-width:80px; height:44px; accent-color:currentColor; cursor:pointer; }
+.vision-details { display:grid; gap:14px; margin-top:20px; }
+.vision-bottom { display:flex; align-items:center; flex-wrap:wrap; gap:16px; margin-top:20px; }
+.vision-panel :is(button,input):focus-visible { outline:3px solid #b04e00; outline-offset:4px; }
+html[data-vision-palette="blue"] { --vision-bg:#cce8ff; --vision-fg:#06345e; --vision-accent:#06345e; }
+html[data-vision-palette="cream"] { --vision-bg:#fff0c9; --vision-fg:#3b2914; --vision-accent:#3b2914; }
+html.vision-contrast :is(.vision-panel,.vision-panel button) { background:var(--vision-bg); color:var(--vision-fg); }
+html[data-vision-images="gray"] :is(.stage__bg,.stage__portrait,.hero__art) { filter:grayscale(1)!important; }
+html[data-vision-images="hidden"] :is(.stage__bg,.stage__portrait,.hero__art) { visibility:hidden; }
+@media(max-width:600px) { .vision-top { gap:18px; } .vision-panel { padding-inline:8px; } .vision-panel .vision-group { display:block; } .vision-group legend { float:none; margin-bottom:8px; } .vision-options { gap:10px; } .vision-range { min-width:0; flex-basis:100%; } }
