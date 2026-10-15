@@ -1,3 +1,6 @@
+import { analyticsHtml } from '../reporting.ts';
+import { save } from '../state.ts';
+import { playSound } from '../sound.ts';
 import { assessment, reportHtml, downloadReport } from '../learning.ts';
 import { achievements } from '../content.ts';
 import type { GameState, ResultRow } from '../types.ts';
@@ -7,6 +10,9 @@ import { escapeHtml } from './shared.ts';
 /** Финальный экран: таблица итогов, достижения, «Пройти заново». */
 export async function runFinal(ui: UI, state: GameState, title: string, rows: ResultRow[], action: string): Promise<void> {
   if (state.learning.final === null) await assessment(ui, state, 'final');
+  state.analytics.finishedAt ??= new Date().toISOString();
+  save(state);
+  playSound('success');
   await ui.screen(
     host =>
       new Promise<void>(resolve => {
@@ -40,7 +46,7 @@ export async function runFinal(ui: UI, state: GameState, title: string, rows: Re
                   .join('')}
               </ul>
             </section>
-            <section class="learning-summary"><h3>Учебный результат</h3>${reportHtml(state)}
+            <section class="learning-summary"><h3>Личный кабинет · результаты</h3>${analyticsHtml(state.analytics)}<details class="report-details"><summary>Маршрут и диагностика</summary>${reportHtml(state)}</details><p>Откройте «Кабинет и результаты» в верхней панели для отчёта с ФИО / кодом, группой и экспорта CSV.</p>
               <h3>Мой следующий шаг</h3><p>Выберите действие после игры: дополнить резюме реальным проектом, проверить одну вакансию или обсудить условия договора с преподавателем. Объясните, что измените после разбора ошибок.</p>
               <button class="btn" type="button" data-export>Скачать результаты без личных данных</button>
             </section>

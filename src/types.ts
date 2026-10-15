@@ -231,7 +231,36 @@ export interface LearningProgress {
   final: number | null;
 }
 
+export type TaskCategory = 'resume' | 'test' | 'interview' | 'law';
+
+export interface ActivityEvent {
+  at: string;
+  category: TaskCategory | 'jobs' | 'story';
+  question: string;
+  answer: string;
+  correct: boolean | null;
+  feedback: string;
+}
+
+export interface TaskOutcome {
+  at: string;
+  category: TaskCategory;
+  earned: number;
+  possible: number;
+}
+
+export interface Analytics {
+  sessionId: string;
+  startedAt: string;
+  finishedAt: string | null;
+  fullName: string;
+  group: string;
+  events: ActivityEvent[];
+  outcomes: TaskOutcome[];
+}
+
 export interface GameState {
+  analytics: Analytics;
   learning: LearningProgress;
   playerName: string;
   gender: 'm' | 'f';

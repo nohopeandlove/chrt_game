@@ -1,3 +1,4 @@
+import { recordEvent, recordOutcome } from '../reporting.ts';
 import { recordAttempt } from '../learning.ts';
 import { tests } from '../content.ts';
 import { fill } from '../text.ts';
@@ -74,6 +75,8 @@ export async function runTest(ui: UI, state: GameState): Promise<void> {
           const correct = set.questions.filter((q, i) => answers[i] === q.correct).length;
           const passed = correct === set.questions.length;
           state.flags['testPassed'] = passed;
+          recordOutcome(state, 'test', correct, set.questions.length);
+          for (const [i, q] of set.questions.entries()) recordEvent(state, { category: 'test', question: q.text, answer: q.options[answers[i] ?? -1] ?? 'Нет ответа', correct: answers[i] === q.correct, feedback: `Верный ответ: ${q.options[q.correct] ?? ''}` });
           recordAttempt(state, set.title, correct, set.questions.length);
           const verdict = passed ? set.pass : set.fail;
           host.innerHTML = `

@@ -1,3 +1,5 @@
+import { recordEvent } from '../reporting.ts';
+import { save } from '../state.ts';
 import { specialty as findSpecialty, vacancies, vacancyResponses } from '../content.ts';
 import type { GameState, Vacancy } from '../types.ts';
 import type { UI } from '../ui.ts';
@@ -43,6 +45,7 @@ export async function runJobs(ui: UI, state: GameState): Promise<void> {
           attempts.set(vacancy.id, (attempts.get(vacancy.id) ?? 0) + 1);
 
           if (vacancy.kind === 'trap') {
+            recordEvent(state, { category: 'jobs', question: vacancy.title, answer: 'Отклик на объявление-ловушку', correct: false, feedback: vacancy.reject ?? 'Проверяйте условия вакансии.' }); save(state);
             return showResponse(vacancy.reject ?? '', vacancy.heroComment, 'К вакансиям', showBoard);
           }
           if (vacancy.kind === 'scam') {
@@ -50,16 +53,20 @@ export async function runJobs(ui: UI, state: GameState): Promise<void> {
             return showBoard();
           }
           if (!vacancy.specialties.includes(state.specialty ?? '')) {
+            recordEvent(state, { category: 'jobs', question: vacancy.title, answer: 'Отклик не соответствует выбранной специальности', correct: false, feedback: 'Сопоставьте требования вакансии и свою специальность.' }); save(state);
             return showResponse(vacancyResponses.wrongSpecialty, heroOnMismatch(state), 'К вакансиям', showBoard);
           }
           if (!mentions(letter, vacancy.secretWord ?? '')) {
+            recordEvent(state, { category: 'jobs', question: vacancy.title, answer: 'Не указано секретное слово в сопроводительном письме', correct: false, feedback: 'Перечитайте полное описание и выполните инструкцию работодателя.' }); save(state);
             return showResponse(vacancyResponses.wrongWord, undefined, 'Перечитать вакансию', () => showDetail(vacancy));
           }
 
+          recordEvent(state, { category: 'jobs', question: vacancy.title, answer: 'Требования отклика выполнены', correct: true, feedback: 'Вакансия подходит по специальности, инструкция выполнена.' });
           state.job = { id: vacancy.id, title: vacancy.title, company: vacancy.company };
           state.flags['secretWordFoundOnFirstTry'] = attempts.get(vacancy.id) === 1;
           state.flags['openedBothScams'] = openedScams.size === vacancies.filter(v => v.kind === 'scam').length;
           state.flags['cardNotEntered'] = true;
+          save(state);
           showResponse(vacancyResponses.ok, vacancyResponses.okHero, 'Дальше', resolve);
         };
 

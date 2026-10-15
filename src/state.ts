@@ -1,3 +1,4 @@
+import { newAnalytics, restoreAnalytics } from './reporting.ts';
 import type { GameState, Option, Scale } from './types.ts';
 import { FIRST_SCENE, scenes } from './content.ts';
 
@@ -5,6 +6,7 @@ const SAVE_KEY = 'ya-specialist/save/v1';
 
 export function newGame(playerName: string, gender: 'm' | 'f'): GameState {
   return {
+    analytics: newAnalytics(),
     learning: { visited: [], attempts: [], baseline: null, final: null },
     playerName,
     gender,
@@ -63,6 +65,7 @@ export function load(): GameState | null {
         !parsed.scales || !parsed.flags || !parsed.interview || !parsed.resume) return null;
     // Старое сохранение может не знать новых полей — дополняем значениями по умолчанию.
     const state = { ...newGame(parsed.playerName, parsed.gender ?? 'f'), ...parsed } as GameState;
+    state.analytics = restoreAnalytics(parsed.analytics);
     state.learning = {
       visited: Array.isArray(parsed.learning?.visited) ? [...new Set(parsed.learning.visited.filter(x => typeof x === 'string' && scenes.has(x)))] : [],
       attempts: Array.isArray(parsed.learning?.attempts) ? parsed.learning.attempts.filter(x =>

@@ -1,3 +1,4 @@
+import { recordEvent, recordOutcome } from './reporting.ts';
 import { recordAttempt } from './learning.ts';
 import { character, scenes, achievements as allAchievements } from './content.ts';
 import { applyOption, award, save } from './state.ts';
@@ -26,6 +27,7 @@ export class Engine {
     this.ui.setBackground(scene.background);
     if (!this.state.learning.visited.includes(scene.id)) this.state.learning.visited.push(scene.id);
     // Сцену всегда начинаем сначала: узлы короткие, а сохранение хранит сцену.
+    if (scene.id === 'interview') this.state.interview = { good: 0, neutral: 0, bad: 0 };
     this.state.scene = scene.id;
     this.state.nodeIndex = 0;
     save(this.state);
@@ -73,6 +75,7 @@ export class Engine {
         const picked = await this.ui.choice({ options: options.map(o => this.t(o.text)) });
         const option = options[picked];
         if (!option) return null;
+        recordEvent(this.state, { category: scene.id === 'interview' ? 'interview' : 'story', question: node.prompt?.text ?? node.id, answer: option.text, correct: option.score === undefined ? null : option.score === 1, feedback: option.reply?.text ?? option.note ?? 'Обсудите последствия выбранного действия.' });
         applyOption(this.state, option);
         save(this.state);
         if (option.reply) await this.speak('say', option.reply);
@@ -110,6 +113,7 @@ export class Engine {
         const screen = node.screen ?? '';
         if (screen === 'resume' && node.form) {
           await runResume(this.ui, this.state, node.form);
+          recordOutcome(this.state, 'resume', this.state.resumePercent, 100);
           save(this.state);
           return null;
         }
@@ -133,7 +137,10 @@ export class Engine {
         }
         if (node.type === 'quiz' && node.questions && node.results) {
           if (node.prompt) await this.speak('say', node.prompt);
-          const result = await runQuiz(this.ui, node.questions, node.results, (correct, total) => recordAttempt(this.state, 'Трудовые отношения', correct, total));
+          const result = await runQuiz(this.ui, node.questions, node.results, (correct, total) => {
+            recordOutcome(this.state, 'law', correct, total);
+            recordAttempt(this.state, 'Трудовые отношения', correct, total);
+          }, (q, picked) => recordEvent(this.state, { category: 'law', question: q.text, answer: q.options[picked] ?? '', correct: picked === q.correct, feedback: `Верный ответ: ${q.options[q.correct] ?? ''}` }));
           if (result) {
             applyOption(this.state, { text: '', ...(result.effects ? { effects: result.effects } : {}) });
             save(this.state);
@@ -170,6 +177,7 @@ export class Engine {
     const picked = await this.ui.choice({ options: options.map(o => this.t(o.text)) });
     const option = options[picked];
     if (!option) return;
+    recordEvent(this.state, { category: 'story', question: variant.task, answer: option.text, correct: null, feedback: option.reply?.text ?? option.outcome ?? '' });
     applyOption(this.state, option);
     save(this.state);
     if (option.reply) await this.speak('say', option.reply);
@@ -222,6 +230,7 @@ export class Engine {
     }
     if (node.on === 'interviewScore') {
       const { good, neutral, bad } = this.state.interview;
+      if (good + neutral + bad > 0) recordOutcome(this.state, 'interview', good * 2 + neutral, (good + neutral + bad) * 2);
       // Решает большинство. При равенстве — осторожная сторона.
       const outcome = good > bad && good >= neutral ? 'good' : bad > good && bad >= neutral ? 'bad' : 'neutral';
       if (outcome !== 'good') this.rejectCurrentJob();

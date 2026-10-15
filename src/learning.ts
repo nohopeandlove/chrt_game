@@ -1,3 +1,7 @@
+import { dashboard } from './dashboard.ts';
+import { makeReport } from './reporting.ts';
+import type { StudentReport } from './reporting.ts';
+import { playSound, setSound, soundEnabled } from './sound.ts';
 import { scenes } from './content.ts';
 import { save } from './state.ts';
 import type { GameState } from './types.ts';
@@ -63,6 +67,7 @@ export async function assessment(ui: UI, state: GameState, phase: 'baseline' | '
       const data = new FormData(form);
       const score = diagnostic.filter((q, i) => Number(data.get(`q${i}`)) === q.correct).length;
       state.learning[phase] = score;
+      playSound(score === diagnostic.length ? 'success' : 'notice');
       save(state);
       host.innerHTML = `<h2 class="screen__title" tabindex="-1">Результат: ${score} из ${diagnostic.length}</h2>
         <p>Разберите каждую ситуацию. Повторяющиеся вопросы помогают закрепить материал; прирост балла сам по себе не доказывает эффективность обучения.</p>
@@ -92,7 +97,7 @@ export function reportHtml(state: GameState): string {
 
 export function downloadReport(state: GameState): void {
   const report = {
-    format: 'ya-specialist-learning-v1',
+    ...makeReport(state),
     note: 'Учебные результаты; без имени, резюме, контактов и решений о найме. Повторные попытки сохранены.',
     ...state.learning
   };
@@ -103,10 +108,11 @@ export function downloadReport(state: GameState): void {
 }
 
 export function installLearningTools(root: HTMLElement, getState: () => GameState | null): void {
+  const reports = new Map<string, StudentReport>();
   const tools = document.createElement('aside');
   tools.className = 'learning-tools';
   tools.setAttribute('aria-label', 'Прогресс и настройки доступности');
-  tools.innerHTML = `<button type="button" data-journal>Маршрут и результаты</button><button type="button" data-setting="large" aria-pressed="false">Крупный текст</button><button type="button" data-setting="contrast" aria-pressed="false">Контраст</button><button type="button" data-setting="still" aria-pressed="false">Без анимации</button><span class="save-warning" role="status" hidden>Сохранение недоступно. Не закрывайте вкладку до завершения.</span>`;
+  tools.innerHTML = `<button type="button" data-journal>Кабинет и результаты</button><button type="button" data-setting="large" aria-pressed="false">Крупный текст</button><button type="button" data-setting="contrast" aria-pressed="false">Контраст</button><button type="button" data-setting="still" aria-pressed="false">Без анимации</button><button type="button" data-sound aria-pressed="${soundEnabled()}">Звук: ${soundEnabled() ? 'вкл' : 'выкл'}</button><span class="save-warning" role="status" hidden>Сохранение недоступно. Не закрывайте вкладку до завершения.</span>`;
   root.append(tools);
   const sizeTools = (): void => {
     document.documentElement.style.setProperty('--learning-tools-height', `${tools.getBoundingClientRect().height}px`);
@@ -132,11 +138,18 @@ export function installLearningTools(root: HTMLElement, getState: () => GameStat
       try { localStorage.setItem(`ya-specialist/${setting}`, String(active)); } catch { /* работает без хранилища */ }
     });
   });
+  tools.querySelector<HTMLButtonElement>('[data-sound]')?.addEventListener('click', event => {
+    setSound(!soundEnabled());
+    const button = event.currentTarget as HTMLButtonElement;
+    button.textContent = `Звук: ${soundEnabled() ? 'вкл' : 'выкл'}`;
+    button.setAttribute('aria-pressed', String(soundEnabled()));
+  });
+  document.addEventListener('click', event => {
+    if (event.target instanceof HTMLElement && event.target.closest('button:not([data-sound])')) playSound('tap');
+  });
   tools.querySelector('[data-journal]')?.addEventListener('click', () => {
     const state = getState();
-    dialog.innerHTML = `<h2 id="journal-title">Маршрут и результаты</h2>${state ? reportHtml(state) : '<p>Начните игру, чтобы увидеть маршрут и результаты.</p>'}<p>Пауза: читайте в своём темпе. Чтобы продолжить историю, закройте журнал. После перезагрузки главы диалоги и задания могут повторяться; завершённые попытки учитываются отдельно.</p><div class="learning-actions">${state ? '<button class="btn" data-export>Скачать результаты без личных данных</button>' : ''}<button class="btn btn--primary" data-close>Вернуться к игре</button></div>`;
-    dialog.querySelector('[data-close]')?.addEventListener('click', () => dialog.close());
-    dialog.querySelector('[data-export]')?.addEventListener('click', () => { if (state) downloadReport(state); });
+    dashboard(dialog, state, state ? reportHtml(state) : '', () => { if (state) downloadReport(state); }, reports);
     dialog.showModal();
   });
   document.addEventListener('game-save-unavailable', () => {

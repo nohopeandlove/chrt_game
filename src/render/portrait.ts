@@ -13,13 +13,13 @@ import type { Emotion, Portrait } from '../types.ts';
  */
 export type Look = 'flat' | 'ink' | 'chibi' | 'minimal';
 
-export const DEFAULT_LOOK: Look = 'flat';
+export const DEFAULT_LOOK: Look = 'ink';
 
 const SKIN = '#F7D2BC';
 const SKIN_SHADE = '#E9B99F';
 const SKIN_LINE = '#C68F71';
 const LINE = '#3B2C43';
-const INK = '#111111';
+const INK = '#26364D';
 
 interface Ctx {
   p: Portrait;
@@ -38,7 +38,7 @@ function ctx(p: Portrait, emotion: Emotion, look: Look): Ctx {
     p,
     emotion,
     look,
-    o: outlined ? ` stroke="${INK}" stroke-width="3" stroke-linejoin="round"` : '',
+    o: outlined ? ` stroke="${INK}" stroke-width="2.2" stroke-linejoin="round"` : '',
     outlined,
     chibi: look === 'chibi',
     minimal: look === 'minimal'
@@ -56,7 +56,7 @@ function hairBack(c: Ctx): string {
         <circle cx="76" cy="78" r="37" fill="${h}"${o}/><circle cx="224" cy="78" r="37" fill="${h}"${o}/>
         ${detail ? `<circle cx="76" cy="78" r="22" fill="${d}" opacity=".35"/><circle cx="224" cy="78" r="22" fill="${d}" opacity=".35"/>` : ''}`;
     case 'spiky':
-      return `<path d="M96,96 L92,44 L124,80 L142,38 L160,80 L188,44 L196,84 Z" fill="${h}"${o}/>
+      return `<path d="M78,116 C72,78 98,49 129,51 C145,37 176,44 188,57 C211,62 226,85 222,120 L211,107 C190,78 116,78 89,112 Z" fill="${h}"${o}/>
         <rect x="76" y="62" width="148" height="120" rx="74" fill="${h}"${o}/>`;
     case 'bob':
       return `<rect x="62" y="58" width="176" height="200" rx="88" fill="${h}"${o}/>
@@ -142,7 +142,7 @@ const BROWS: Record<Emotion, string> = {
 
 function sideFeatures(c: Ctx): string {
   const { p, emotion } = c;
-  const browWidth = c.minimal ? 4 : 7;
+  const browWidth = c.minimal ? 4 : 5;
   const brow = `<path d="${BROWS[emotion]}" fill="none" stroke="${c.outlined ? INK : p.brow}" stroke-width="${browWidth}" stroke-linecap="round"/>`;
 
   if (c.minimal) {
@@ -157,7 +157,7 @@ function sideFeatures(c: Ctx): string {
   if (emotion === 'joy') {
     eye = `<path d="M160,155 Q176,140 192,155" fill="none" stroke="${LINE}" stroke-width="4.2" stroke-linecap="round"/>`;
   } else {
-    const k = c.chibi ? 1.28 : 1;
+    const k = c.chibi ? 1.12 : .88;
     const ry = (emotion === 'worry' ? 14.5 : 13.5) * k;
     const rx = 17 * k;
     eye = `<ellipse cx="176" cy="152" rx="${rx}" ry="${ry}" fill="#FDFBFF"${c.outlined ? ` stroke="${INK}" stroke-width="2"` : ''}/>
@@ -179,7 +179,7 @@ function nose(c: Ctx): string {
   if (c.chibi) {
     return `<path d="M147,180 q3,4 6,0" fill="none" stroke="${INK}" stroke-width="2.5" stroke-linecap="round"/>`;
   }
-  return `<path d="M150,158 C 143,178 140,187 149,189 C 155,190 159,187 161,183" fill="none" stroke="${c.outlined ? INK : SKIN_LINE}" stroke-width="${c.outlined ? 2.5 : 3}" stroke-linecap="round"/>`;
+  return `<path d="M150,160 Q144,178 147,185 Q151,188 156,183" fill="none" stroke="${c.outlined ? INK : SKIN_LINE}" stroke-width="${c.outlined ? 2.5 : 3}" stroke-linecap="round"/>`;
 }
 
 function mouth(c: Ctx): string {
@@ -222,7 +222,7 @@ function glasses(c: Ctx): string {
   const radius = p.glassesRound ? 16 : 7;
   const col = c.outlined ? INK : p.glasses;
   const w = c.minimal ? 3 : 4.5;
-  return `<g fill="${c.minimal ? 'none' : (p.glassesTint ?? 'none')}" stroke="${col}" stroke-width="${w}" opacity=".95">
+  return `<g fill="${c.minimal ? 'none' : (p.glassesTint ?? 'none')}" stroke="${col}" stroke-width="${w}" fill-opacity="${p.glassesTint ? .22 : 1}" opacity=".95">
       <rect x="96" y="130" width="52" height="40" rx="${radius}"/>
       <rect x="152" y="130" width="52" height="40" rx="${radius}"/>
     </g>
@@ -232,7 +232,7 @@ function glasses(c: Ctx): string {
 }
 
 export interface PortraitOptions {
-  /** Кадрировать по лицу — для мелких превью. */
+  /** Компактное превью с теми же пропорциями и полным силуэтом. */
   crop?: boolean;
   /** Нарисовать подложку цвета персонажа. По умолчанию фон прозрачный. */
   plate?: boolean;
@@ -242,9 +242,9 @@ export interface PortraitOptions {
 
 export function renderPortrait(p: Portrait, emotion: Emotion, opts: PortraitOptions = {}): string {
   const c = ctx(p, emotion, opts.look ?? DEFAULT_LOOK);
-  const viewBox = opts.crop ? '68 62 164 164' : '0 0 300 360';
+  const viewBox = '0 0 300 360';
   const features = sideFeatures(c);
-  const plate = opts.plate ? `<rect x="0" y="0" width="300" height="360" fill="${p.bg}"/>` : '';
+  const plate = opts.plate ? `<rect x="0" y="0" width="300" height="360" rx="24" fill="${p.bg}"/><circle cx="150" cy="146" r="112" fill="#FFFFFF" opacity=".55"/>` : '';
 
   // Голова с причёской у чиби крупнее, тело остаётся прежним.
   const headScale = c.chibi ? 'transform="translate(150 150) scale(1.22) translate(-150 -150)"' : '';
