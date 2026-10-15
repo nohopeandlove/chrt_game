@@ -1,7 +1,7 @@
 import type { ActivityEvent, Analytics, GameState, TaskCategory, TaskOutcome } from './types.ts';
 import { escapeHtml as esc } from './screens/shared.ts';
 
-export const taskNames: Record<TaskCategory, string> = { resume: 'Резюме', test: 'Тестовое задание', interview: 'Собеседование', law: 'Трудовые отношения' };
+export const taskNames: Record<TaskCategory, string> = { portfolio: 'Портфолио', resume: 'Резюме', test: 'Тестовое задание', interview: 'Собеседование', law: 'Трудовые отношения' };
 const categories = Object.keys(taskNames) as TaskCategory[];
 const isRecord = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null && !Array.isArray(v);
 const text = (v: unknown, max = 1000): string => typeof v === 'string' ? v.slice(0, max) : '';
@@ -48,7 +48,7 @@ export function recommendations(a: Analytics): string[] {
   const result: string[] = [];
   for (const category of categories) {
     const score = percentage(latest(a, category));
-    if (score !== null && score < 80) result.push(category === 'resume' ? 'Дополните незаполненные поля учебного резюме.' : category === 'test' ? 'Повторите задания по своей специальности и разберите неверные ответы.' : category === 'interview' ? 'Потренируйтесь отвечать по схеме: опыт, пример, результат; объясняйте мотивацию.' : 'Повторите тему «Трудовой договор и ГПХ», гарантии и обязанности работника.');
+    if (score !== null && score < 80) result.push(category === 'portfolio' ? 'Выбирайте собственные работы с описанием задачи, личного вклада и результата. Не выдавайте чужую работу за свою.' : category === 'resume' ? 'Дополните незаполненные поля учебного резюме.' : category === 'test' ? 'Повторите задания по своей специальности и разберите неверные ответы.' : category === 'interview' ? 'Потренируйтесь отвечать по схеме: опыт, пример, результат; объясняйте мотивацию.' : 'Повторите тему «Трудовой договор и ГПХ», гарантии и обязанности работника.');
   }
   if (a.events.some(e => e.category === 'jobs' && e.correct === false)) result.push('Перечитывайте требования вакансии; проверяйте работодателя и условия отклика.');
   if (!result.length) result.push(a.outcomes.length ? 'По выполненным заданиям выраженных затруднений не выявлено. Подтвердите навыки на новом примере с преподавателем.' : 'Завершите задания, чтобы получить рекомендации по результатам.');
@@ -102,7 +102,7 @@ export function csvCell(value: string): string {
   return `"${safe.replaceAll('"', '""')}"`;
 }
 export function reportsCsv(reports: StudentReport[]): string {
-  const rows = [['Сессия','ФИО / код','Группа','Начало (UTC)','Завершение (UTC)','Резюме, % заполнения','Тест, %','Собеседование, %','Трудовые отношения, %','Входная диагностика, из 3','Итоговая диагностика, из 3','Набор итоговой диагностики','Выбранные действия','Ошибки','Рекомендации']];
+  const rows = [['Сессия','ФИО / код','Группа','Начало (UTC)','Завершение (UTC)','Портфолио, %','Резюме, % заполнения','Тест, %','Собеседование, %','Трудовые отношения, %','Входная диагностика, из 3','Итоговая диагностика, из 3','Набор итоговой диагностики','Выбранные действия','Ошибки','Рекомендации']];
   for (const report of reports) {
     const a = report.analytics;
     rows.push([a.sessionId,a.fullName || 'Не указано',a.group,a.startedAt,a.finishedAt || 'Не завершено',

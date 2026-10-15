@@ -4,6 +4,8 @@ import { character, scenes, achievements as allAchievements } from './content.ts
 import { applyOption, award, save } from './state.ts';
 import { fill } from './text.ts';
 import { UI } from './ui.ts';
+import { runPortfolio } from './screens/portfolio.ts';
+import { summarizeScene } from './screens/scene-summary.ts';
 import { runResume } from './screens/resume.ts';
 import { runJobs } from './screens/jobs.ts';
 import { runLetter, runTest } from './screens/test.ts';
@@ -32,6 +34,13 @@ export class Engine {
     this.state.nodeIndex = 0;
     save(this.state);
 
+    const start = { ...this.state.scales };
+    let summarized = false;
+    const summary = async (): Promise<void> => {
+      if (summarized) return;
+      summarized = true;
+      await summarizeScene(this.ui, this.state, scene, start);
+    };
     let index = 0;
     while (index < scene.nodes.length) {
       const node = scene.nodes[index];
@@ -40,8 +49,16 @@ export class Engine {
       this.state.nodeIndex = index;
       save(this.state);
 
+      if (node.type === 'chapter' && index > 0) await summary();
+      if (node.type === 'results') {
+        await summary();
+        if (node.screen !== 'final') { index += 1; continue; }
+      }
       const jump = await this.playNode(node, scene);
-      if (jump?.kind === 'scene') return jump.id;
+      if (jump?.kind === 'scene') {
+        await summary();
+        return jump.id;
+      }
       if (jump?.kind === 'node') {
         const target = scene.nodes.findIndex(n => n.id === jump.id);
         if (target < 0) throw new Error(`Узел ${jump.id} не найден в сцене ${scene.id}`);
@@ -111,6 +128,10 @@ export class Engine {
       case 'minigame':
       case 'results': {
         const screen = node.screen ?? '';
+        if (screen === 'portfolio') {
+          await runPortfolio(this.ui, this.state);
+          return null;
+        }
         if (screen === 'resume' && node.form) {
           await runResume(this.ui, this.state, node.form);
           recordOutcome(this.state, 'resume', this.state.resumePercent, 100);
@@ -133,6 +154,7 @@ export class Engine {
         }
         if (screen === 'compare' && node.columns) {
           await runCompare(this.ui, node.columns, node.summary ?? '');
+          await this.showAchievement('informed-choice');
           return null;
         }
         if (node.type === 'quiz' && node.questions && node.results) {

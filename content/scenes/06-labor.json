@@ -29,8 +29,7 @@
         {
           "text": "Главное — зарплата, остальное не важно.",
           "effects": { "risk": 1 },
-          "set": { "signedBlind": true },
-          "award": "no-rights",
+          "set": { "wantedHastySignature": true },
           "reply": { "who": "director-company", "emotion": "stern", "text": "Так думают многие — и потом удивляются. Пять минут, и вы будете знать свои права. Слушайте." }
         }
       ]
@@ -265,12 +264,7 @@
       "id": "scene-results",
       "type": "results",
       "title": "Итоги сцены",
-      "rows": [
-        { "label": "Знания трудовых отношений", "value": "+3" },
-        { "label": "Ответственность", "value": "+1" },
-        { "label": "Осознанность", "value": "+2, если понял разницу между договорами" },
-        { "label": "Риск ошибок", "value": "−1 при трудовом договоре, +1 при ГПХ без понимания" }
-      ]
+      "rows": []
     },
     {
       "id": "handoff",

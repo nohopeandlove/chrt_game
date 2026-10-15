@@ -17,7 +17,7 @@ export async function runFinal(ui: UI, state: GameState, title: string, rows: Re
   await ui.screen(
     host =>
       new Promise<void>(resolve => {
-        const earned = new Set(state.achievements);
+        const earned = new Set(state.achievements.filter(id => achievements.some(a => a.id === id)));
         host.innerHTML = `
           <div class="final">
             <header class="final__head">

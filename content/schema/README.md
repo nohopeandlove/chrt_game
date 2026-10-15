@@ -56,7 +56,7 @@
 `effects` — шкалы: `energy`, `mood`, `confidence`, `reputation`, `law`,
 `responsibility`, `awareness`, `risk`.
 `set` — флаги: `style`, `approach`, `portfolio`, `contract`, `readContract`,
-`signedBlind`.
+`wantedHastySignature`.
 `score` — только в сцене собеседования, значения `1`, `0`, `-1`.
 
 ## Проверка

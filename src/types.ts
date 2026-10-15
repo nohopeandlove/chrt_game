@@ -233,7 +233,7 @@ export interface LearningProgress {
   final: number | null;
 }
 
-export type TaskCategory = 'resume' | 'test' | 'interview' | 'law';
+export type TaskCategory = 'portfolio' | 'resume' | 'test' | 'interview' | 'law';
 
 export interface ActivityEvent {
   at: string;
