@@ -4,7 +4,6 @@ dist
 .claude
 assets/reference
 design
-docs
 data
 .env
 .env.*
