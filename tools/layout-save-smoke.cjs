@@ -32,7 +32,7 @@ let browser;
  for(const size of [{width:1440,height:900},{width:792,height:303},{width:390,height:844},{width:320,height:568}]){
   await page.setViewportSize(size);
   for(const large of [false,true]){
-   await page.evaluate(l=>document.documentElement.classList.toggle('a11y-large',l),large);
+   await page.evaluate(l=>document.documentElement.style.setProperty('--vision-size',l?'26px':'18px'),large);
    const positions=await page.locator('.panel').evaluate(p=>{const b=p.getBoundingClientRect();return [...p.querySelectorAll('.panel__speaker,.panel__line,.panel__hint')].map(el=>{const r=el.getBoundingClientRect();return {name:el.className,inside:r.left>=b.left&&r.right<=b.right&&r.top>=b.top&&r.bottom<=b.bottom};});});
    assert.ok(positions.every(p=>p.inside),JSON.stringify({size,large,positions}));
    const dock=await page.locator('.dock').evaluate(e=>({scroll:e.scrollWidth,client:e.clientWidth}));assert.ok(dock.scroll<=dock.client+1,JSON.stringify({size,dock}));

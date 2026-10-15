@@ -1,3 +1,4 @@
+import { installAccessibility } from './accessibility.ts';
 import { syncStatus } from './sync.ts';
 import { dashboard } from './dashboard.ts';
 import { playSound, setSound, soundEnabled } from './sound.ts';
@@ -60,8 +61,8 @@ export async function orientation(ui: UI, state: GameState): Promise<void> {
       <h3>Как проходит игра</h3>
       <p>Восемь этапов: выпускной → портфолио → резюме → вакансии → тестовое → собеседование → договор → первый рабочий день. Читайте реплики, выбирайте действия и разбирайте обратную связь. Таймера нет: темп выбираете вы.</p>
       <p>Входная и итоговая диагностика содержат разные ситуации по трём общим темам: безопасный поиск работы, резюме и условия договора. В финале вы примените знания к новым примерам. Баллы не подтверждают профессиональную квалификацию. Диагностику можно пропустить.</p>
-      <details><summary>Управление, доступность и сохранение</summary><p>Tab — переход по кнопкам; Enter — нажатие; Enter или пробел — следующая реплика; цифры — выбор ответа в диалоге. В верхней панели доступны журнал, крупный текст, контраст и отключение анимации. Можно сделать перерыв: «Продолжить» возвращает к началу текущей главы.</p><p>Используйте вымышленное имя и учебные данные в резюме. Позиция в игре хранится в браузере. Учебные результаты, код / ФИО и группа автоматически сохраняются на сервере для преподавателя. При очистке данных браузера он исчезнет; если сохранение недоступно, появится предупреждение.</p></details>
-      <details><summary>Границы модели и преподавателю</summary><p>Компании, вакансии, суммы и ситуации — учебные примеры. «Секретное слово» — условность для тренировки внимательного чтения; требование 100% в тестовом — правило игры, а не норма найма. Повторная попытка после отказа разрешена. Игра не заменяет проверку работодателя и юридическую консультацию.</p><p>Для занятия: короткое обсуждение опыта → игра в своём темпе → разбор решений → итоговая диагностика и личный план. Откройте <a href="/materials/methodical/" target="_blank" rel="noopener noreferrer">методические указания</a> и <a href="/materials/criteria/" target="_blank" rel="noopener noreferrer">описание соответствия критериям</a>.</p></details>
+      <details><summary>Управление, доступность и сохранение</summary><p>Tab — переход по кнопкам; Enter — нажатие; Enter или пробел — следующая реплика; цифры — выбор ответа в диалоге. В верхней панели доступны журнал, версия для слабовидящих и отключение анимации. Можно сделать перерыв: «Продолжить» возвращает к началу текущей главы.</p><p>Используйте вымышленное имя и учебные данные в резюме. Позиция в игре хранится в браузере. Учебные результаты, код / ФИО и группа автоматически сохраняются на сервере для преподавателя. При очистке данных браузера он исчезнет; если сохранение недоступно, появится предупреждение.</p></details>
+      <details><summary>Условности учебных ситуаций</summary><p>Компании, вакансии, суммы и ситуации — учебные примеры. «Секретное слово» — условность для тренировки внимательного чтения; требование 100% в тестовом — правило игры, а не норма найма. Повторная попытка после отказа разрешена. Игра не заменяет проверку работодателя и юридическую консультацию.</p></details>
       <div class="learning-actions"><button class="btn btn--primary" data-assess>Пройти входную диагностику</button><button class="btn" data-skip>Перейти к истории</button></div>
     </article>`;
     host.querySelector('[data-assess]')?.addEventListener('click', () => resolve(true));
@@ -121,8 +122,9 @@ export function installLearningTools(root: HTMLElement, getState: () => GameStat
   const tools = document.createElement('aside');
   tools.className = 'learning-tools';
   tools.setAttribute('aria-label', 'Прогресс и настройки доступности');
-  tools.innerHTML = `<button type="button" data-journal>Кабинет и результаты</button><button type="button" data-setting="large" aria-pressed="false">Крупный текст</button><button type="button" data-setting="contrast" aria-pressed="false">Контраст</button><button type="button" data-setting="still" aria-pressed="false">Без анимации</button><button type="button" data-sound aria-pressed="${soundEnabled()}">Звук: ${soundEnabled() ? 'вкл' : 'выкл'}</button><span class="save-warning" role="status" hidden>Сохранение недоступно. Не закрывайте вкладку до завершения.</span>`;
+  tools.innerHTML = `<button type="button" data-journal>Кабинет и результаты</button><button type="button" data-vision>Версия для слабовидящих</button><button type="button" data-setting="still" aria-pressed="false">Без анимации</button><button type="button" data-sound aria-pressed="${soundEnabled()}">Звук: ${soundEnabled() ? 'вкл' : 'выкл'}</button><span class="save-warning" role="status" hidden>Сохранение недоступно. Не закрывайте вкладку до завершения.</span>`;
   root.append(tools);
+  installAccessibility(root, tools.querySelector<HTMLButtonElement>('[data-vision]')!);
   const sizeTools = (): void => {
     document.documentElement.style.setProperty('--learning-tools-height', `${tools.getBoundingClientRect().height}px`);
   };

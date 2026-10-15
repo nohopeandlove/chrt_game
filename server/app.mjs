@@ -2,7 +2,7 @@ import http from 'node:http';
 import { DatabaseSync } from 'node:sqlite';
 import { randomBytes, createHash, timingSafeEqual, scryptSync } from 'node:crypto';
 import { mkdirSync, existsSync, readFileSync, writeFileSync, unlinkSync, statSync, createReadStream } from 'node:fs';
-import { resolve, join, extname, sep } from 'node:path';
+import { resolve, join, extname, sep, posix } from 'node:path';
 import { parseReport, reportsCsv } from '../src/reporting.ts';
 
 const dataDir = resolve(process.env.DATA_DIR || './data');
@@ -32,7 +32,8 @@ const equal = (a,b) => timingSafeEqual(Buffer.from(hash(a)),Buffer.from(hash(b))
 const token = () => randomBytes(32).toString('base64url');
 const sessions = db.prepare('SELECT expires FROM teacher_sessions WHERE hash=?');
 const secureCookie = process.env.COOKIE_SECURE === 'true';
-const cookie = (value,age) => `teacher_session=${value}; Path=/api/teacher; HttpOnly; SameSite=Strict; Max-Age=${age}${secureCookie ? '; Secure' : ''}`;
+const cookie = (value,age) => `teacher_session=${value}; Path=/; HttpOnly; SameSite=Strict; Max-Age=${age}${secureCookie ? '; Secure' : ''}`;
+const legacyCookie = 'teacher_session=; Path=/api/teacher; HttpOnly; SameSite=Strict; Max-Age=0';
 const attempts = new Map();
 function limited(req, scope, max, duration) {
  const key = scope + ':' + req.socket.remoteAddress; const current = attempts.get(key);
@@ -90,9 +91,9 @@ async function api(req,res,url) {
   if(!admin || input?.username!==admin.username || !equal(supplied,admin.password_hash))throw new Failure(401,'Неверный логин или пароль.');
   const value=token();db.prepare('DELETE FROM teacher_sessions WHERE expires < ?').run(Date.now());
   db.prepare('INSERT INTO teacher_sessions VALUES (?,?)').run(hash(value),Date.now()+8*60*60_000);
-  return json(res,200,{ok:true},{'Set-Cookie':cookie(value,8*60*60)});
+  return json(res,200,{ok:true},{'Set-Cookie':[cookie(value,8*60*60),legacyCookie]});
  }
- if(url.pathname==='/api/teacher/logout' && req.method==='POST') {const session=teacher(req);db.prepare('DELETE FROM teacher_sessions WHERE hash=?').run(session);return json(res,200,{ok:true},{'Set-Cookie':cookie('',0)});}
+ if(url.pathname==='/api/teacher/logout' && req.method==='POST') {const session=teacher(req);db.prepare('DELETE FROM teacher_sessions WHERE hash=?').run(session);return json(res,200,{ok:true},{'Set-Cookie':[cookie('',0),legacyCookie]});}
  if(url.pathname==='/api/student/session' && req.method==='POST') {
   limited(req,'student-session',300,10*60_000);await body(req);
   const id=crypto.randomUUID(),value=token();db.prepare('INSERT INTO students (id,token_hash) VALUES (?,?)').run(id,hash(value));
@@ -147,9 +148,14 @@ const server=http.createServer(async(req,res)=>{
   if(url.pathname.startsWith('/api/'))return await api(req,res,url);
   if(!['GET','HEAD'].includes(req.method))throw new Failure(405,'Метод не поддерживается.');
   if(url.pathname==='/teacher'){res.writeHead(302,{Location:'/teacher/'});return res.end();}
-  const path=decodeURIComponent(url.pathname);const file=resolve(webRoot,'.'+(path.endsWith('/')?path+'index.html':path));
+  const path=posix.normalize(decodeURIComponent(url.pathname));
+  if(path === '/materials' || path.startsWith('/materials/')) {
+   if(!/^\/materials\/(methodical|criteria|analytics)\/(index\.html)?$/.test(path)) throw new Failure(404,'Страница не найдена.');
+   try { teacher(req); } catch { res.writeHead(302,{Location:'/teacher/','Cache-Control':'no-store'});return res.end(); }
+  }
+  const file=resolve(webRoot,'.'+(path.endsWith('/')?path+'index.html':path));
   if(!file.startsWith(webRoot+sep)||!existsSync(file)||!statSync(file).isFile())throw new Failure(404,'Страница не найдена.');
-  res.writeHead(200,{'Content-Type':mime[extname(file)] || 'application/octet-stream','Cache-Control':extname(file)==='.html'?'no-cache':'public, max-age=3600'});
+  res.writeHead(200,{'Content-Type':mime[extname(file)] || 'application/octet-stream','Cache-Control':path.startsWith('/materials/')?'no-store':extname(file)==='.html'?'no-cache':'public, max-age=3600'});
   if(req.method==='HEAD')return res.end();createReadStream(file).pipe(res);
  } catch(error){if(!res.headersSent)json(res,error instanceof Failure?error.status:500,{error:error instanceof Failure?error.message:'Ошибка сервера.'});else res.end();}
 });

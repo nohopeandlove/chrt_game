@@ -983,3 +983,27 @@ body.teacher-page { height: auto; min-height: 100dvh; overflow: auto; }
 
 .curtain--table .results { table-layout: fixed; overflow-wrap: anywhere; }
 .curtain--table .results th { white-space: normal; }
+
+/* User-controlled readable type and high-contrast surfaces. */
+body { font-size: var(--vision-size,18px); font-family: var(--vision-font,system-ui,sans-serif); line-height: var(--vision-lines,1.6); letter-spacing: var(--vision-spacing,normal); }
+.vision-settings { display:grid; gap:18px; }
+.vision-dialog { width:min(680px,96vw); }
+.vision-dialog h2 { font-size:1.4em; line-height:1.3; }
+.vision-settings select { width:100%; font:inherit; height:auto; padding:12px; }
+html.vision-large :is(.panel__line,.choice__text,.input,.menu__input,.quiz__text,.curtain__text,.btn,.quiz__options,.learning-question,.letter textarea) { font-size:1em; }
+html.vision-large .learning-tools button { font-size:16px; }
+html.vision-contrast { --vision-bg:#fff; --vision-fg:#000; --vision-accent:#000; }
+html[data-vision-palette="dark"] { --vision-bg:#000; --vision-fg:#fff; --vision-accent:#fff; }
+html[data-vision-palette="yellow"] { --vision-bg:#000; --vision-fg:#ffeb3b; --vision-accent:#ffeb3b; }
+html.vision-contrast { --paper:var(--vision-bg); --paper-2:var(--vision-bg); --white:var(--vision-bg); --ink:var(--vision-fg); --ink-2:var(--vision-fg); --ink-3:var(--vision-fg); }
+html.vision-contrast body { background:var(--vision-bg); color:var(--vision-fg); }
+html.vision-contrast :is(.overlay,.menu,.sheet>*,.learning-dialog,.panel,.curtain,.choice,.btn,.learning-tools,.learning-tools button,.input,.menu__input,.metric-card,.hero,.work-card,.portfolio-zone,.quiz__verdict,.choice__num,.panel__speaker,.curtain__eyebrow,.screen__eyebrow,.menu__eyebrow,.icon-close,.letter textarea,.results,.results th,.results td,select,option,.learning-intro details,.learning-question,.report-details) { background:var(--vision-bg)!important; color:var(--vision-fg)!important; border-color:var(--vision-fg)!important; box-shadow:none!important; }
+html.vision-contrast :is(p,h1,h2,h3,span,small,label,legend,strong,summary,li,a,th,td) { color:var(--vision-fg)!important; }
+html.vision-contrast :is(a,button,input,select,textarea,summary):focus-visible { outline:3px solid var(--vision-accent)!important; outline-offset:4px; }
+html.vision-contrast :is(button[aria-pressed="true"],.hero:has(input:checked),.choice.is-right,.choice.is-wrong) { outline:3px solid var(--vision-fg); outline-offset:-5px; }
+html.vision-contrast .stage { opacity:.12; }
+html.vision-contrast .overlay { background-image:none; }
+html.vision-contrast input { accent-color:var(--vision-fg); }
+html.vision-large .results th { white-space:normal; }
+
+:is(.panel__line,.choice__text,p,li,label,.input,.menu__input,.quiz__text,textarea) { line-height:var(--vision-lines,1.6); letter-spacing:var(--vision-spacing,normal); }
