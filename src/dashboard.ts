@@ -46,7 +46,7 @@ export function dashboard(dialog: HTMLDialogElement, state: GameState | null, jo
     body.querySelector('[data-clear]')?.addEventListener('click', () => {reports.clear();renderTeacher();});
     body.querySelectorAll<HTMLButtonElement>('[data-detail]').forEach(b=>b.addEventListener('click',()=>{
       const report=[...reports.values()][Number(b.dataset['detail'])];if(!report)return;
-      const area=body.querySelector<HTMLElement>('[data-detail-body]')!;area.innerHTML=`<h3 tabindex="-1">Отчёт: ${esc(report.analytics.fullName || report.analytics.sessionId.slice(0,8))}</h3><p>Входная диагностика: ${report.diagnostics.baseline === null ? 'нет данных' : `${report.diagnostics.baseline}/3`}; итоговая: ${report.diagnostics.final === null ? 'нет данных' : `${report.diagnostics.final}/3`}.</p>${analyticsHtml(report.analytics)}`;
+      const area=body.querySelector<HTMLElement>('[data-detail-body]')!;area.innerHTML=`<h3 tabindex="-1">Отчёт: ${esc(report.analytics.fullName || report.analytics.sessionId.slice(0,8))}</h3><p>Входная диагностика: ${report.diagnostics.baseline === null ? 'нет данных' : `${report.diagnostics.baseline}/3`}; итоговая: ${report.diagnostics.final === null ? 'нет данных' : `${report.diagnostics.final}/3${report.diagnostics.finalForm === 'transfer-v2' ? '' : ' (прежний набор)'}`}.</p>${analyticsHtml(report.analytics)}`;
       area.querySelector<HTMLElement>('h3')?.focus();
     }));
     body.querySelector<HTMLInputElement>('[data-import]')?.addEventListener('change', async event => {

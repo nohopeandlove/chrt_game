@@ -9,7 +9,7 @@ import { escapeHtml } from './shared.ts';
 
 /** Финальный экран: таблица итогов, достижения, «Пройти заново». */
 export async function runFinal(ui: UI, state: GameState, title: string, rows: ResultRow[], action: string): Promise<void> {
-  if (state.learning.final === null) await assessment(ui, state, 'final');
+  if (state.learning.final === null || state.learning.finalForm !== 'transfer-v2') await assessment(ui, state, 'final');
   state.analytics.finishedAt ??= new Date().toISOString();
   save(state);
   playSound('success');

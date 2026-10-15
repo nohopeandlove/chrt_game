@@ -132,6 +132,7 @@ export interface JobRef {
 }
 
 export interface TestQuestion {
+  explanation?: string;
   text: string;
   options: string[];
   correct: number;
@@ -225,6 +226,7 @@ export interface LearningAttempt {
 }
 
 export interface LearningProgress {
+  finalForm?: 'transfer-v2';
   visited: string[];
   attempts: LearningAttempt[];
   baseline: number | null;

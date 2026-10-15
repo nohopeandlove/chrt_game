@@ -67,6 +67,7 @@ export function load(): GameState | null {
     const state = { ...newGame(parsed.playerName, parsed.gender ?? 'f'), ...parsed } as GameState;
     state.analytics = restoreAnalytics(parsed.analytics);
     state.learning = {
+      ...(parsed.learning?.finalForm === 'transfer-v2' ? { finalForm: 'transfer-v2' as const } : {}),
       visited: Array.isArray(parsed.learning?.visited) ? [...new Set(parsed.learning.visited.filter(x => typeof x === 'string' && scenes.has(x)))] : [],
       attempts: Array.isArray(parsed.learning?.attempts) ? parsed.learning.attempts.filter(x =>
         typeof x?.topic === 'string' && Number.isInteger(x.correct) && Number.isInteger(x.total) &&

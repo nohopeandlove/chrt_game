@@ -30,8 +30,8 @@ export async function runLetter(ui: UI, state: GameState): Promise<void> {
 
 /**
  * Тестовое задание. Набор выбирается по специальности из резюме.
- * Вопросы идут по одному, после ответа — реплика героя; правильность
- * не раскрывается до конца, как в настоящем тесте. Проходной балл — 4 из 4.
+ * После каждого ответа — правильность и объяснение; изменить ответ нельзя.
+ * Итоговый балл учитывает первоначальные ответы. Для прохождения нужны все верные.
  */
 export async function runTest(ui: UI, state: GameState): Promise<void> {
   const set = tests.sets.find(s => s.specialty === state.specialty) ?? tests.sets[0];
@@ -76,7 +76,7 @@ export async function runTest(ui: UI, state: GameState): Promise<void> {
           const passed = correct === set.questions.length;
           state.flags['testPassed'] = passed;
           recordOutcome(state, 'test', correct, set.questions.length);
-          for (const [i, q] of set.questions.entries()) recordEvent(state, { category: 'test', question: q.text, answer: q.options[answers[i] ?? -1] ?? 'Нет ответа', correct: answers[i] === q.correct, feedback: `Верный ответ: ${q.options[q.correct] ?? ''}` });
+          for (const [i, q] of set.questions.entries()) recordEvent(state, { category: 'test', question: q.text, answer: q.options[answers[i] ?? -1] ?? 'Нет ответа', correct: answers[i] === q.correct, feedback: `Верный ответ: ${q.options[q.correct] ?? ''}. ${q.explanation ?? ''}` });
           recordAttempt(state, set.title, correct, set.questions.length);
           const verdict = passed ? set.pass : set.fail;
           host.innerHTML = `
@@ -85,7 +85,7 @@ export async function runTest(ui: UI, state: GameState): Promise<void> {
               <p class="curtain__title">${escapeHtml(verdict.text)}</p>
               <p class="curtain__text">Верных ответов: ${correct} из ${set.questions.length}</p>
               <p class="curtain__text curtain__text--hero">${escapeHtml(verdict.hero)}</p>
-              <details class="learning-review"><summary>Разбор ответов и что повторить</summary><ol>${set.questions.map((q, i) => `<li><b>${escapeHtml(q.text)}</b><p>Ваш ответ: ${escapeHtml(q.options[answers[i] ?? -1] ?? 'Нет ответа')}</p><p>${answers[i] === q.correct ? 'Верно.' : 'Нужно повторить.'} Правильный ответ: ${escapeHtml(q.options[q.correct] ?? '')}</p></li>`).join('')}</ol><p>Сопоставьте ответы с описанием вакансии и материалами по специальности. После отказа можно попробовать снова; это учебная тренировка.</p></details>
+              <details class="learning-review"><summary>Разбор ответов и что повторить</summary><ol>${set.questions.map((q, i) => `<li><b>${escapeHtml(q.text)}</b><p>Ваш ответ: ${escapeHtml(q.options[answers[i] ?? -1] ?? 'Нет ответа')}</p><p>${answers[i] === q.correct ? 'Верно.' : 'Нужно повторить.'} Правильный ответ: ${escapeHtml(q.options[q.correct] ?? '')}</p><p>${escapeHtml(q.explanation ?? '')}</p></li>`).join('')}</ol><p>Сопоставьте ответы с описанием вакансии и материалами по специальности. После отказа можно попробовать снова; это учебная тренировка.</p></details>
               <button class="curtain__go" type="button" data-next>${passed ? 'Дальше' : 'Понятно'}</button>
             </div>`;
           const next = host.querySelector<HTMLButtonElement>('[data-next]');
@@ -113,7 +113,7 @@ function question(set: TestSet, index: number, picked?: number): string {
         ${q.options
           .map(
             (text, i) => `
-          <button class="choice${answered && i === picked ? ' is-picked' : ''}" type="button"
+          <button class="choice${answered ? (i === q.correct ? ' is-right' : i === picked ? ' is-wrong' : '') : ''}" type="button"
             data-answer="${i}" ${answered ? 'disabled' : ''}>
             <span class="choice__num">${i + 1}</span>
             <span class="choice__text">${escapeHtml(text)}</span>
@@ -121,6 +121,7 @@ function question(set: TestSet, index: number, picked?: number): string {
           )
           .join('')}
       </div>
+      ${answered ? `<div class="quiz__verdict${picked === q.correct ? '' : ' is-wrong'}" role="status"><b>${picked === q.correct ? 'Верно.' : 'Неверно.'}</b><p>Правильный ответ: ${escapeHtml(q.options[q.correct] ?? '')}</p><p>${escapeHtml(q.explanation ?? '')}</p></div>` : ''}
       <p class="quiz__hero" hidden>${escapeHtml(q.heroComment ?? '')}</p>
       <div class="quiz__actions"><button class="btn btn--primary" type="button" data-next hidden>Дальше</button></div>
     </div>`;

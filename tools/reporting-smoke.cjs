@@ -23,7 +23,17 @@ let browser;
    window.testAnswers=tests.sets[0].questions.map((q,i)=>i<2?q.correct:(q.correct+1)%q.options.length);window.ui=new UI(root);window.finished=false;
    void runTest(window.ui,window.student).then(()=>window.finished=true);
  });
- for(const a of await page.evaluate(()=>window.testAnswers)){await page.locator(`[data-answer="${a}"]`).click();await page.locator('[data-next]:visible').click();}
+ for(const [i,a] of (await page.evaluate(()=>window.testAnswers)).entries()){
+  assert.equal(await page.locator('.quiz__verdict').count(),0);
+  await page.locator(`[data-answer="${a}"]`).click();
+  assert.equal(await page.locator('[data-answer]:enabled').count(),0);
+  assert.equal(await page.locator('[data-answer].is-right').count(),1);
+  assert.equal(await page.locator('[data-answer].is-wrong').count(),i<2?0:1);
+  assert.ok((await page.locator('.quiz__verdict').innerText()).includes(i<2?'Верно.':'Неверно.'));
+  assert.ok((await page.locator('.quiz__verdict p').last().innerText()).length>40);
+  await page.locator('[data-next]:visible').click();
+ }
+
  await page.locator('[data-next]').click();await page.waitForFunction(()=>window.finished);
  assert.deepEqual(await page.evaluate(()=>window.student.analytics.outcomes.map(o=>[o.category,o.earned,o.possible])),[['test',2,4]]);
  assert.equal(await page.evaluate(()=>window.student.analytics.events.filter(e=>e.correct===false).length),2);

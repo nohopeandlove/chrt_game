@@ -72,13 +72,13 @@ export function analyticsHtml(a: Analytics): string {
 export interface StudentReport {
   format: 'ya-specialist-report-v2';
   generatedAt: string;
-  diagnostics: { baseline: number | null; final: number | null };
+  diagnostics: { baseline: number | null; final: number | null; finalForm: 'transfer-v2' | 'original-v1' };
   analytics: Analytics;
 }
 export function makeReport(state: GameState, identified = false): StudentReport {
   const analytics = restoreAnalytics(state.analytics);
   if (!identified) { analytics.fullName = ''; analytics.group = ''; }
-  return { format: 'ya-specialist-report-v2', generatedAt: now(), diagnostics: { baseline: state.learning.baseline, final: state.learning.final }, analytics };
+  return { format: 'ya-specialist-report-v2', generatedAt: now(), diagnostics: { baseline: state.learning.baseline, final: state.learning.final, finalForm: state.learning.finalForm ?? 'original-v1' }, analytics };
 }
 export function parseReport(source: string): StudentReport {
   if (source.length > 2_000_000) throw new Error('Файл больше 2 МБ.');
@@ -90,7 +90,7 @@ export function parseReport(source: string): StudentReport {
   if (analytics.events.length !== a.events.length || analytics.outcomes.length !== a.outcomes.length) throw new Error('Некорректные события или результаты в отчёте.');
   const diagnostics = isRecord(value.diagnostics) ? value.diagnostics : {};
   const score = (v: unknown): number | null => typeof v === 'number' && Number.isInteger(v) && v >= 0 && v <= 3 ? v : null;
-  return { format: 'ya-specialist-report-v2', generatedAt: date(value.generatedAt) || now(), diagnostics: { baseline: score(diagnostics.baseline), final: score(diagnostics.final) }, analytics };
+  return { format: 'ya-specialist-report-v2', generatedAt: date(value.generatedAt) || now(), diagnostics: { baseline: score(diagnostics.baseline), final: score(diagnostics.final), finalForm: diagnostics.finalForm === 'transfer-v2' ? 'transfer-v2' : 'original-v1' }, analytics };
 }
 export function downloadFile(contents: string, filename: string, type: string): void {
   const url = URL.createObjectURL(new Blob([contents], { type })); const a = document.createElement('a');
@@ -102,12 +102,13 @@ export function csvCell(value: string): string {
   return `"${safe.replaceAll('"', '""')}"`;
 }
 export function reportsCsv(reports: StudentReport[]): string {
-  const rows = [['Сессия','ФИО / код','Группа','Начало (UTC)','Завершение (UTC)','Резюме, % заполнения','Тест, %','Собеседование, %','Трудовые отношения, %','Входная диагностика, из 3','Итоговая диагностика, из 3','Выбранные действия','Ошибки','Рекомендации']];
+  const rows = [['Сессия','ФИО / код','Группа','Начало (UTC)','Завершение (UTC)','Резюме, % заполнения','Тест, %','Собеседование, %','Трудовые отношения, %','Входная диагностика, из 3','Итоговая диагностика, из 3','Набор итоговой диагностики','Выбранные действия','Ошибки','Рекомендации']];
   for (const report of reports) {
     const a = report.analytics;
     rows.push([a.sessionId,a.fullName || 'Не указано',a.group,a.startedAt,a.finishedAt || 'Не завершено',
       ...categories.map(c => { const p = percentage(latest(a,c)); return p === null ? 'Нет данных' : String(p); }),
       report.diagnostics.baseline === null ? 'Нет данных' : String(report.diagnostics.baseline), report.diagnostics.final === null ? 'Нет данных' : String(report.diagnostics.final),
+      report.diagnostics.final === null ? 'Нет данных' : report.diagnostics.finalForm === 'transfer-v2' ? 'Новые ситуации' : 'Прежний набор',
       a.events.map(e => `${e.question}: ${e.answer}`).join('\n'), a.events.filter(e=>e.correct===false).map(e=>`${e.question}: ${e.feedback}`).join('\n'),recommendations(a).join('\n')]);
   }
   return '\uFEFF' + rows.map(row => row.map(csvCell).join(';')).join('\r\n');
