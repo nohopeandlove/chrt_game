@@ -1,8 +1,9 @@
 import './styles.css';
 import { installLearningTools, orientation } from './learning.ts';
+import { scenes } from './content.ts';
 import { Engine } from './engine.ts';
 import { UI } from './ui.ts';
-import { clearSave, load, newGame, save } from './state.ts';
+import { canContinue, clearSave, load, newGame, save } from './state.ts';
 import type { GameState } from './types.ts';
 
 const root = document.getElementById('app');
@@ -14,7 +15,7 @@ installLearningTools(root, () => activeState);
 
 async function start(): Promise<void> {
   const saved = load();
-  const choice = await ui.menu(saved !== null);
+  const choice = await ui.menu(saved !== null, canContinue(saved), saved ? scenes.get(saved.scene)?.title ?? '' : '');
 
   let state: GameState;
   if (choice === 'continue' && saved) {

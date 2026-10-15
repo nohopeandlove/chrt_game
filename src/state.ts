@@ -80,10 +80,18 @@ export function load(): GameState | null {
   }
 }
 
-export function clearSave(): void {
+/** A name-only autosave is not a played session. */
+export function canContinue(state: GameState | null): boolean {
+  return state !== null && (state.scene !== FIRST_SCENE || state.nodeIndex > 0 ||
+    state.learning.baseline !== null || state.learning.attempts.length > 0 ||
+    state.analytics.events.length > 0 || state.analytics.outcomes.length > 0);
+}
+
+export function clearSave(): boolean {
   try {
     localStorage.removeItem(SAVE_KEY);
+    return true;
   } catch {
-    // ничего
+    return false;
   }
 }

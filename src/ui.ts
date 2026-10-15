@@ -1,3 +1,4 @@
+import { clearSave } from './state.ts';
 import { renderBackground } from './render/backgrounds.ts';
 import { renderPortrait } from './render/portrait.ts';
 import { backgroundTitles, characters } from './content.ts';
@@ -312,7 +313,7 @@ export class UI {
   }
 
 
-  menu(hasSave: boolean): Promise<MenuResult | 'continue'> {
+  menu(hasSave: boolean, canResume = hasSave, savedTitle = ''): Promise<MenuResult | 'continue'> {
     this.setBackground('assembly-hall');
     this.panel.hidden = true;
     this.hideChoices();
@@ -323,6 +324,12 @@ export class UI {
         <h1 class="menu__title">Я — специалист</h1>
         <p class="menu__lede">От выпускного до первого рабочего дня. Резюме, вакансии, собеседование и первые задачи — как в жизни, только без последствий.</p>
 
+        ${hasSave ? `<section class="menu__saved" data-saved aria-label="Сохранённая игра">
+          <p>${canResume ? `Сохранённое прохождение: ${escapeHtml(savedTitle)}. Продолжение начнётся с начала этой главы.` : 'Есть начальные данные, но прохождение ещё не началось.'}</p>
+          <p>Прогресс хранится отдельно от кэша браузера. Чтобы начать с чистого листа, удалите сохранение здесь.</p>
+          <div class="menu__actions">${canResume ? '<button class="btn" type="button" data-action="continue">Продолжить</button>' : ''}<button class="btn" type="button" data-action="delete-save">Удалить сохранение</button></div>
+          <p data-delete-status role="status"></p>
+        </section>` : ''}
         <fieldset class="menu__field">
           <legend>Кем играем</legend>
           <div class="heroes">
@@ -355,7 +362,6 @@ export class UI {
 
         <div class="menu__actions">
           <button class="btn btn--primary" type="submit">Начать</button>
-          ${hasSave ? '<button class="btn" type="button" data-action="continue">Продолжить</button>' : ''}
         </div>
         <p class="menu__privacy">Для учебного резюме используйте вымышленные контакты. Данные остаются в этом браузере.</p>
         <p class="menu__error" role="alert" hidden>Введите имя — оно будет звучать в репликах.</p>
@@ -372,6 +378,7 @@ export class UI {
         const name = String(data.get('playerName') ?? '').trim();
         if (!name) {
           error.hidden = false;
+          error.textContent = 'Введите псевдоним — он будет звучать в репликах.';
           form.querySelector<HTMLInputElement>('.menu__input')?.focus();
           return;
         }
@@ -380,6 +387,17 @@ export class UI {
         resolve({ name, gender: data.get('gender') === 'm' ? 'm' : 'f' });
       });
 
+      form.querySelector<HTMLButtonElement>('[data-action="delete-save"]')?.addEventListener('click', () => {
+        if (clearSave()) {
+          form.querySelector('[data-saved]')?.remove();
+          error.hidden = false;
+          error.textContent = 'Сохранение удалено. Введите псевдоним и начните новую игру.';
+          form.querySelector<HTMLInputElement>('.menu__input')?.focus();
+        } else {
+          const status = form.querySelector<HTMLElement>('[data-delete-status]');
+          if (status) status.textContent = 'Браузер не разрешил удалить сохранение. Проверьте настройки данных сайта.';
+        }
+      });
       form.querySelector<HTMLButtonElement>('[data-action="continue"]')?.addEventListener('click', () => {
         this.overlay.hidden = true;
         this.overlay.innerHTML = '';
