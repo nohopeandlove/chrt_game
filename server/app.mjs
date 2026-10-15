@@ -17,7 +17,16 @@ db.exec(`PRAGMA journal_mode=WAL; PRAGMA busy_timeout=5000;
 if (!db.prepare('PRAGMA table_info(students)').all().some(c=>c.name==='name_search')) db.exec("ALTER TABLE students ADD COLUMN name_search TEXT NOT NULL DEFAULT ''");
 for(const row of db.prepare("SELECT id,report FROM students WHERE report IS NOT NULL AND name_search=''").all()) db.prepare('UPDATE students SET name_search=? WHERE id=?').run(JSON.parse(row.report).analytics.fullName.toLowerCase(),row.id);
 const setupFile = join(dataDir, 'setup-code');
-if (!db.prepare('SELECT id FROM admin').get() && !existsSync(setupFile)) writeFileSync(setupFile, randomBytes(24).toString('base64url'), { mode: 0o600 });
+// Managed hosting can supply the private bootstrap code at runtime, without a shell.
+// It can replace an inaccessible generated code, but never an existing account.
+if (!db.prepare('SELECT id FROM admin').get()) {
+ const suppliedCode = process.env.TEACHER_SETUP_CODE;
+ if (suppliedCode !== undefined) {
+  if (!/^[A-Za-z0-9_-]{24,256}$/.test(suppliedCode)) throw new Error('TEACHER_SETUP_CODE must contain 24–256 letters, digits, underscores or hyphens.');
+  writeFileSync(setupFile, suppliedCode, { mode: 0o600 });
+ } else if (!existsSync(setupFile)) writeFileSync(setupFile, randomBytes(24).toString('base64url'), { mode: 0o600 });
+}
+delete process.env.TEACHER_SETUP_CODE;
 const hash = value => createHash('sha256').update(value).digest('hex');
 const equal = (a,b) => timingSafeEqual(Buffer.from(hash(a)),Buffer.from(hash(b)));
 const token = () => randomBytes(32).toString('base64url');
