@@ -1,8 +1,10 @@
 import { defineConfig } from 'vite';
+import { materialPages } from './tools/material-pages.mjs';
 
 export default defineConfig({
   // Относительные пути — игру можно положить в любую подпапку сайта техникума.
   base: './',
+  plugins: [materialPages()],
   server: {
     host: '127.0.0.1',
     port: 5173,
