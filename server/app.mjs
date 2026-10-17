@@ -11,6 +11,7 @@ mkdirSync(dataDir, { recursive: true, mode: 0o700 });
 const db = new DatabaseSync(join(dataDir, 'results.sqlite'));
 db.exec(`PRAGMA journal_mode=WAL; PRAGMA busy_timeout=5000;
  CREATE TABLE IF NOT EXISTS admin (id INTEGER PRIMARY KEY CHECK(id=1), username TEXT NOT NULL, salt TEXT NOT NULL, password_hash TEXT NOT NULL);
+ CREATE TABLE IF NOT EXISTS password_reset_uses (hash TEXT PRIMARY KEY);
  CREATE TABLE IF NOT EXISTS teacher_sessions (hash TEXT PRIMARY KEY, expires INTEGER NOT NULL);
  CREATE TABLE IF NOT EXISTS students (id TEXT PRIMARY KEY, token_hash TEXT NOT NULL, report TEXT, updated_at TEXT, revision INTEGER NOT NULL DEFAULT 0);
  CREATE INDEX IF NOT EXISTS students_updated ON students(updated_at);`);
@@ -27,6 +28,8 @@ if (!db.prepare('SELECT id FROM admin').get()) {
  } else if (!existsSync(setupFile)) writeFileSync(setupFile, randomBytes(24).toString('base64url'), { mode: 0o600 });
 }
 delete process.env.TEACHER_SETUP_CODE;
+const resetCode=process.env.TEACHER_RESET_CODE;
+delete process.env.TEACHER_RESET_CODE;
 const hash = value => createHash('sha256').update(value).digest('hex');
 const equal = (a,b) => timingSafeEqual(Buffer.from(hash(a)),Buffer.from(hash(b)));
 const token = () => randomBytes(32).toString('base64url');
@@ -88,6 +91,21 @@ async function api(req,res,url) {
   const salt=randomBytes(16).toString('hex');
   db.prepare('INSERT INTO admin VALUES (1,?,?,?)').run(input.username,salt,scryptSync(input.password,salt,64).toString('hex'));
   unlinkSync(setupFile);return json(res,201,{ok:true});
+ }
+ if(url.pathname==='/api/teacher/reset-password' && req.method==='POST') {
+  limited(req,'password-reset',10,15*60_000);
+  const input=await body(req);
+  if(!db.prepare('SELECT id FROM admin').get() || typeof resetCode!=='string' || !/^[A-Za-z0-9_-]{24,256}$/.test(resetCode) || typeof input?.code!=='string' || input.code.length>256 || !equal(input.code,resetCode) || db.prepare('SELECT hash FROM password_reset_uses WHERE hash=?').get(hash(resetCode))) throw new Failure(403,'Неверный или уже использованный код сброса. Получите новый код у администратора.');
+  if(typeof input.password!=='string' || input.password.length<12 || input.password.length>128) throw new Failure(400,'Новый пароль: 12–128 символов.');
+  const salt=randomBytes(16).toString('hex');
+  const passwordHash=scryptSync(input.password,salt,64).toString('hex');
+  db.exec('BEGIN IMMEDIATE');
+  try {
+   db.prepare('UPDATE admin SET salt=?,password_hash=? WHERE id=1').run(salt,passwordHash);
+   db.prepare('INSERT INTO password_reset_uses VALUES (?)').run(hash(resetCode));
+   db.exec('DELETE FROM teacher_sessions; COMMIT');
+  } catch(error) { db.exec('ROLLBACK'); throw error; }
+  return json(res,200,{ok:true},{'Set-Cookie':[cookie('',0),legacyCookie]});
  }
  if(url.pathname==='/api/teacher/login' && req.method==='POST') {
   limited(req,'login',10,15*60_000);const input=await body(req);const admin=db.prepare('SELECT * FROM admin WHERE id=1').get();

@@ -24,7 +24,8 @@ async function start():Promise<void>{
     const setup=!status.configured;
     root.innerHTML=`<section class="teacher-login"><span class="screen__eyebrow">Я — специалист</span><h1>${setup?'Настройка преподавателя':'Вход преподавателя'}</h1><p>Отдельная страница с автоматически сохранёнными результатами студентов.</p>
       ${setup?'<p>Введите одноразовый код, полученный от администратора приложения. После создания учётной записи код больше не действует.</p>':''}
-      <form data-login>${setup?'<label class="field"><span>Одноразовый код настройки</span><input class="input" name="code" autocomplete="off" required></label>':''}<label class="field"><span>Логин</span><input class="input" name="username" autocomplete="username" minlength="3" maxlength="40" pattern="[a-zA-Z0-9_.-]+" required></label><label class="field"><span>Пароль${setup?' (не менее 12 символов)':''}</span><input class="input" name="password" type="password" autocomplete="${setup?'new-password':'current-password'}" ${setup?'minlength="12"':''} maxlength="128" required></label><button class="btn btn--primary" type="submit">${setup?'Создать учётную запись':'Войти'}</button><p role="alert" data-error></p></form><a href="/">Открыть игру</a></section>`;
+      <form data-login>${setup?'<label class="field"><span>Одноразовый код настройки</span><input class="input" name="code" autocomplete="off" required></label>':''}<label class="field"><span>Логин</span><input class="input" name="username" autocomplete="username" minlength="3" maxlength="40" pattern="[a-zA-Z0-9_.-]+" required></label><label class="field"><span>Пароль${setup?' (не менее 12 символов)':''}</span><input class="input" name="password" type="password" autocomplete="${setup?'new-password':'current-password'}" ${setup?'minlength="12"':''} maxlength="128" required></label><button class="btn btn--primary" type="submit">${setup?'Создать учётную запись':'Войти'}</button><p role="alert" data-error></p></form>${setup?'':'<button class="btn" type="button" data-reset-password>Забыли пароль?</button>'}<a href="/">Открыть игру</a></section>`;
+    root.querySelector('[data-reset-password]')?.addEventListener('click',passwordReset);
     root.querySelector('form')?.addEventListener('submit',async event=>{
       event.preventDefault();const form=event.currentTarget as HTMLFormElement;if(!form.reportValidity())return;
       const button=form.querySelector<HTMLButtonElement>('button')!;button.disabled=true;
@@ -35,11 +36,28 @@ async function start():Promise<void>{
     });
   }catch(error){if(current===page){root.innerHTML='<section class="teacher-login"><h1>Кабинет временно недоступен</h1><p role="alert" data-error></p><button class="btn" data-retry>Повторить</button></section>';showError(root.querySelector('[data-error]')!,error);root.querySelector('[data-retry]')?.addEventListener('click',()=>void start());}}
 }
+function passwordReset():void {
+ clearInterval(refresh);page++;
+ root.innerHTML=`<section class="teacher-login"><h1>Сброс пароля преподавателя</h1><p>Введите одноразовый код от администратора и новый пароль. Логин и результаты студентов сохранятся. После сброса потребуется войти заново на всех устройствах.</p><form data-password-reset><label class="field"><span>Одноразовый код сброса</span><input class="input" name="code" type="password" autocomplete="off" maxlength="256" required></label><label class="field"><span>Новый пароль (не менее 12 символов)</span><input class="input" name="password" type="password" autocomplete="new-password" minlength="12" maxlength="128" required></label><label class="field"><span>Повторите новый пароль</span><input class="input" name="confirmation" type="password" autocomplete="new-password" minlength="12" maxlength="128" required></label><button class="btn btn--primary" type="submit">Установить новый пароль</button><p role="alert" data-error></p></form><button class="btn" type="button" data-back>Назад</button></section>`;
+ root.querySelector('[data-back]')?.addEventListener('click',()=>void start());
+ root.querySelector('form')!.addEventListener('submit',async event=>{
+  event.preventDefault();const form=event.currentTarget as HTMLFormElement;if(!form.reportValidity())return;
+  const data=new FormData(form);const error=form.querySelector<HTMLElement>('[data-error]')!;
+  if(data.get('password')!==data.get('confirmation')){error.textContent='Пароли не совпадают.';return;}
+  const button=form.querySelector<HTMLButtonElement>('button')!;button.disabled=true;
+  try {
+   await request('/api/teacher/reset-password',{method:'POST',body:JSON.stringify({code:data.get('code'),password:data.get('password')})});
+   root.innerHTML='<section class="teacher-login"><h1>Пароль изменён</h1><p>Войдите с прежним логином и новым паролем. Результаты студентов сохранены.</p><button class="btn btn--primary" data-login-again>Перейти ко входу</button></section>';
+   root.querySelector('[data-login-again]')!.addEventListener('click',()=>void start());
+  } catch(e){showError(error,e);button.disabled=false;}
+ });
+}
 async function cabinet():Promise<void>{
   const current=page;
-  root.innerHTML=`<header class="teacher-head"><div><span class="screen__eyebrow">Я — специалист</span><h1>Результаты студентов</h1><p>Результаты поступают автоматически. Обновление каждые 10 секунд.</p></div><div class="learning-actions"><a class="btn" href="/">Открыть игру</a><a class="btn" href="/about/">Об электронном образовательном ресурсе</a><a class="btn" href="/materials/analytics/">Описание аналитики</a><button class="btn" data-logout>Выйти</button></div></header>
+  root.innerHTML=`<header class="teacher-head"><div><span class="screen__eyebrow">Я — специалист</span><h1>Результаты студентов</h1><p>Результаты поступают автоматически. Обновление каждые 10 секунд.</p></div><div class="learning-actions"><a class="btn" href="/">Открыть игру</a><a class="btn" href="/about/">Об электронном образовательном ресурсе</a><a class="btn" href="/materials/analytics/">Описание аналитики</a><button class="btn" data-reset-password>Сбросить пароль</button><button class="btn" data-logout>Выйти</button></div></header>
     <form class="teacher-filters"><label class="field"><span>Группа (точное название)</span><input class="input" name="group" maxlength="40" value="${esc(filter.group)}"></label><label class="field"><span>ФИО / учебный код</span><input class="input" name="q" maxlength="100" value="${esc(filter.q)}"></label><button class="btn" type="submit">Найти</button><button class="btn" type="button" data-reset>Сбросить фильтр</button></form>
     <div class="learning-actions"><button class="btn" data-refresh>Обновить сейчас</button><a class="btn" data-csv href="/api/teacher/export.csv">Скачать CSV для Excel</a></div><p role="status" data-status></p><div data-table></div><div class="learning-actions"><button class="btn" data-prev>Назад</button><button class="btn" data-next>Далее</button></div><section data-details></section>`;
+  root.querySelector('[data-reset-password]')?.addEventListener('click',passwordReset);
   root.querySelector('[data-logout]')?.addEventListener('click',async()=>{try{await request('/api/teacher/logout',{method:'POST',body:'{}'});await start();}catch(error){showError(root.querySelector('[data-status]')!,error);}});
   root.querySelector('form')?.addEventListener('submit',event=>{event.preventDefault();const d=new FormData(event.currentTarget as HTMLFormElement);filter={group:String(d.get('group')||'').trim(),q:String(d.get('q')||'').trim(),offset:0};void load();});
   root.querySelector('[data-reset]')?.addEventListener('click',()=>{filter={group:'',q:'',offset:0};root.querySelector<HTMLFormElement>('form')!.reset();root.querySelector<HTMLInputElement>('[name=group]')!.value='';root.querySelector<HTMLInputElement>('[name=q]')!.value='';void load();});
