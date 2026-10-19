@@ -101,6 +101,7 @@ try {
  await page.getByRole('button',{name:'Продолжить историю',exact:true}).click();
  assert.equal(await page.locator('.overlay--summary').count(),0);
  await page.evaluate(()=>{const {ui,characters}=window.portraitTest;ui.setBackground('laptop');void ui.say({kind:'say',who:characters.get('hr'),emotion:'smile',text:'Здравствуйте! Давайте познакомимся.'});});
+ await page.evaluate(async()=>{await Promise.all([...document.querySelectorAll('.stage image')].map(async node=>{const image=new Image();image.src=node.getAttribute('href');await image.decode();}));await new Promise(requestAnimationFrame);});
  await page.screenshot({path:'/tmp/hr-portrait-fixed.png'});
  assert.deepEqual(errors,[]);
  console.log('PASS: 7 transparent portraits, 35 expression frames with transparent side margins, clipped menu frames, consistent name and role, mobile fit, grayscale and hidden images preserve speaker role, scene recap metrics and continuation');
