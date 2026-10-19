@@ -25,6 +25,7 @@ function load(relPath) {
 }
 
 const specialties = load('specialties.json');
+const endings = load('endings.json');
 const characters = load('characters.json');
 const vacancies = load('vacancies.json');
 const tests = load('tests.json');
@@ -117,15 +118,21 @@ for (const v of vacancies.items) {
   if (v.kind === 'scam') {
     if (!v.cardForm) fail(w, 'у мошеннической вакансии нет описания формы карты');
     else {
-      if (v.cardForm.interactive !== false) fail(w, 'форма ввода карты обязана быть неинтерактивной (правка 3)');
+      if (v.cardForm.interactive !== true) fail(w, 'форма мошенников должна реагировать на обращение к полям');
       if (!v.cardForm.warning) fail(w, 'нет текста предупреждения о мошенниках');
     }
   }
 }
 for (const sp of specialtyIds) {
   const n = vacancies.items.filter(v => v.kind === 'real' && v.specialties.includes(sp)).length;
-  if (!n) fail('vacancies.json', `для специальности «${sp}» нет ни одной подходящей вакансии`);
+  if (n < 2) fail('vacancies.json', `для специальности «${sp}» нужны минимум две настоящие вакансии`);
 }
+
+// Each professional path must end with its own text.
+for (const sp of specialtyIds) {
+ if (typeof endings[sp] !== 'string' || !endings[sp].trim()) fail('endings.json', `нет концовки для «${sp}»`);
+}
+if (new Set(Object.values(endings)).size !== specialtyIds.size) fail('endings.json', 'концовки специальностей должны различаться');
 
 // --- тестовые задания ---------------------------------------------------
 const setBySpecialty = new Set();
@@ -167,7 +174,7 @@ for (const b of backgrounds.items) {
 
 // --- сцены --------------------------------------------------------------
 const GENDER_TOKEN = /\{g:([^|{}]*)\|([^|{}]*)\}/g;
-const KNOWN_TOKENS = new Set(['playerName', 'specialtyTitle', 'resumePercent', 'position', 'company', 'resumeQuality', 'topTraits']);
+const KNOWN_TOKENS = new Set(['playerName', 'specialtyTitle', 'resumePercent', 'position', 'company', 'resumeQuality', 'topTraits', 'careerEnding']);
 const gotoTargets = [];
 
 for (const { file, data } of scenes) {

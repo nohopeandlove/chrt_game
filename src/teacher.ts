@@ -20,12 +20,12 @@ async function start():Promise<void>{
   clearInterval(refresh);page++;const current=page;
   try{
     const status=await request<{configured:boolean;authenticated:boolean}>('/api/teacher/status');if(current!==page)return;
+    if(status.configured && location.hash==='#reset-password'){history.replaceState(null,'',location.pathname+location.search);passwordReset();return;}
     if(status.authenticated){await cabinet();return;}
     const setup=!status.configured;
     root.innerHTML=`<section class="teacher-login"><span class="screen__eyebrow">Я — специалист</span><h1>${setup?'Настройка преподавателя':'Вход преподавателя'}</h1><p>Отдельная страница с автоматически сохранёнными результатами студентов.</p>
       ${setup?'<p>Введите одноразовый код, полученный от администратора приложения. После создания учётной записи код больше не действует.</p>':''}
-      <form data-login>${setup?'<label class="field"><span>Одноразовый код настройки</span><input class="input" name="code" autocomplete="off" required></label>':''}<label class="field"><span>Логин</span><input class="input" name="username" autocomplete="username" minlength="3" maxlength="40" pattern="[a-zA-Z0-9_.-]+" required></label><label class="field"><span>Пароль${setup?' (не менее 12 символов)':''}</span><input class="input" name="password" type="password" autocomplete="${setup?'new-password':'current-password'}" ${setup?'minlength="12"':''} maxlength="128" required></label><button class="btn btn--primary" type="submit">${setup?'Создать учётную запись':'Войти'}</button><p role="alert" data-error></p></form>${setup?'':'<button class="btn" type="button" data-reset-password>Забыли пароль?</button>'}<a href="/">Открыть игру</a></section>`;
-    root.querySelector('[data-reset-password]')?.addEventListener('click',passwordReset);
+      <form data-login>${setup?'<label class="field"><span>Одноразовый код настройки</span><input class="input" name="code" autocomplete="off" required></label>':''}<label class="field"><span>Логин</span><input class="input" name="username" autocomplete="username" minlength="3" maxlength="40" pattern="[a-zA-Z0-9_.-]+" required></label><label class="field"><span>Пароль${setup?' (не менее 12 символов)':''}</span><input class="input" name="password" type="password" autocomplete="${setup?'new-password':'current-password'}" ${setup?'minlength="12"':''} maxlength="128" required></label><button class="btn btn--primary" type="submit">${setup?'Создать учётную запись':'Войти'}</button><p role="alert" data-error></p></form><a href="/">Открыть игру</a></section>`;
     root.querySelector('form')?.addEventListener('submit',async event=>{
       event.preventDefault();const form=event.currentTarget as HTMLFormElement;if(!form.reportValidity())return;
       const button=form.querySelector<HTMLButtonElement>('button')!;button.disabled=true;
@@ -83,4 +83,5 @@ async function load():Promise<void>{
     }));
   }catch(error){if(current===page && root.querySelector('[data-status]'))showError(root.querySelector('[data-status]')!,error);}finally{loading=false;}
 }
+window.addEventListener('hashchange',()=>{if(location.hash==='#reset-password')void start();});
 void start();

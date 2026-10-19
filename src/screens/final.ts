@@ -48,7 +48,6 @@ export async function runFinal(ui: UI, state: GameState, title: string, rows: Re
               </ul>
             </section>
             <section class="learning-summary"><h3>Личный кабинет · результаты</h3>${analyticsHtml(state.analytics)}<details class="report-details"><summary>Маршрут и диагностика</summary>${reportHtml(state)}</details><p>Откройте «Кабинет и результаты» в верхней панели для просмотра прогресса и статуса автоматического сохранения.</p>
-              <h3>Мой следующий шаг</h3><p>Выберите действие после игры: дополнить резюме реальным проектом, проверить одну вакансию или обсудить условия договора с преподавателем. Объясните, что измените после разбора ошибок.</p>
               <p data-sync-status role="status">${escapeHtml(syncStatus())}</p>
             </section>
             <div class="final__actions">

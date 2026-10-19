@@ -1,3 +1,4 @@
+import endings from '../content/endings.json';
 import type { GameState } from './types.ts';
 import { specialty } from './content.ts';
 
@@ -15,6 +16,8 @@ export function fill(text: string, state: GameState, extra: Record<string, strin
       return state.gender === 'm' ? male : female;
     }
     switch (body) {
+      case 'careerEnding':
+        return fill(endings[state.specialty as keyof typeof endings] ?? 'Первый рабочий день позади. Впереди — новые профессиональные задачи и рост.', state);
       case 'playerName':
         return state.playerName;
       case 'specialtyTitle':

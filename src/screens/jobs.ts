@@ -33,7 +33,22 @@ export async function runJobs(ui: UI, state: GameState): Promise<void> {
           host.scrollIntoView({ block: 'start' });
           if (vacancy.kind === 'scam') openedScams.add(vacancy.id);
 
-          host.querySelector<HTMLButtonElement>('[data-back]')?.addEventListener('click', showBoard);
+          host.querySelectorAll<HTMLButtonElement>('[data-back]').forEach(button => button.addEventListener('click', showBoard));
+          let warned = false;
+          const warn = (): void => {
+            const warning = host.querySelector<HTMLElement>('[data-scam-warning]');
+            if (!warning) return;
+            warning.hidden = false;
+            if (!warned) {
+              warned = true;
+              recordEvent(state, { category: 'jobs', question: vacancy.title, answer: 'Обращение к форме банковских данных', correct: false, feedback: 'Это мошенники. Не передавайте номер карты, срок действия и CVV. Выйдите со страницы.' });
+              save(state);
+            }
+          };
+          host.querySelectorAll<HTMLInputElement>('[data-scam-field]').forEach(field => {
+            field.addEventListener('pointerdown', warn);
+            field.addEventListener('focus', warn);
+          });
           host.querySelector<HTMLFormElement>('.apply')?.addEventListener('submit', event => {
             event.preventDefault();
             const letter = host.querySelector<HTMLTextAreaElement>('[data-letter]')?.value ?? '';
@@ -105,7 +120,7 @@ function board(state: GameState): string {
       <header class="jobs__head">
         <span class="screen__eyebrow">Глава 3</span>
         <h2 class="screen__title">Вакансии</h2>
-        <p class="screen__lede">Десять объявлений — как на настоящем сайте. Читайте внимательно: работодатели любят проверять, дочитали ли вы до конца.</p>
+        <p class="screen__lede">Выбирайте объявления, подходящие вашей специальности. Читайте внимательно: работодатели любят проверять, дочитали ли вы до конца.</p>
       </header>
       <div class="jobs__grid">
         ${vacancies.map(v => card(v, state.rejectedJobs.includes(v.id))).join('')}
@@ -169,20 +184,20 @@ function applyForm(state: GameState): string {
     </form>`;
 }
 
-/** Правка 3: поля карты недоступны, предупреждение видно сразу. */
+/** Поля видимы и фокусируемы, но не принимают платёжные данные. */
 function scamForm(v: Vacancy): string {
   const form = v.cardForm;
   return `
     <div class="scam">
-      <p class="scam__warning">${escapeHtml(form?.warning ?? '')}</p>
-      <fieldset class="scam__form" disabled aria-label="Форма данных карты — заблокирована">
-        <label class="field"><span class="field__label">Номер карты</span><input class="input" type="text" placeholder="•••• •••• •••• ••••"></label>
+      <div class="scam__warning" data-scam-warning role="alert" hidden><strong>Опасно: это мошенники!</strong><p>${escapeHtml(form?.warning ?? 'Не передавайте данные банковской карты работодателю.')}</p></div>
+      <fieldset class="scam__form" aria-label="Форма данных карты">
+        <label class="field"><span class="field__label">Номер карты</span><input class="input" type="text" readonly data-scam-field autocomplete="off" aria-label="Номер карты" placeholder="•••• •••• •••• ••••"></label>
         <div class="scam__row">
-          <label class="field"><span class="field__label">Срок действия</span><input class="input" type="text" placeholder="ММ/ГГ"></label>
-          <label class="field"><span class="field__label">CVV</span><input class="input" type="text" placeholder="•••"></label>
+          <label class="field"><span class="field__label">Срок действия</span><input class="input" type="text" readonly data-scam-field autocomplete="off" aria-label="Срок действия" placeholder="ММ/ГГ"></label>
+          <label class="field"><span class="field__label">CVV</span><input class="input" type="text" readonly data-scam-field autocomplete="off" aria-label="CVV" placeholder="•••"></label>
         </div>
       </fieldset>
-      <p class="scam__hero">${escapeHtml(v.heroComment ?? '')}</p>
+
       <div class="apply__actions">
         <button class="btn btn--primary" type="button" data-back>Уйти с этой страницы</button>
       </div>

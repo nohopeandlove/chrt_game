@@ -1038,3 +1038,8 @@ html[data-vision-images="hidden"] :is(.stage__bg,.stage__portrait,.hero__art) { 
 .menu__footer { width:100%; margin-top:16px; padding-top:20px; border-top:1px solid #cbd6e5; text-align:center; }
 .menu__footer a { display:inline-block; padding:10px 4px; color:var(--ink); text-underline-offset:4px; overflow-wrap:anywhere; }
 .menu__footer a:focus-visible { outline:3px solid var(--ink); outline-offset:3px; }
+
+.scam__form { opacity:1; }
+.scam__warning { padding:20px; border:3px solid #b51930; border-radius:12px; background:#fff0f2; color:#8c1023; font-size:1em; line-height:1.55; text-transform:none; }
+.scam__warning p { margin:8px 0 0; }
+html.vision-contrast .scam__warning { background:var(--vision-bg); color:var(--vision-fg); border-color:var(--vision-fg); }

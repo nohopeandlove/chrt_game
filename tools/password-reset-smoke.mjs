@@ -36,7 +36,8 @@ try {
  const require=createRequire(import.meta.url);const {chromium}=require(process.env.PLAYWRIGHT_MODULE || 'playwright');
  browser=await chromium.launch({executablePath:process.env.BROWSER_EXECUTABLE || undefined,args:process.env.BROWSER_NO_SANDBOX==='1'?['--no-sandbox']:[]});
  const page=await browser.newPage();await page.goto(server.base+'/teacher/');
- await page.getByRole('button',{name:'Забыли пароль?',exact:true}).click();
+ assert.equal(await page.getByRole('button',{name:'Забыли пароль?',exact:true}).count(),0);
+ await page.goto(server.base+'/teacher/#reset-password');
  await page.locator('[name=code]').fill(extras.TEACHER_RESET_CODE);
  await page.locator('[name=password]').fill(password);await page.locator('[name=confirmation]').fill(newPassword);
  await page.getByRole('button',{name:'Установить новый пароль'}).click();assert.match(await page.locator('[data-error]').innerText(),/не совпадают/);
