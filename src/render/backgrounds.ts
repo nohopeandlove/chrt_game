@@ -1,3 +1,4 @@
+import kitchenImage from '../../assets/backgrounds/kitchen.webp';
 import openOfficeImage from '../../assets/backgrounds/open-office.webp';
 import hrOfficeImage from '../../assets/backgrounds/hr-office.webp';
 import laptopImage from '../../assets/backgrounds/laptop.webp';
@@ -183,38 +184,19 @@ function openOffice(): string {
 }
 
 function kitchen(): string {
-  return wrap('kitchen', 'Кухня', `
-    <rect width="1600" height="900" fill="#F5EFE6"/>
-    <rect width="1600" height="560" fill="#EFE6D8"/>
-    <rect y="560" width="1600" height="340" fill="#D9C7B0"/>
-    <g fill="#4A6B5D">
-      <rect x="60" y="120" width="300" height="220" rx="10"/>
-      <rect x="380" y="120" width="300" height="220" rx="10"/>
-      <rect x="920" y="120" width="300" height="220" rx="10"/>
-      <rect x="1240" y="120" width="300" height="220" rx="10"/>
-    </g>
-    <g fill="#F5EFE6">
-      <rect x="190" y="220" width="40" height="8" rx="4"/><rect x="510" y="220" width="40" height="8" rx="4"/>
-      <rect x="1050" y="220" width="40" height="8" rx="4"/><rect x="1370" y="220" width="40" height="8" rx="4"/>
-    </g>
-    <rect x="700" y="120" width="200" height="220" rx="8" fill="#C7DCE8"/>
-    <rect x="0" y="470" width="1600" height="40" fill="#C4A484"/>
-    <rect x="0" y="510" width="1600" height="220" fill="#4A6B5D"/>
-    <rect x="0" y="510" width="1600" height="6" fill="#3B5649"/>
-
-    <g>
-      <rect x="640" y="400" width="90" height="72" rx="10" fill="#D96C4A"/>
-      <path d="M730,420 q40,0 40,26 q0,26 -40,26" fill="none" stroke="#D96C4A" stroke-width="10"/>
-      <g class="steam">
-        <path d="M660,392 q10,-20 0,-40 q-10,-20 0,-40" stroke="#B9AFA3" stroke-width="5" fill="none" stroke-linecap="round" style="animation-delay:0s"/>
-        <path d="M685,392 q10,-20 0,-40 q-10,-20 0,-40" stroke="#B9AFA3" stroke-width="5" fill="none" stroke-linecap="round" style="animation-delay:1.6s"/>
-        <path d="M710,392 q10,-20 0,-40 q-10,-20 0,-40" stroke="#B9AFA3" stroke-width="5" fill="none" stroke-linecap="round" style="animation-delay:3.2s"/>
+  return wrap('kitchen', 'Уютная кухня команды с обеденным столом и зелёными шкафами', `
+    <image href="${kitchenImage}" width="1600" height="900" preserveAspectRatio="xMidYMid slice"/>
+    <defs>
+      <radialGradient id="kitchen-lamp-light"><stop stop-color="#ffe3a0" stop-opacity=".18"/><stop offset="1" stop-color="#ffe3a0" stop-opacity="0"/></radialGradient>
+      <linearGradient id="kitchen-daylight" x1="1" y1="0" x2="0" y2="1"><stop stop-color="#fff0bc" stop-opacity=".1"/><stop offset="1" stop-color="#fff0bc" stop-opacity="0"/></linearGradient>
+    </defs>
+    <g aria-hidden="true" pointer-events="none">
+      <ellipse class="room-lamplight scene-motion" cx="300" cy="105" rx="175" ry="140" fill="url(#kitchen-lamp-light)"/>
+      <path class="office-daylight scene-motion" d="M790 40 H1380 L1260 830 H460 Z" fill="url(#kitchen-daylight)"/>
+      <g class="room-steam scene-motion" fill="none" stroke="#fff5e2" stroke-width="2.5" stroke-linecap="round" opacity=".24">
+        <path d="M1030 388 Q1020 373 1030 360 Q1040 345 1031 332"/>
+        <path d="M1044 391 Q1054 378 1046 365"/>
       </g>
-    </g>
-    <g>
-      <rect x="1120" y="380" width="70" height="90" rx="12" fill="#B87252"/>
-      <path d="M1155,380 C 1120,330 1110,290 1150,270 C 1180,300 1200,330 1155,380 Z" fill="#4A6B5D"/>
-      <path d="M1160,378 C 1200,340 1220,300 1190,280" fill="none" stroke="#4A6B5D" stroke-width="14" stroke-linecap="round"/>
     </g>
   `);
 }

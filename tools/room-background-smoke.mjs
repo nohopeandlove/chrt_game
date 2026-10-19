@@ -53,6 +53,27 @@ try {
    await page.screenshot({path:'/tmp/open-office-mobile.png'});
    await page.setViewportSize({width:1440,height:900});
    await page.screenshot({path:'/tmp/open-office-desktop.png'});
+   await page.locator('[data-setting=still]').click();
+   for(let step=0;step<20 && await page.locator('.bg--kitchen').count()===0;step++) {
+    const choice=page.locator('.choice:visible').first();
+    if(await choice.count()) await choice.click();
+    else await page.locator('.panel').click();
+    await page.waitForTimeout(60);
+   }
+   const kitchen=page.locator('.bg--kitchen image');await kitchen.waitFor({state:'visible'});
+   const kitchenSrc=await kitchen.getAttribute('href');const kitchenResponse=await fetch(new URL(kitchenSrc,server.base));assert.equal(kitchenResponse.status,200);assert.equal(kitchenResponse.headers.get('content-type'),'image/webp');
+   await page.evaluate(async src=>{const image=new Image();image.src=src;await image.decode();if(image.naturalWidth<1600)throw Error('Kitchen illustration too small');},kitchenSrc);
+   assert.ok(await page.locator('.bg--kitchen .scene-motion').evaluateAll(es=>es.length===3 && es.every(e=>getComputedStyle(e).animationName==='none')));
+   await page.locator('[data-setting=still]').click();
+   assert.ok(await page.locator('.bg--kitchen .scene-motion').evaluateAll(es=>es.every(e=>e.getAnimations().some(a=>a.playState==='running'))));
+   await page.emulateMedia({reducedMotion:'reduce'});
+   assert.ok(await page.locator('.bg--kitchen .scene-motion').evaluateAll(es=>es.every(e=>getComputedStyle(e).animationName==='none')));
+   await page.screenshot({path:'/tmp/kitchen-desktop.png'});
+   await page.setViewportSize({width:390,height:844});
+   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+   await page.waitForFunction(()=>document.querySelector('.stage__portrait').getBoundingClientRect().top>=document.querySelector('.learning-tools').getBoundingClientRect().bottom);
+   await page.screenshot({path:'/tmp/kitchen-mobile.png'});
+
   }
   if(scene==='labor') {
    await page.screenshot({path:'/tmp/hr-office-desktop.png'});
@@ -67,5 +88,5 @@ try {
   }
  }
  assert.deepEqual(errors,[]);
- console.log('PASS: campus, room, laptop, HR office and team office WebP load in all relevant scenes, scene animations run, manual and system reduced motion disable every effect, mobile fits, no browser errors');
+ console.log('PASS: campus, room, laptop, HR office, team office and kitchen WebP load in all relevant scenes, scene animations run, manual and system reduced motion disable every effect, mobile fits, no browser errors');
 }finally{if(browser)await browser.close();await server.close();}
