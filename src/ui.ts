@@ -385,7 +385,6 @@ export class UI {
         <div class="menu__campus" role="img" aria-label="Иллюстрация Челябинского радиотехнического техникума"></div>
         <section class="menu__intro" aria-labelledby="menu-title">
           <span class="menu__eyebrow">ГБПОУ «Челябинский радиотехнический техникум»</span>
-          <p class="menu__genre">Визуальная новелла</p>
           <h1 class="menu__title" id="menu-title">Я —<br><span>специалист!</span></h1>
           <p class="menu__lede">Вчера — выпускной.<br>Сегодня начинается твоя история.</p>
         </section>
@@ -436,7 +435,7 @@ export class UI {
         <p class="menu__error" role="alert" hidden>Введите имя — оно будет звучать в репликах.</p>
         </div>
         </section>
-        <footer class="menu__footer"><span>Я — специалист · Учебная игра</span><a href="/about/" target="_blank" rel="noopener noreferrer">Об электронном образовательном ресурсе <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 19 19 5M5 5h14v14"/></svg></a></footer>
+        <footer class="menu__footer"><span>Я — специалист · Интерактивный симулятор</span><a href="/about/" target="_blank" rel="noopener noreferrer">Об электронном образовательном ресурсе <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 19 19 5M5 5h14v14"/></svg></a></footer>
       </form>`;
     this.overlay.scrollTop = 0;
 
