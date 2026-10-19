@@ -16,7 +16,7 @@ try {
   const {characters}=await import('/src/content.ts');
   const {renderPortrait}=await import('/src/render/portrait.ts');
   const emotions=['neutral','smile','joy','worry','stern'];
-  const images=new Map();let frames=0;
+  const images=new Map();const frameBoxes=new Map();let frames=0;
   for(const who of characters.values()) {
    const boxes=[];
    for(const emotion of emotions){
@@ -28,6 +28,7 @@ try {
     const href=node.querySelector('image').getAttribute('href');images.set(who.id,href);frames++;
    }
    if(new Set(boxes).size!==5)throw Error('Expressions share same viewport');
+   frameBoxes.set(who.id,boxes.map(box=>box.split(' ').map(Number)));
   }
   for(const [id,url] of images){
    const image=new Image();image.src=url;await image.decode();
@@ -35,6 +36,16 @@ try {
    const ctx=canvas.getContext('2d');ctx.drawImage(image,0,0);
    const corner=ctx.getImageData(0,0,1,1).data[3];
    if(corner!==0)throw Error('Opaque portrait background: '+id);
+   const pixels=ctx.getImageData(0,0,canvas.width,canvas.height).data;
+   for(const [index,box] of frameBoxes.get(id).entries()) {
+    const [x,top,width,height]=box;
+    for(const edge of [Math.ceil(x)+3,Math.floor(x+width)-4]) {
+     let opaque=0;
+     for(let y=Math.ceil(top);y<Math.min(canvas.height,top+height*.7);y++)if(pixels[(y*canvas.width+edge)*4+3]>200)opaque++;
+     if(opaque>height*.05)throw Error(`Cropped shoulder at frame edge: ${id}, expression ${index}`);
+    }
+   }
+
   }
   const root=document.querySelector('#app');const ui=new UI(root);installLearningTools(root,()=>null);
   window.portraitTest={ui,characters};
@@ -56,5 +67,5 @@ try {
  assert.equal(await page.locator('.stage__portrait').evaluate(e=>getComputedStyle(e).visibility),'hidden');
  assert.equal(await page.locator('.panel__role').textContent(),'Наставник');
  assert.deepEqual(errors,[]);
- console.log('PASS: 7 transparent portraits, 35 distinct expression frames, name and role, mobile fit, grayscale and hidden images preserve speaker role');
+ console.log('PASS: 7 transparent portraits, 35 expression frames with transparent side margins, name and role, mobile fit, grayscale and hidden images preserve speaker role');
 }finally{if(browser)await browser.close();await server.close();}

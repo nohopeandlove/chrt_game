@@ -11,8 +11,8 @@ export function illustratedPortrait(id: string, emotion: Emotion, label: string,
   const image = images[`../../assets/portraits/${id}.webp`];
   if (!frame || !image) return undefined;
   const index = Math.max(0, emotions.indexOf(emotion));
-  const width = frame.width / 5;
-  const x = width * index;
+  const x = frame.edges[index]!;
+  const width = frame.edges[index + 1]! - x;
   const backing = plate ? `<rect x="${x}" y="${frame.top}" width="${width}" height="${frame.height}" rx="20" fill="${escapeAttribute(plate)}"/>` : '';
   return `<svg class="illustrated-portrait" data-character="${escapeAttribute(id)}" data-emotion="${emotion}" viewBox="${x} ${frame.top} ${width} ${frame.height}" width="${width}" height="${frame.height}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${escapeAttribute(label)}">
     ${backing}<image href="${image}" x="0" y="0" width="${frame.width}" height="${frame.sourceHeight}"/>
