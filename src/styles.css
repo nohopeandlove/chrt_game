@@ -1256,3 +1256,9 @@ html.vision-large :is(.reward__description,.final-stat p,.ach__body,.ach__body b
 
 .campus-confetti { opacity: .85; }
 .panel:not([hidden]), .choices:not([hidden]) { animation: finale-arrive .4s ease-out both; }
+
+/* The story advance is a full-sized keyboard-accessible button, not a tiny hint. */
+.panel__hint { display:inline-flex; align-items:center; justify-content:center; min-width:140px; min-height:48px; padding:12px 26px; font:inherit; font-weight:700; line-height:1.3; letter-spacing:normal; text-transform:none; border:1px solid #233f68; border-radius:12px; cursor:pointer; opacity:1; background:#233f68; color:#fff; }
+.panel__hint:hover { background:#172f51; }
+.panel__hint:focus-visible { outline:3px solid #bd3153; outline-offset:4px; }
+html.vision-contrast .panel__hint { background:var(--vision-bg); color:var(--vision-fg); border-color:var(--vision-fg); }

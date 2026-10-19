@@ -17,7 +17,9 @@ try{
  for(const passed of [true,false]){
   await page.evaluate(passed=>{const {ui,state,scenes,Engine}=window.design;state.flags.testPassed=passed;const scene=scenes.get('test');window.outroDone=false;void new Engine(ui,state).playNode(scene.nodes.find(n=>n.id==='outro'),scene).then(()=>window.outroDone=true);},passed);
   const text=await page.locator('.panel__line').textContent();assert.equal(text.includes('Даже если не получилось'),!passed);if(passed)assert.ok(text.includes('прошла') || text.includes('справилась'));
-  await page.locator('.panel').click();await page.waitForFunction(()=>window.outroDone);
+  const advance=page.getByRole('button',{name:'Далее',exact:true});const box=await advance.boundingBox();assert.ok(box.width>=140 && box.height>=48);
+  if(passed)await page.screenshot({path:'/tmp/story-next-large.png'});
+  await advance.click();await page.waitForFunction(()=>window.outroDone);
  }
  await page.evaluate(async()=>{const {runResume}=await import('/src/screens/resume.ts');const {ui,state,scenes}=window.design;void runResume(ui,state,scenes.get('resume').nodes.find(n=>n.form).form);});
  const school=page.locator('[data-field=school]');await school.waitFor({state:'visible'});assert.equal(await school.inputValue(),'ГБПОУ «Челябинский радиотехнический техникум»');
@@ -33,6 +35,7 @@ try{
  await page.evaluate(async()=>{const {runCompare}=await import('/src/screens/labor.ts');const {scenes,ui}=window.design;const node=scenes.get('labor').nodes.find(n=>n.screen==='compare');void runCompare(ui,node.columns,node.summary);});
  await page.locator('[data-folder="0"]').click();await page.locator('[data-folder="1"]').click();await page.screenshot({path:'/tmp/contracts-new.png'});assert.equal(await page.locator('[data-done]').isEnabled(),true);await page.locator('[data-done]').click();
  assert.equal(await page.evaluate(()=>window.audioNotes),0);await page.locator('[data-sound]').click();await page.waitForFunction(()=>window.audioNotes>=3);assert.equal(await page.evaluate(()=>window.testAudio.state),'running');
+ const firstNotes=await page.evaluate(()=>window.audioNotes);await page.waitForFunction(initial=>window.audioNotes>initial,firstNotes,{timeout:9000});
  await page.locator('.sound-settings summary').click();await page.locator('[data-volume]').evaluate(e=>{e.value='25';e.dispatchEvent(new Event('input',{bubbles:true}));});
  assert.equal(await page.evaluate(()=>localStorage.getItem('ya-specialist/volume')),'0.25');await page.locator('[data-music]').uncheck();assert.equal(await page.evaluate(()=>localStorage.getItem('ya-specialist/music')),'false');await page.locator('[data-sound]').click();await page.waitForFunction(()=>window.testAudio.state==='suspended');await page.locator('.sound-settings summary').click();
  await page.evaluate(async()=>{const {runFinal}=await import('/src/screens/final.ts');const {ui,state}=window.design;state.learning.final=4;state.learning.finalForm='transfer-v2';state.achievements=['first-day','informed-choice'];window.finalDone=false;void runFinal(ui,state,'Итоги игры',[{label:'Карьера',value:'Специалист по рекламе в компании «Рекламист»'},{label:'Резюме',value:'Готово к первым откликам'},{label:'Навыки',value:'Ответственность и внимательность'},{label:'Финальный статус',value:'Начало пути'}],'Пройти заново').then(()=>window.finalDone=true);});
@@ -40,5 +43,8 @@ try{
  await page.setViewportSize({width:390,height:900});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));await page.screenshot({path:'/tmp/final-new-mobile.png'});
  await page.getByRole('button',{name:'Версия для слабовидящих',exact:true}).click();await page.locator('[data-vision-key=palette][data-value=dark]').click();assert.equal(await page.locator('.final-stat').first().evaluate(e=>getComputedStyle(e).backgroundColor),'rgb(0, 0, 0)');
  await page.getByRole('button',{name:'Версия для слабовидящих',exact:true}).click();await page.getByRole('button',{name:'Пройти заново',exact:true}).click();await page.waitForFunction(()=>window.finalDone);
- assert.deepEqual(errors,[]);console.log('PASS: conditional success/failure outro, full school text on mobile, rewards and reduced motion, contracts, opt-in audio/volume/music/mute, final cards and earned badges, high contrast and restart');
+ await page.evaluate(()=>{localStorage.setItem('ya-specialist/sound','true');localStorage.setItem('ya-specialist/music','true');});
+ await page.reload();assert.equal(await page.evaluate(()=>window.audioNotes),0);await page.locator('.menu__title').click();await page.waitForFunction(()=>window.audioNotes>=11);
+ assert.equal(await page.evaluate(()=>window.testAudio.state),'running');
+ assert.deepEqual(errors,[]);console.log('PASS: conditional success/failure outro, full school text on mobile, rewards and reduced motion, contracts, continuous soundtrack without clicks, saved audio unlock on story interaction, volume/music/mute, final cards and earned badges, high contrast and restart');
 }finally{if(browser)await browser.close();await server.close();}

@@ -21,10 +21,11 @@ function context(): AudioContext {
   if (!master) { master=audio.createGain();master.gain.value=volume;master.connect(audio.destination); }
   return audio;
 }
-function note(frequency: number, start: number, duration: number, level: number, type: OscillatorType): void {
+function note(frequency: number, start: number, duration: number, level: number, type: OscillatorType, sustain = false): void {
   const ctx=context();const oscillator=ctx.createOscillator();const envelope=ctx.createGain();
   oscillator.type=type;oscillator.frequency.value=frequency;
-  envelope.gain.setValueAtTime(0,start);envelope.gain.linearRampToValueAtTime(level,start+Math.min(.35,duration*.15));
+  envelope.gain.setValueAtTime(0,start);envelope.gain.linearRampToValueAtTime(level,start+Math.min(.55,duration*.15));
+  if(sustain)envelope.gain.setValueAtTime(level*.8,start+duration*.7);
   envelope.gain.exponentialRampToValueAtTime(.0001,start+duration);
   oscillator.connect(envelope);envelope.connect(master!);voices.add(oscillator);
   oscillator.start(start);oscillator.stop(start+duration+.02);
@@ -35,10 +36,22 @@ function ambientChord(): void {
   if(!enabled || !music || document.hidden || !audio || audio.state!=='running')return;
   const chords=[[130.81,164.81,196],[110,130.81,164.81],[87.31,130.81,174.61],[98,146.83,196]];
   const notes=chords[chord++%chords.length]!;const start=audio.currentTime;
-  notes.forEach((frequency,i)=>note(frequency,start+i*.13,5.8,.028,'sine'));
-  note(notes[1]!*2,start+1.7,2.8,.016,'sine');
+  // Overlapping sustained chords and a light melodic pattern keep the soundtrack
+  // audible throughout reading, choices and tasks, without waiting for UI events.
+  notes.forEach((frequency,i)=>note(frequency,start+i*.1,6.5,.035,'sine',true));
+  const pattern=[0,1,2,1,0,2,1,2];
+  pattern.forEach((step,i)=>note(notes[step]!*2,start+.2+i*.68,1.25,.052,'triangle'));
 }
 function startMusic(): void { if(timer || !enabled || !music || document.hidden)return;ambientChord();timer=setInterval(ambientChord,6000); }
+/** Resume a saved sound preference on any user interaction, including story text. */
+export function resumeSoundtrack(): void {
+  if(!enabled || document.hidden)return;
+  try { const ctx=context();void ctx.resume().then(()=>{if(enabled)startMusic();}).catch(()=>undefined); }
+  catch { /* Audio support is optional. */ }
+}
+document.addEventListener('pointerdown',resumeSoundtrack,{passive:true});
+document.addEventListener('keydown',resumeSoundtrack);
+
 export function setSound(value: boolean): void {
   enabled=value;persist('sound',value);
   if(!value){stopMusic();for(const voice of voices)try{voice.stop();}catch{/* already ended */}if(audio)void audio.suspend().catch(()=>undefined);return;}

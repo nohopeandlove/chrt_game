@@ -62,7 +62,7 @@ export class UI {
         <div class="panel" hidden>
           <span class="panel__speaker"></span>
           <p class="panel__line"></p><span class="sr-only panel__announcement" aria-live="polite" aria-atomic="true"></span>
-          <span class="panel__hint" aria-hidden="true">дальше</span>
+          <button class="panel__hint" type="button">Далее</button>
         </div>
         <div class="choices" hidden></div>
       </div>
