@@ -1050,3 +1050,7 @@ html.vision-contrast .scam__warning { background:var(--vision-bg); color:var(--v
 .environment-banner[hidden] { display:none; }
 .teacher-page .environment-banner { max-width:1200px; margin:20px auto 0; }
 html.vision-contrast .environment-banner { background:var(--vision-bg); color:var(--vision-fg); border-color:var(--vision-fg); }
+
+@media(max-width:720px) {
+  .stage__portrait { top:calc(var(--learning-tools-height,60px) + 16px); bottom:auto; }
+}

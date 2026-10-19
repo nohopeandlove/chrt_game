@@ -1,0 +1,30 @@
+import assert from 'node:assert/strict';
+import {createRequire} from 'node:module';
+import {testServer} from './server-smoke.mjs';
+const require=createRequire(import.meta.url);const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
+const server=await testServer({APP_ENV:'dev'});let browser;
+try {
+ browser=await chromium.launch({executablePath:process.env.BROWSER_EXECUTABLE||undefined,args:process.env.BROWSER_NO_SANDBOX==='1'?['--no-sandbox']:[]});
+ const page=await browser.newPage({viewport:{width:1440,height:900}});const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.goto(server.base);assert.equal(await page.locator('.bg--assembly-hall').count(),1);
+ await page.locator('[name=playerName]').fill('Тест выпускного');await page.getByRole('button',{name:'Начать',exact:true}).click();
+ await page.getByRole('button',{name:'Перейти к истории',exact:true}).click();
+ const art=page.locator('.bg--crt-campus image');await art.waitFor({state:'visible'});
+ const url=await art.getAttribute('href');assert.ok(url.endsWith('.webp'));
+ const response=await fetch(new URL(url,server.base));assert.equal(response.status,200);assert.equal(response.headers.get('content-type'),'image/webp');
+ const dimensions=await page.evaluate(async src=>{const image=new Image();image.src=src;await image.decode();return {width:image.naturalWidth,height:image.naturalHeight}},url);
+ assert.ok(dimensions.width>=1600 && dimensions.height>=900);
+ await page.locator('.panel').click();
+ await page.screenshot({path:'/tmp/crt-campus-desktop.png'});
+ await page.setViewportSize({width:390,height:844});
+ assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+ await page.waitForFunction(()=>document.querySelector('.stage__portrait').getBoundingClientRect().top>=document.querySelector('.learning-tools').getBoundingClientRect().bottom);
+ await page.screenshot({path:'/tmp/crt-campus-mobile.png'});
+ await page.getByRole('button',{name:'Версия для слабовидящих',exact:true}).click();
+ await page.locator('[data-vision-key=images][data-value=gray]').click();
+ assert.equal(await page.locator('.stage__bg').evaluate(e=>getComputedStyle(e).filter),'grayscale(1)');
+ await page.locator('[data-vision-key=images][data-value=hidden]').click();
+ assert.equal(await page.locator('.stage__bg').evaluate(e=>getComputedStyle(e).visibility),'hidden');
+ assert.deepEqual(errors,[]);
+ console.log('PASS: production WebP loads with correct MIME, graduation uses illustrated campus, menu unchanged, mobile fits, grayscale/hidden modes work, no browser errors');
+}finally{if(browser)await browser.close();await server.close();}

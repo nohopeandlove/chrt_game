@@ -169,7 +169,7 @@ if (new Set(failTexts).size !== failTexts.length) {
 for (const b of backgrounds.items) {
   const w = `backgrounds.json/${b.id}`;
   if (!b.layers?.length) fail(w, 'не описаны слои');
-  if (!b.animation?.length) warn(w, 'не описана ни одна анимация');
+  if (!b.animation?.length && b.static !== true) warn(w, 'не описана ни одна анимация');
 }
 
 // --- сцены --------------------------------------------------------------

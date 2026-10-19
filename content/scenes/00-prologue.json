@@ -1,7 +1,7 @@
 {
   "id": "prologue",
   "title": "Пролог — Выпускной",
-  "background": "assembly-hall",
+  "background": "crt-campus",
   "nodes": [
     {
       "id": "kurator-speech",

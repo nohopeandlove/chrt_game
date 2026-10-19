@@ -1,8 +1,10 @@
+import crtCampusImage from '../../assets/backgrounds/crt-campus.webp';
+
 /**
- * Локации рисуются как SVG-сцены со слоями. Анимации живут в styles.css
+ * SVG-сцены со слоями и отдельная рисованная иллюстрация ЧРТ. Анимации живут в styles.css
  * и выключаются при prefers-reduced-motion.
  *
- * Все семь локаций из content/backgrounds.json. Заглушка остаётся
+ * Локации из content/backgrounds.json. Заглушка остаётся
  * на случай, если в сцене появится новый id.
  */
 
@@ -11,6 +13,13 @@ const VIEW_BOX = '0 0 1600 900';
 function wrap(id: string, title: string, body: string): string {
   return `<svg class="bg bg--${id}" viewBox="${VIEW_BOX}" preserveAspectRatio="xMidYMid slice"
     xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${title}">${body}</svg>`;
+}
+
+function crtCampus(): string {
+  return wrap('crt-campus', 'Челябинский радиотехнический техникум — выпускной у главного входа', `
+    <rect width="1600" height="900" fill="#eaf0f8"/>
+    <image href="${crtCampusImage}" width="1600" height="900" preserveAspectRatio="xMidYMid slice"/>
+  `);
 }
 
 function assemblyHall(): string {
@@ -375,6 +384,7 @@ function placeholder(id: string, title: string): string {
 }
 
 const BUILT: Record<string, () => string> = {
+  'crt-campus': crtCampus,
   'assembly-hall': assemblyHall,
   'hero-room': heroRoom,
   laptop,
