@@ -91,6 +91,7 @@ try {
  });
  await page.getByRole('heading',{name:'Выпускной позади',exact:true}).waitFor({state:'visible'});
  assert.equal(await page.locator('.scene-metric').count(),2);
+ const recapTitle=await page.locator('#recap-title').boundingBox();const toolbar=await page.locator('.learning-tools').boundingBox();assert.ok(recapTitle.y>=toolbar.y+toolbar.height);
  assert.equal(await page.locator('.scene-metric__change strong').first().textContent(),'+2');
  assert.ok((await page.locator('.scene-metric__total').first().textContent()).includes('Стало'));
  await page.screenshot({path:'/tmp/scene-recap-mobile.png'});

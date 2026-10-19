@@ -240,6 +240,7 @@ export class UI {
     this.hideChoices();
     this.overlay.hidden = false;
     this.overlay.innerHTML = `${html}<button class="curtain__go" type="button">${action}</button>`;
+    this.overlay.scrollTop = 0;
 
     return new Promise<void>(resolve => {
       const done = (): void => {
@@ -258,7 +259,7 @@ export class UI {
       };
       this.overlay.querySelector<HTMLButtonElement>('.curtain__go')?.addEventListener('click', done);
       document.addEventListener('keydown', onKey);
-      this.overlay.querySelector<HTMLButtonElement>('.curtain__go')?.focus();
+      this.overlay.querySelector<HTMLButtonElement>('.curtain__go')?.focus({ preventScroll: true });
     });
   }
 
