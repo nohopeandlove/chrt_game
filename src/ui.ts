@@ -322,6 +322,32 @@ export class UI {
   }
 
   /** Таблица итогов сцены. */
+  async sceneSummary(title: string, text: string, metrics: {label: string; before: number; after: number; delta: number}[]): Promise<void> {
+    const number = (value: number): string => String(value).replace('-', '−');
+    this.setPortrait(undefined);
+    this.overlay.classList.add('overlay--summary');
+    try {
+      await this.curtain(
+        `<section class="scene-recap" aria-labelledby="recap-title">
+          <header class="scene-recap__head">
+            <span class="scene-recap__eyebrow">Этап завершён</span>
+            <h2 id="recap-title">${escapeHtml(title)}</h2>
+            <p>${escapeHtml(text)}</p>
+          </header>
+          <div class="scene-recap__metrics">${metrics.length ? metrics.map(metric => `
+            <section class="scene-metric" aria-label="${escapeHtml(metric.label)}">
+              <h3>${escapeHtml(metric.label)}</h3>
+              <p class="scene-metric__change"><strong>${metric.delta > 0 ? '+' : ''}${number(metric.delta)}</strong><span>за эту сцену</span></p>
+              <p class="scene-metric__total"><span>Было <b>${number(metric.before)}</b></span><span aria-hidden="true">→</span><span>Стало <b>${number(metric.after)}</b></span></p>
+            </section>`).join('') : '<p class="scene-recap__empty">Игровые показатели остались без изменений.</p>'}</div>
+        </section>`,
+        'Продолжить историю'
+      );
+    } finally {
+      this.overlay.classList.remove('overlay--summary');
+    }
+  }
+
   table(title: string, rows: { label: string; value: string }[]): Promise<void> {
     return this.curtain(
       `<div class="curtain curtain--table">

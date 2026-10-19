@@ -80,6 +80,25 @@ try {
  await page.locator('[data-vision-key=images][data-value=hidden]').click();
  assert.equal(await page.locator('.stage__portrait').evaluate(e=>getComputedStyle(e).visibility),'hidden');
  assert.equal(await page.locator('.panel__role').textContent(),'Наставник');
+ await page.locator('[data-vision-key=images][data-value=color]').click();
+ await page.getByRole('button',{name:'Версия для слабовидящих',exact:true}).click();
+ await page.evaluate(async()=>{
+  const {summarizeScene}=await import('/src/screens/scene-summary.ts');
+  const {newGame}=await import('/src/state.ts');
+  const {scenes}=await import('/src/content.ts');
+  const state=newGame('Проверка','f');const start={...state.scales};state.scales.energy+=2;state.scales.mood+=1;
+  void summarizeScene(window.portraitTest.ui,state,scenes.get('prologue'),start);
+ });
+ await page.getByRole('heading',{name:'Выпускной позади',exact:true}).waitFor({state:'visible'});
+ assert.equal(await page.locator('.scene-metric').count(),2);
+ assert.equal(await page.locator('.scene-metric__change strong').first().textContent(),'+2');
+ assert.ok((await page.locator('.scene-metric__total').first().textContent()).includes('Стало'));
+ await page.screenshot({path:'/tmp/scene-recap-mobile.png'});
+ assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+ await page.setViewportSize({width:1440,height:900});
+ await page.screenshot({path:'/tmp/scene-recap-desktop.png'});
+ await page.getByRole('button',{name:'Продолжить историю',exact:true}).click();
+ assert.equal(await page.locator('.overlay--summary').count(),0);
  assert.deepEqual(errors,[]);
- console.log('PASS: 7 transparent portraits, 35 expression frames with transparent side margins, clipped menu frames, consistent name and role, mobile fit, grayscale and hidden images preserve speaker role');
+ console.log('PASS: 7 transparent portraits, 35 expression frames with transparent side margins, clipped menu frames, consistent name and role, mobile fit, grayscale and hidden images preserve speaker role, scene recap metrics and continuation');
 }finally{if(browser)await browser.close();await server.close();}

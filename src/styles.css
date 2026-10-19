@@ -1122,3 +1122,23 @@ html.vision-large .panel__speaker { font-size: 1em; }
 @media(max-width:720px) {
   .stage__portrait { left: 20px; right: auto; width: min(48vw,220px); height: min(40dvh,320px); }
 }
+
+.overlay--summary { background: #f3f6fbf5; }
+.scene-recap { width: min(100%,820px); padding: clamp(24px,4vw,44px); background: var(--white); border: 1px solid #d5dfed; border-radius: 26px; box-shadow: 0 16px 48px #23344d0c; animation: finale-arrive .6s ease-out both; }
+.scene-recap__head { text-align: left; }
+.scene-recap__eyebrow { display: inline-block; color: #805625; background: #fff1ce; border-radius: 999px; padding: 6px 12px; font-size: 13px; font-weight: 700; }
+.scene-recap__head h2 { margin: 16px 0 10px; font-size: clamp(28px,4vw,42px); line-height: 1.2; text-wrap: balance; color: var(--ink); }
+.scene-recap__head p { margin: 0; color: var(--ink-2); max-width: 54ch; }
+.scene-recap__metrics { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,220px),1fr)); gap: 16px; margin-top: 30px; }
+.scene-metric { border: 1px solid #dbe4ef; background: #f7f9fd; border-radius: 18px; padding: 22px; text-align: left; }
+.scene-metric h3 { margin: 0; font-size: 18px; font-weight: 650; color: var(--ink); }
+.scene-metric__change { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px; margin: 12px 0 20px; }
+.scene-metric__change strong { color: #233f68; font-size: 40px; font-weight: 750; line-height: 1.2; }
+.scene-metric__change span { color: var(--ink-2); font-size: 15px; }
+.scene-metric__total { display: flex; flex-wrap: wrap; gap: 12px; margin: 0; padding-top: 14px; border-top: 1px solid #dbe4ef; font-size: 16px; color: var(--ink-2); }
+.scene-metric__total b { color: var(--ink); margin-left: 3px; }
+.scene-recap__empty { margin: 0; color: var(--ink-2); }
+html.vision-contrast :is(.scene-recap,.scene-metric,.scene-recap__eyebrow) { background: var(--vision-bg); color: var(--vision-fg); border-color: var(--vision-fg); box-shadow: none; }
+html.vision-contrast .scene-metric__total { border-color: var(--vision-fg); }
+html.vision-large .scene-metric__change span, html.vision-large .scene-metric__total { font-size: 1em; }
+@media(max-width:600px) { .scene-recap { border-radius: 20px; } .scene-recap__metrics { margin-top: 22px; } .scene-metric { padding: 18px; } }

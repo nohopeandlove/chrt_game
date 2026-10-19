@@ -15,5 +15,12 @@ export async function summarizeScene(ui: UI, state: GameState, scene: Scene, sta
   const rows = changes.length ? changes : [{ label: 'Игровые показатели', value: 'Без изменений' }];
   recordEvent(state, { category: 'story', question: `Итоги: ${scene.title}`, answer: rows.map(r => `${r.label}: ${r.value}`).join('; '), correct: null, feedback: 'Изменения игровых шкал за эту сцену. Это последствия решений героя, а не психологическая оценка студента.' });
   save(state);
-  await ui.table(`Итоги · ${scene.title}`, rows);
+  const metrics = (Object.keys(labels) as Scale[]).filter(key => state.scales[key] !== start[key]).map(key => ({
+    label: labels[key], before: start[key], after: state.scales[key], delta: state.scales[key] - start[key]
+  }));
+  await ui.sceneSummary(
+    scene.id === 'prologue' ? 'Выпускной позади' : scene.title,
+    scene.id === 'prologue' ? 'Учёба завершена. Впереди — первые самостоятельные решения.' : 'Вот как изменились игровые показатели за эту сцену.',
+    metrics
+  );
 }
