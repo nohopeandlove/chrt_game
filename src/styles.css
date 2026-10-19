@@ -1262,3 +1262,12 @@ html.vision-large :is(.reward__description,.final-stat p,.ach__body,.ach__body b
 .panel__hint:hover { background:#172f51; }
 .panel__hint:focus-visible { outline:3px solid #bd3153; outline-offset:4px; }
 html.vision-contrast .panel__hint { background:var(--vision-bg); color:var(--vision-fg); border-color:var(--vision-fg); }
+
+/* Teacher reports expand next to their student and keep their state on refresh. */
+.report-row-actions { display:flex; flex-wrap:wrap; gap:8px; }
+.report-delete { color:#a52543; border-color:#c6677c; }
+.report-delete-confirm { max-width:300px; min-width:200px; padding:12px; margin-top:12px; border:1px solid #c6677c; border-radius:12px; white-space:normal; background:#fff5f6; }
+.report-delete-confirm p { margin:0 0 12px; }
+.report-expanded>td { padding:16px; white-space:normal; background:#f0f4fa; }
+.report-expanded .teacher-report { margin:0 0 16px; max-width:100%; }
+.report-expanded .teacher-report h2 { white-space:normal; overflow-wrap:anywhere; }

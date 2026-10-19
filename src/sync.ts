@@ -2,7 +2,7 @@ import { makeReport, parseReport } from './reporting.ts';
 import type { StudentReport } from './reporting.ts';
 import type { GameState } from './types.ts';
 
-type Link = { id: string; token: string; revision: number };
+type Link = { id: string; token: string; revision: number; deleted?: boolean };
 let message = 'Результаты будут автоматически сохранены после начала игры.';
 const pending = new Map<string, StudentReport>();
 const links = new Map<string, Link>();
@@ -33,30 +33,32 @@ async function linkFor(key: string): Promise<Link> {
   if(!response.ok || typeof data.id!=='string' || typeof data.token!=='string')throw new Error('Не удалось открыть сессию результатов.');
   link={id:data.id,token:data.token,revision:0};persist(key,link);return link;
 }
-async function send(key: string, report: StudentReport): Promise<void> {
+async function send(key: string, report: StudentReport): Promise<boolean> {
   const link=await linkFor(key);
+  if(link.deleted)return false;
   for(let attempt=0;attempt<2;attempt++) {
     const revision=link.revision+1;
     const response=await fetch(`/api/student/reports/${encodeURIComponent(link.id)}`,{method:'PUT',headers:{'Content-Type':'application/json',Authorization:`Bearer ${link.token}`},body:JSON.stringify({report,revision}),signal:AbortSignal.timeout(15000)});
     const data=await responseJson(response);
+    if(response.status===410){link.deleted=true;persist(key,link);return false;}
     if(response.status===409 && typeof data.revision==='number'){link.revision=data.revision;persist(key,link);continue;}
     if(response.status===401){links.delete(key);try{localStorage.removeItem(`ya-specialist/server-session/${key}`);}catch{/* session only */}}
     if(!response.ok)throw new Error('Сохранение на сервере временно недоступно.');
-    link.revision=revision;persist(key,link);return;
+    link.revision=revision;persist(key,link);return true;
   }
   throw new Error('Откройте прохождение только в одной вкладке.');
 }
 async function flush(): Promise<void> {
   if(running || !pending.size)return;
-  let failed=false;
+  let failed=false;let removed=false;
   running=true;status('Сохраняем результаты преподавателю…');
   try {
     for(const [key,report] of pending) {
-      await send(key,report);
+      if(!await send(key,report))removed=true;
       if(pending.get(key)===report)pending.delete(key);
       persistPending();
     }
-    status(pending.size?'Есть новые результаты, продолжаем сохранение…':'Результаты сохранены на сервере. Преподаватель увидит их автоматически.');
+    status(pending.size?'Есть новые результаты, продолжаем сохранение…':removed?'Прохождение удалено преподавателем. Чтобы отправить новые результаты, начните новую игру.':'Результаты сохранены на сервере. Преподаватель увидит их автоматически.');
   } catch {
     failed=true;
     status('Нет связи с сервером результатов. Игра продолжается; повторим сохранение автоматически. Не закрывайте вкладку до подтверждения.');
@@ -68,6 +70,7 @@ async function flush(): Promise<void> {
 export function queueSync(state: GameState): void {
   const report=makeReport(state,true);
   const key=state.analytics.sessionId;
+  if(links.get(key)?.deleted){status('Прохождение удалено преподавателем. Чтобы отправить новые результаты, начните новую игру.');return;}
   const fingerprint=JSON.stringify({analytics:report.analytics,diagnostics:report.diagnostics});
   if(fingerprints.get(key)===fingerprint)return;
   fingerprints.set(key,fingerprint);pending.set(key,report);persistPending();status('Есть новые результаты. Сохраняем автоматически…');

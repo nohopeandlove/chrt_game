@@ -26,6 +26,7 @@ db.exec(`PRAGMA journal_mode=WAL; PRAGMA busy_timeout=5000;
  CREATE TABLE IF NOT EXISTS students (id TEXT PRIMARY KEY, token_hash TEXT NOT NULL, report TEXT, updated_at TEXT, revision INTEGER NOT NULL DEFAULT 0);
  CREATE INDEX IF NOT EXISTS students_updated ON students(updated_at);`);
 if (!db.prepare('PRAGMA table_info(students)').all().some(c=>c.name==='name_search')) db.exec("ALTER TABLE students ADD COLUMN name_search TEXT NOT NULL DEFAULT ''");
+if (!db.prepare('PRAGMA table_info(students)').all().some(c=>c.name==='deleted')) db.exec('ALTER TABLE students ADD COLUMN deleted INTEGER NOT NULL DEFAULT 0');
 for(const row of db.prepare("SELECT id,report FROM students WHERE report IS NOT NULL AND name_search=''").all()) db.prepare('UPDATE students SET name_search=? WHERE id=?').run(JSON.parse(row.report).analytics.fullName.toLowerCase(),row.id);
 const setupFile = join(dataDir, 'setup-code');
 // Managed hosting can supply the private bootstrap code at runtime, without a shell.
@@ -138,14 +139,16 @@ async function api(req,res,url) {
  }
  const studentMatch=/^\/api\/student\/reports\/([a-zA-Z0-9-]{1,80})$/.exec(url.pathname);
  if(studentMatch && req.method==='PUT') {
-  const row=db.prepare('SELECT token_hash,revision FROM students WHERE id=?').get(studentMatch[1]);
+  const row=db.prepare('SELECT token_hash,revision,deleted FROM students WHERE id=?').get(studentMatch[1]);
   const bearer=req.headers.authorization?.replace(/^Bearer /,'') || '';
   if(!row || !equal(hash(bearer),row.token_hash))throw new Failure(401,'Недействительная сессия студента.');
+  if(row.deleted)throw new Failure(410,'Это прохождение удалено преподавателем.');
   const input=await body(req);
   if(!Number.isSafeInteger(input?.revision)||input.revision<1)throw new Failure(400,'Неверная версия отчёта.');
   let report;try{report=parseReport(JSON.stringify(input.report));}catch{throw new Failure(400,'Некорректные результаты.');}
   report.analytics.sessionId=studentMatch[1];
-  const current=db.prepare('SELECT revision FROM students WHERE id=?').get(studentMatch[1]);
+  const current=db.prepare('SELECT revision,deleted FROM students WHERE id=?').get(studentMatch[1]);
+  if(current.deleted)throw new Failure(410,'Это прохождение удалено преподавателем.');
   if(input.revision<=current.revision)return json(res,409,{error:'Версия устарела.',revision:current.revision});
   if(input.revision>row.revision)db.prepare('UPDATE students SET report=?, updated_at=?, revision=?, name_search=? WHERE id=?').run(JSON.stringify(report),new Date().toISOString(),input.revision,report.analytics.fullName.toLowerCase(),studentMatch[1]);
   return json(res,200,{ok:true,revision:input.revision});
@@ -174,6 +177,12 @@ async function api(req,res,url) {
   }
   const match=/^\/api\/teacher\/reports\/([a-zA-Z0-9-]{1,80})$/.exec(url.pathname);
   if(match && req.method==='GET') {const row=db.prepare('SELECT report FROM students WHERE id=?').get(match[1]);if(!row?.report)throw new Failure(404,'Отчёт не найден.');return json(res,200,JSON.parse(row.report));}
+  if(match && req.method==='DELETE') {
+   // Keep only the session marker to prevent automatic sync resurrecting a deleted report.
+   const result=db.prepare("UPDATE students SET report=NULL,name_search='',updated_at=NULL,deleted=1 WHERE id=? AND report IS NOT NULL").run(match[1]);
+   if(!result.changes)throw new Failure(404,'Прохождение уже удалено или не найдено.');
+   return json(res,200,{ok:true});
+  }
  }
  throw new Failure(404,'Не найдено.');
 }
