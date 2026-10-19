@@ -38,7 +38,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
   const rows=await page.evaluate(async()=>{
    const {summarizeScene}=await import('/src/screens/scene-summary.ts');const {newGame}=await import('/src/state.ts');const state=newGame('Тест','f');const start={...state.scales};state.scales.mood=1;let result;
    await summarizeScene({table:async(_title,r)=>{result=r}},state,{title:'Тест'},start);return result;
-  });assert.deepEqual(rows,[{label:'Настроение',value:'+1 · теперь 1'}]);
+  });assert.deepEqual(rows,[{label:'Настроение',value:'Было: 0 → Стало: 1\nЗа сцену: +1'}]);
   await page.evaluate(async()=>{
    const {runFinal}=await import('/src/screens/final.ts');window.state.learning.final=3;window.state.learning.finalForm='transfer-v2';void runFinal(window.ui,window.state,'Итоги',[],'Заново');
   });

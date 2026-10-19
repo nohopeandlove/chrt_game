@@ -29,7 +29,7 @@ const assert=require('node:assert/strict');
   const {parseReport,makeReport,reportsCsv}=await import('/src/reporting.ts');
   return {rows,parsed:parseReport(JSON.stringify(makeReport(window.student,true))),csv:reportsCsv([makeReport(window.student,true)])};
  });
- assert.ok(summary.rows.some(r=>r.label==='Уверенность' && r.value.startsWith('−1')));assert.ok(summary.parsed);assert.match(summary.csv,/Портфолио, %/);
+ assert.ok(summary.rows.some(r=>r.label==='Уверенность' && r.value.includes('За сцену: −1')));assert.ok(summary.parsed);assert.match(summary.csv,/Портфолио, %/);
  await page.setViewportSize({width:390,height:844});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
  // The achievement follows the real gated comparison; the hasty reply cannot award it.
  await page.evaluate(async()=>{
@@ -52,8 +52,8 @@ const assert=require('node:assert/strict');
   return {next,initial,summaries};
  });
  assert.equal(transitions.next,'portfolio');assert.equal(transitions.initial.length,1);
- assert.ok(transitions.initial[0].rows.some(r=>r.label==='Энергия' && r.value.startsWith('+2')));
- assert.equal(transitions.summaries.length,1);assert.ok(transitions.summaries[0].rows.some(r=>r.label==='Уверенность' && r.value.startsWith('−1')));
+ assert.ok(transitions.initial[0].rows.some(r=>r.label==='Энергия' && r.value.includes('За сцену: +2')));
+ assert.equal(transitions.summaries.length,1);assert.ok(transitions.summaries[0].rows.some(r=>r.label==='Уверенность' && r.value.includes('За сцену: −1')));
  console.log('PASS: scene transitions show actual deltas once, including existing results nodes');
  console.log('PASS: drag/drop, button fallback, selection limits, feedback, scoring, actual deltas, CSV, mobile layout and gated achievement');
  }finally{await browser.close();}
