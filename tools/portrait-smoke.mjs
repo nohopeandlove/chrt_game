@@ -10,6 +10,8 @@ try {
  const page=await browser.newPage({viewport:{width:1440,height:900}});const errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.route('**/api/**',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({environment:'dev',appEnv:'dev'})}));
  await page.goto(base);
+ await page.locator('.hero__art .illustrated-portrait').first().waitFor({state:'visible'});
+ await page.screenshot({path:'/tmp/hero-menu-fixed.png'});
  const result=await page.evaluate(async()=>{
   const {UI}=await import('/src/ui.ts');
   const {installLearningTools}=await import('/src/learning.ts');
@@ -47,6 +49,17 @@ try {
    }
 
   }
+  for(const [id,emotion] of [['hero-f','smile'],['hero-m','joy']]) {
+   const who=characters.get(id);
+   const svg=new DOMParser().parseFromString(renderPortrait(who.portrait,emotion,{characterId:id,plate:true}),'image/svg+xml').documentElement;
+   const url=svg.querySelector('image').getAttribute('href');
+   const blob=await (await fetch(url)).blob();
+   const dataUrl=await new Promise(resolve=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.readAsDataURL(blob);});
+   svg.querySelector('image').setAttribute('href',dataUrl);svg.setAttribute('width','180');svg.setAttribute('height','216');
+   const image=new Image();image.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(new XMLSerializer().serializeToString(svg));await image.decode();
+   const canvas=document.createElement('canvas');canvas.width=180;canvas.height=216;const ctx=canvas.getContext('2d');ctx.drawImage(image,0,0);
+   for(const x of [1,178]){const side=ctx.getImageData(x,0,1,216).data;for(let i=3;i<side.length;i+=4)if(side[i]!==0)throw Error('Neighbor expression leaks into menu: '+id);}
+  }
   const root=document.querySelector('#app');const ui=new UI(root);installLearningTools(root,()=>null);
   window.portraitTest={ui,characters};
   void ui.say({kind:'say',who:characters.get('mentor'),text:'Пойдём, познакомлю с остальными. У нас обед без галстуков — общаемся, шутим, обсуждаем проекты.'});
@@ -60,6 +73,7 @@ try {
  await page.setViewportSize({width:390,height:844});
  assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
  await page.screenshot({path:'/tmp/portraits-mobile.png'});
+ assert.equal(await page.locator('.panel__name').evaluate(e=>getComputedStyle(e).fontSize),await page.locator('.panel__role').evaluate(e=>getComputedStyle(e).fontSize));
  await page.getByRole('button',{name:'Версия для слабовидящих',exact:true}).click();
  await page.locator('[data-vision-key=images][data-value=gray]').click();
  assert.equal(await page.locator('.stage__portrait').evaluate(e=>getComputedStyle(e).filter),'grayscale(1)');
@@ -67,5 +81,5 @@ try {
  assert.equal(await page.locator('.stage__portrait').evaluate(e=>getComputedStyle(e).visibility),'hidden');
  assert.equal(await page.locator('.panel__role').textContent(),'Наставник');
  assert.deepEqual(errors,[]);
- console.log('PASS: 7 transparent portraits, 35 expression frames with transparent side margins, name and role, mobile fit, grayscale and hidden images preserve speaker role');
+ console.log('PASS: 7 transparent portraits, 35 expression frames with transparent side margins, clipped menu frames, consistent name and role, mobile fit, grayscale and hidden images preserve speaker role');
 }finally{if(browser)await browser.close();await server.close();}
