@@ -1068,3 +1068,6 @@ html.vision-contrast .environment-banner { background:var(--vision-bg); color:va
 @keyframes room-steam { 0% { opacity: 0; transform: translateY(5px); } 30%,65% { opacity: .24; } 100% { opacity: 0; transform: translateY(-20px); } }
 @keyframes room-shooting-star { 0%,86%,100% { opacity: 0; transform: translate(0,0); } 88% { opacity: .65; } 92% { opacity: 0; transform: translate(180px,60px); } }
 @keyframes campus-confetti { from { transform: translate(-25px,-30px) rotate(0deg); } to { transform: translate(55px,980px) rotate(280deg); } }
+
+.laptop-status { animation: laptop-status 4s ease-in-out infinite; }
+@keyframes laptop-status { 0%,100% { opacity: .25; } 50% { opacity: .8; } }

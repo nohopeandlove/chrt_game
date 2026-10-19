@@ -1,3 +1,4 @@
+import laptopImage from '../../assets/backgrounds/laptop.webp';
 import heroRoomImage from '../../assets/backgrounds/hero-room.webp';
 import crtCampusImage from '../../assets/backgrounds/crt-campus.webp';
 
@@ -115,40 +116,25 @@ function heroRoom(): string {
 }
 
 function laptop(): string {
-  const lines: string[] = [];
-  for (let i = 0; i < 5; i++) {
-    const y = 330 + i * 46;
-    const w = 260 + ((i * 97) % 200);
-    lines.push(`<rect x="560" y="${y}" width="${w}" height="16" rx="8" fill="#DDE3F0"/>`);
-  }
-  return wrap('laptop', 'Ноутбук на столе', `
-    <rect width="1600" height="900" fill="#1C2238"/>
-    <rect width="1600" height="560" fill="#222A45"/>
-    <rect y="560" width="1600" height="340" fill="#3A2F2A"/>
-    <rect y="560" width="1600" height="18" fill="#4A3C35"/>
-    <rect x="120" y="120" width="360" height="260" rx="8" fill="#2B3556"/>
-    <rect x="1120" y="140" width="300" height="200" rx="8" fill="#2B3556"/>
-
-    <g>
-      <rect x="380" y="220" width="840" height="520" rx="26" fill="#3B4562"/>
-      <rect x="404" y="244" width="792" height="470" rx="10" fill="#F4F6FB"/>
-      <rect x="404" y="244" width="792" height="44" rx="10" fill="#E3E8F3"/>
-      <circle cx="432" cy="266" r="7" fill="#F0895D"/><circle cx="456" cy="266" r="7" fill="#E2B653"/><circle cx="480" cy="266" r="7" fill="#54C9A0"/>
-      <rect x="440" y="316" width="90" height="90" rx="12" fill="#5B3FD6" opacity=".85"/>
-      ${lines.join('')}
-      <rect x="560" y="576" width="220" height="40" rx="10" fill="#5B3FD6"/>
-      <rect class="cursor" x="796" y="585" width="3" height="22" fill="#2E3A59"/>
-      <g class="typing" transform="translate(1020 592)">
-        <circle cx="0" cy="0" r="6" fill="#9AA7C4" style="animation-delay:0s"/>
-        <circle cx="20" cy="0" r="6" fill="#9AA7C4" style="animation-delay:.2s"/>
-        <circle cx="40" cy="0" r="6" fill="#9AA7C4" style="animation-delay:.4s"/>
+  return wrap('laptop', 'Ноутбук с вакансиями на уютном рабочем столе', `
+    <image href="${laptopImage}" width="1600" height="900" preserveAspectRatio="xMidYMid slice"/>
+    <defs>
+      <radialGradient id="laptop-screen-light"><stop stop-color="#c3d8ff" stop-opacity=".16"/><stop offset="1" stop-color="#c3d8ff" stop-opacity="0"/></radialGradient>
+      <radialGradient id="laptop-lamp-light"><stop stop-color="#ffcb86" stop-opacity=".2"/><stop offset="1" stop-color="#ffcb86" stop-opacity="0"/></radialGradient>
+    </defs>
+    <g aria-hidden="true" pointer-events="none">
+      <ellipse class="room-glow scene-motion" cx="795" cy="360" rx="340" ry="205" fill="url(#laptop-screen-light)"/>
+      <ellipse class="room-lamplight scene-motion" cx="210" cy="260" rx="200" ry="155" fill="url(#laptop-lamp-light)"/>
+      <g class="room-steam scene-motion" fill="none" stroke="#f4dfd3" stroke-width="3" stroke-linecap="round" opacity=".24">
+        <path d="M1320 428 Q1308 410 1320 394 Q1332 377 1322 360"/>
+        <path d="M1348 430 Q1360 410 1349 393"/>
       </g>
-      <path d="M340,740 L1260,740 L1220,780 L380,780 Z" fill="#2E374F"/>
-      <rect x="740" y="742" width="120" height="8" rx="4" fill="#4A5470"/>
+      <g class="laptop-status scene-motion" fill="#c7bdfa">
+        <circle cx="1050" cy="188" r="2.5"/>
+        <circle cx="1063" cy="188" r="2.5"/>
+        <circle cx="1076" cy="188" r="2.5"/>
+      </g>
     </g>
-    <ellipse cx="1360" cy="700" rx="70" ry="22" fill="#2A211E"/>
-    <rect x="1330" y="600" width="60" height="100" rx="10" fill="#6C4FD6" opacity=".9"/>
-    <path d="M1330,600 h60 v10 h-60 z" fill="#F0E8FF" opacity=".6"/>
   `);
 }
 
