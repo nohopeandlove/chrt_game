@@ -77,10 +77,10 @@ export const portraitFrames: Record<string, {width: number; sourceHeight: number
     "height": 698,
     "edges": [
       0,
-      432,
-      830,
-      1236,
-      1642,
+      427,
+      824,
+      1231,
+      1636,
       2048
     ]
   },

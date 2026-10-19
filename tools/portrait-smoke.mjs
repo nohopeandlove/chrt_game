@@ -41,10 +41,10 @@ try {
    const pixels=ctx.getImageData(0,0,canvas.width,canvas.height).data;
    for(const [index,box] of frameBoxes.get(id).entries()) {
     const [x,top,width,height]=box;
-    for(const edge of [Math.ceil(x)+3,Math.floor(x+width)-4]) {
+    for(const edge of id==='hr' ? [Math.ceil(x),Math.floor(x+width)-1] : [Math.ceil(x)+3,Math.floor(x+width)-4]) {
      let opaque=0;
-     for(let y=Math.ceil(top);y<Math.min(canvas.height,top+height*.7);y++)if(pixels[(y*canvas.width+edge)*4+3]>200)opaque++;
-     if(opaque>height*.05)throw Error(`Cropped shoulder at frame edge: ${id}, expression ${index}`);
+     for(let y=Math.ceil(top);y<Math.min(canvas.height,top+height*(id==='hr'?1:.7));y++)if(pixels[(y*canvas.width+edge)*4+3]>200)opaque++;
+     if(opaque>(id==='hr'?0:height*.05))throw Error(`Cropped shoulder at frame edge: ${id}, expression ${index}`);
     }
    }
 
@@ -100,6 +100,8 @@ try {
  await page.screenshot({path:'/tmp/scene-recap-desktop.png'});
  await page.getByRole('button',{name:'Продолжить историю',exact:true}).click();
  assert.equal(await page.locator('.overlay--summary').count(),0);
+ await page.evaluate(()=>{const {ui,characters}=window.portraitTest;ui.setBackground('laptop');void ui.say({kind:'say',who:characters.get('hr'),emotion:'smile',text:'Здравствуйте! Давайте познакомимся.'});});
+ await page.screenshot({path:'/tmp/hr-portrait-fixed.png'});
  assert.deepEqual(errors,[]);
  console.log('PASS: 7 transparent portraits, 35 expression frames with transparent side margins, clipped menu frames, consistent name and role, mobile fit, grayscale and hidden images preserve speaker role, scene recap metrics and continuation');
 }finally{if(browser)await browser.close();await server.close();}
