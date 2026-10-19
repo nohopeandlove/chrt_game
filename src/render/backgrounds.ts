@@ -1,3 +1,4 @@
+import openOfficeImage from '../../assets/backgrounds/open-office.webp';
 import hrOfficeImage from '../../assets/backgrounds/hr-office.webp';
 import laptopImage from '../../assets/backgrounds/laptop.webp';
 import heroRoomImage from '../../assets/backgrounds/hero-room.webp';
@@ -159,61 +160,25 @@ function hrOffice(): string {
 }
 
 function openOffice(): string {
-  const stickies = ['#E2B653', '#54C9A0', '#F0895D', '#A992FF'];
-  const boardNotes = (x: number, y: number): string =>
-    stickies
-      .map(
-        (c, i) =>
-          `<rect class="sticky" x="${x + (i % 2) * 44}" y="${y + Math.floor(i / 2) * 44}" width="34" height="34" rx="3" fill="${c}" style="animation-delay:${i * 0.7}s"/>`
-      )
-      .join('');
-  return wrap('open-office', 'Открытый офис', `
-    <rect width="1600" height="900" fill="#DCE7F2"/>
-    <rect width="1600" height="620" fill="url(#office-sky)"/>
-    <g class="clouds">
-      <ellipse cx="300" cy="180" rx="120" ry="40" fill="#FFFFFF" opacity=".9"/>
-      <ellipse cx="360" cy="160" rx="80" ry="34" fill="#FFFFFF" opacity=".9"/>
-      <ellipse cx="900" cy="120" rx="140" ry="42" fill="#FFFFFF" opacity=".85"/>
-      <ellipse cx="1300" cy="220" rx="110" ry="36" fill="#FFFFFF" opacity=".85"/>
-    </g>
-    <path d="M0,460 Q200,360 400,440 T800,420 T1200,450 T1600,410 V620 H0 Z" fill="#9FB8CF"/>
-    <rect y="600" width="1600" height="20" fill="#B9C9DB"/>
-    <g fill="none" stroke="#F0F4F8" stroke-width="18">
-      <path d="M0,60 H1600"/>
-      <path d="M420,60 V620 M1180,60 V620"/>
-    </g>
-    <rect y="620" width="1600" height="280" fill="#EEF2F6"/>
-
-    <g>
-      <rect x="140" y="110" width="200" height="360" rx="10" fill="#3D4E6B"/>
-      ${boardNotes(180, 170)}
-      <rect x="1260" y="110" width="200" height="360" rx="10" fill="#3D4E6B"/>
-      ${boardNotes(1300, 200)}
-    </g>
-
-    <g>
-      <rect x="480" y="470" width="640" height="24" rx="6" fill="#FFFFFF"/>
-      <rect x="500" y="494" width="20" height="200" fill="#C9D3DE"/>
-      <rect x="1080" y="494" width="20" height="200" fill="#C9D3DE"/>
-      <rect x="640" y="330" width="220" height="140" rx="10" fill="#2E3A59"/>
-      <rect x="652" y="342" width="196" height="116" rx="6" fill="#F4F6FB"/>
-      <rect x="880" y="380" width="120" height="90" rx="6" fill="#5B3FD6" opacity=".8"/>
-      <path d="M980,470 q10,-90 -10,-160" stroke="#7FA8D4" stroke-width="10" fill="none" stroke-linecap="round"/>
-    </g>
-
-    <g transform="translate(800 200)">
-      <circle r="52" fill="#FFFFFF" stroke="#3D4E6B" stroke-width="6"/>
-      <line x1="0" y1="0" x2="0" y2="-30" stroke="#3D4E6B" stroke-width="6" stroke-linecap="round"/>
-      <line class="minute" x1="0" y1="0" x2="0" y2="-40" stroke="#5B3FD6" stroke-width="4" stroke-linecap="round"/>
-      <circle r="5" fill="#3D4E6B"/>
-    </g>
-
+  const motes = Array.from({length: 10}, (_, i) =>
+    `<circle class="office-mote scene-motion" cx="${500 + i * 73 % 700}" cy="${65 + i * 31 % 150}" r="${i % 3 ? 1.6 : 2.2}" fill="#fff7de" style="animation-delay:-${i * 1.7}s;animation-duration:${14 + i % 4}s"/>`
+  ).join('');
+  return wrap('open-office', 'Светлый офис команды с рабочими местами и панорамными окнами', `
+    <image href="${openOfficeImage}" width="1600" height="900" preserveAspectRatio="xMidYMid slice"/>
     <defs>
-      <linearGradient id="office-sky" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#7FA8D4"/>
-        <stop offset="100%" stop-color="#DCE7F2"/>
-      </linearGradient>
+      <radialGradient id="team-screen-light"><stop stop-color="#c3ddff" stop-opacity=".16"/><stop offset="1" stop-color="#c3ddff" stop-opacity="0"/></radialGradient>
+      <linearGradient id="team-daylight" x1="1" y1="0" x2="0" y2="1"><stop stop-color="#fff0bc" stop-opacity=".1"/><stop offset="1" stop-color="#fff0bc" stop-opacity="0"/></linearGradient>
+      <clipPath id="team-windows"><rect x="480" y="42" width="775" height="170"/></clipPath>
     </defs>
+    <g aria-hidden="true" pointer-events="none">
+      <ellipse class="room-glow scene-motion" cx="840" cy="320" rx="165" ry="110" fill="url(#team-screen-light)"/>
+      <path class="office-daylight scene-motion" d="M980 40 H1260 L1100 790 H350 Z" fill="url(#team-daylight)"/>
+      <g clip-path="url(#team-windows)">${motes}</g>
+      <g class="room-steam scene-motion" fill="none" stroke="#fff4db" stroke-width="2" stroke-linecap="round" opacity=".24">
+        <path d="M1012 367 Q1004 355 1013 343 Q1021 330 1013 319"/>
+        <path d="M1026 369 Q1034 357 1027 347"/>
+      </g>
+    </g>
   `);
 }
 
