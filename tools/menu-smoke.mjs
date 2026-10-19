@@ -21,8 +21,16 @@ try {
  }
  await page.setViewportSize({width:1440,height:1000});
  await page.getByRole('button',{name:'Начать',exact:true}).click();await page.locator('.menu__error').waitFor();assert.equal(await page.locator('[name=playerName]').evaluate(e=>document.activeElement===e),true);
+ const castHeight=await page.locator('.heroes').evaluate(e=>e.getBoundingClientRect().height);
+ assert.equal(await page.locator('[data-character="hero-f"]').getAttribute('data-emotion'),'joy');
+ assert.equal(await page.locator('[data-character="hero-m"]').getAttribute('data-emotion'),'neutral');
  await page.locator('.hero').nth(1).click();assert.equal(await page.locator('[name=gender][value=m]').isChecked(),true);
- await page.locator('[name=gender][value=m]').focus();await page.keyboard.press('ArrowLeft');assert.equal(await page.locator('[name=gender][value=f]').isChecked(),true);
+ assert.equal(await page.locator('[data-character="hero-f"]').getAttribute('data-emotion'),'neutral');
+ assert.equal(await page.locator('[data-character="hero-m"]').getAttribute('data-emotion'),'joy');
+ const selectedArt=await page.locator('.hero:has(input:checked) .hero__art').boundingBox();const otherArt=await page.locator('.hero:not(:has(input:checked)) .hero__art').boundingBox();
+ assert.ok(selectedArt.height>otherArt.height*1.2);assert.equal(await page.locator('.heroes').evaluate(e=>e.getBoundingClientRect().height),castHeight);
+
+ await page.locator('[name=gender][value=m]').focus();await page.keyboard.press('ArrowLeft');assert.equal(await page.locator('[name=gender][value=f]').isChecked(),true);assert.equal(await page.locator('[data-character="hero-f"]').getAttribute('data-emotion'),'joy');assert.equal(await page.locator('[data-character="hero-m"]').getAttribute('data-emotion'),'neutral');
  assert.equal(await page.locator('.menu').evaluate(e=>getComputedStyle(e).animationName),'none');
  await page.getByRole('button',{name:'Версия для слабовидящих',exact:true}).click();await page.locator('[data-vision-key=palette][data-value=dark]').click();
  assert.equal(await page.locator('.menu__intro').evaluate(e=>getComputedStyle(e).backgroundColor),'rgb(0, 0, 0)');assert.equal(await page.locator('.menu__title span').evaluate(e=>getComputedStyle(e).color),'rgb(255, 255, 255)');
@@ -35,5 +43,5 @@ try {
  // Exercise the resume action independently of whether the real save has a chapter yet.
  await page.evaluate(async()=>{const {UI}=await import('/src/ui.ts');window.menuUI=new UI(document.querySelector('#app'));void window.menuUI.menu(true,true,'Собеседование').then(r=>window.menuResult=r);});
  await page.getByRole('button',{name:'Продолжить',exact:true}).click();await page.waitForFunction(()=>window.menuResult==='continue');
- assert.deepEqual(errors,[]);console.log('PASS: illustrated landing at 5 widths, campus asset, keyboard character selection, validation and game start, saved progress/delete/resume, reduced motion, high contrast and hidden images');
+ assert.deepEqual(errors,[]);console.log('PASS: illustrated landing at 5 widths, campus asset, keyboard character selection, joy on selection, visible size difference without layout jumps, validation and game start, saved progress/delete/resume, reduced motion, high contrast and hidden images');
 }finally{if(browser)await browser.close();await server.close();}

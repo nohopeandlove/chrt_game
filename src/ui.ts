@@ -397,7 +397,7 @@ export class UI {
               <input type="radio" name="gender" value="f" checked>
               <span class="hero__art">${renderPortrait(
                 requireCharacter('hero-f'),
-                'smile',
+                'joy',
                 { characterId: 'hero-f', crop: true, plate: false, label: 'Женский персонаж' }
               )}</span>
               <span class="hero__label">Героиня</span><span class="hero__check" aria-hidden="true">✓</span>
@@ -406,7 +406,7 @@ export class UI {
               <input type="radio" name="gender" value="m">
               <span class="hero__art">${renderPortrait(
                 requireCharacter('hero-m'),
-                'joy',
+                'neutral',
                 { characterId: 'hero-m', crop: true, plate: false, label: 'Мужской персонаж' }
               )}</span>
               <span class="hero__label">Герой</span><span class="hero__check" aria-hidden="true">✓</span>
@@ -443,6 +443,23 @@ export class UI {
       const form = this.overlay.querySelector<HTMLFormElement>('.menu');
       const error = this.overlay.querySelector<HTMLElement>('.menu__error');
       if (!form || !error) throw new Error('Меню не собралось');
+
+      form.querySelectorAll<HTMLInputElement>('[name="gender"]').forEach(input => {
+        input.addEventListener('change', () => {
+          form.querySelectorAll<HTMLInputElement>('[name="gender"]').forEach(radio => {
+            const art = radio.closest('.hero')?.querySelector<HTMLElement>('.hero__art');
+            if (!art) return;
+            const id = radio.value === 'm' ? 'hero-m' : 'hero-f';
+            art.innerHTML = renderPortrait(requireCharacter(id), radio.checked ? 'joy' : 'neutral', {
+              characterId: id, crop: true, plate: false,
+              label: `${radio.value === 'm' ? 'Мужской' : 'Женский'} персонаж${radio.checked ? ': радость' : ''}`
+            });
+            // Preserve the radio and label positions; only the portrait changes.
+            const portrait = art.querySelector('svg');
+            if (portrait) portrait.style.animation = 'none';
+          });
+        });
+      });
 
       form.addEventListener('submit', e => {
         e.preventDefault();
