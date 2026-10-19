@@ -1,3 +1,4 @@
+import { installEnvironmentBadge } from './environment.ts';
 import { shuffledIndices } from './shuffle.ts';
 import { installAccessibility } from './accessibility.ts';
 import { syncStatus } from './sync.ts';
@@ -126,6 +127,7 @@ export function installLearningTools(root: HTMLElement, getState: () => GameStat
   tools.setAttribute('aria-label', 'Прогресс и настройки доступности');
   tools.innerHTML = `<button type="button" data-journal>Кабинет и результаты</button><button type="button" data-vision>Версия для слабовидящих</button><button type="button" data-setting="still" aria-pressed="false">Без анимации</button><button type="button" data-sound aria-pressed="${soundEnabled()}">Звук: ${soundEnabled() ? 'вкл' : 'выкл'}</button><span class="save-warning" role="status" hidden>Сохранение недоступно. Не закрывайте вкладку до завершения.</span>`;
   root.append(tools);
+  void installEnvironmentBadge(tools);
   installAccessibility(root, tools.querySelector<HTMLButtonElement>('[data-vision]')!);
   const sizeTools = (): void => {
     document.documentElement.style.setProperty('--learning-tools-height', `${tools.getBoundingClientRect().height}px`);

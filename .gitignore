@@ -13,3 +13,6 @@ data/
 *.sqlite
 *.sqlite-shm
 *.sqlite-wal
+
+# Isolated local testing data
+data-dev/

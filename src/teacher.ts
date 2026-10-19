@@ -1,3 +1,4 @@
+import { installEnvironmentBadge } from './environment.ts';
 import './styles.css';
 import { analyticsHtml, latest, percentage, taskNames } from './reporting.ts';
 import type { StudentReport } from './reporting.ts';
@@ -5,6 +6,8 @@ import type { TaskCategory, TaskOutcome } from './types.ts';
 import { escapeHtml as esc } from './screens/shared.ts';
 
 const root=document.getElementById('teacher-app')!;
+const environmentHost=document.createElement('aside');
+root.before(environmentHost);void installEnvironmentBadge(environmentHost);
 type Row={id:string;updatedAt:string;fullName:string;group:string;startedAt:string;finishedAt:string|null;outcomes:TaskOutcome[];diagnostics:StudentReport['diagnostics']};
 let filter={group:'',q:'',offset:0};
 let page=0;

@@ -1045,3 +1045,8 @@ html[data-vision-images="hidden"] :is(.stage__bg,.stage__portrait,.hero__art) { 
 html.vision-contrast .scam__warning { background:var(--vision-bg); color:var(--vision-fg); border-color:var(--vision-fg); }
 
 .curtain--table .results td { white-space:pre-line; line-height:1.8; }
+
+.environment-banner { flex:1 0 100%; padding:12px 16px; border:2px solid #865000; border-radius:10px; background:#fff1c9; color:#542f00; font-weight:700; font-size:16px; overflow-wrap:anywhere; }
+.environment-banner[hidden] { display:none; }
+.teacher-page .environment-banner { max-width:1200px; margin:20px auto 0; }
+html.vision-contrast .environment-banner { background:var(--vision-bg); color:var(--vision-fg); border-color:var(--vision-fg); }

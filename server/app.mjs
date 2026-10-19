@@ -5,9 +5,19 @@ import { mkdirSync, existsSync, readFileSync, writeFileSync, unlinkSync, statSyn
 import { resolve, join, extname, sep, posix } from 'node:path';
 import { parseReport, reportsCsv } from '../src/reporting.ts';
 
-const dataDir = resolve(process.env.DATA_DIR || './data');
+const appEnv=process.env.APP_ENV || 'prod';
+if(!['prod','dev'].includes(appEnv)) throw new Error('APP_ENV must be prod or dev.');
+const dataDir = resolve(process.env.DATA_DIR || (appEnv==='dev'?'./data-dev':'./data'));
 const webRoot = resolve(process.env.DIST_DIR || './dist');
 mkdirSync(dataDir, { recursive: true, mode: 0o700 });
+// Refuse to open another environment's database, before making any DB changes.
+const environmentFile=join(dataDir,'.app-environment');
+if(existsSync(environmentFile)) {
+ if(readFileSync(environmentFile,'utf8').trim()!==appEnv) throw new Error('DATA_DIR belongs to another environment. Use a separate persistent disk.');
+} else {
+ if(appEnv==='dev' && existsSync(join(dataDir,'results.sqlite'))) throw new Error('Existing unmarked database may belong to production. Use a new DATA_DIR for dev.');
+ writeFileSync(environmentFile,appEnv,{mode:0o600,flag:'wx'});
+}
 const db = new DatabaseSync(join(dataDir, 'results.sqlite'));
 db.exec(`PRAGMA journal_mode=WAL; PRAGMA busy_timeout=5000;
  CREATE TABLE IF NOT EXISTS admin (id INTEGER PRIMARY KEY CHECK(id=1), username TEXT NOT NULL, salt TEXT NOT NULL, password_hash TEXT NOT NULL);
@@ -35,8 +45,10 @@ const equal = (a,b) => timingSafeEqual(Buffer.from(hash(a)),Buffer.from(hash(b))
 const token = () => randomBytes(32).toString('base64url');
 const sessions = db.prepare('SELECT expires FROM teacher_sessions WHERE hash=?');
 const secureCookie = process.env.COOKIE_SECURE === 'true';
-const cookie = (value,age) => `teacher_session=${value}; Path=/; HttpOnly; SameSite=Strict; Max-Age=${age}${secureCookie ? '; Secure' : ''}`;
+const cookieName=appEnv==='dev'?'teacher_session_dev':'teacher_session';
+const cookie = (value,age) => `${cookieName}=${value}; Path=/; HttpOnly; SameSite=Strict; Max-Age=${age}${secureCookie ? '; Secure' : ''}`;
 const legacyCookie = 'teacher_session=; Path=/api/teacher; HttpOnly; SameSite=Strict; Max-Age=0';
+const sessionCookies=(value,age)=>appEnv==='dev'?[cookie(value,age)]:[cookie(value,age),legacyCookie];
 const attempts = new Map();
 function limited(req, scope, max, duration) {
  const key = scope + ':' + req.socket.remoteAddress; const current = attempts.get(key);
@@ -56,7 +68,7 @@ function body(req) {
  });
 }
 function teacherSession(req) {
- const values=(req.headers.cookie || '').split(';').map(v=>v.trim()).filter(v=>v.startsWith('teacher_session=')).map(v=>v.slice('teacher_session='.length));
+ const values=(req.headers.cookie || '').split(';').map(v=>v.trim()).filter(v=>v.startsWith(cookieName+'=')).map(v=>v.slice(cookieName.length+1));
  for(const raw of values) {
   const sessionHash=hash(raw),session=sessions.get(sessionHash);
   if(session && session.expires > Date.now())return {raw,hash:sessionHash,expires:session.expires};
@@ -74,12 +86,13 @@ async function api(req,res,url) {
   const origin=req.headers.origin;
   if(origin) {let host;try{host=new URL(origin).host;}catch{throw new Failure(403,'Недопустимый источник запроса.');}if(host!==req.headers.host)throw new Failure(403,'Недопустимый источник запроса.');}
  }
+ if(url.pathname==='/api/environment' && req.method==='GET') return json(res,200,{environment:appEnv});
  if(url.pathname==='/api/health' && req.method==='GET') return json(res,200,{ok:true});
  if(url.pathname==='/api/teacher/status' && req.method==='GET') {
   let session;try{session=teacherSession(req);}catch{}
   // Upgrade cookies from older versions, which only covered /api/teacher.
   // Preserve the original server-side expiration; no new session is created.
-  const headers=session?{'Set-Cookie':[cookie(session.raw,Math.max(1,Math.floor((session.expires-Date.now())/1000))),legacyCookie]}:{};
+  const headers=session?{'Set-Cookie':sessionCookies(session.raw,Math.max(1,Math.floor((session.expires-Date.now())/1000)))}:{};
   return json(res,200,{configured:!!db.prepare('SELECT id FROM admin').get(),authenticated:!!session},headers);
  }
  if(url.pathname==='/api/teacher/setup' && req.method==='POST') {
@@ -105,7 +118,7 @@ async function api(req,res,url) {
    db.prepare('INSERT INTO password_reset_uses VALUES (?)').run(hash(resetCode));
    db.exec('DELETE FROM teacher_sessions; COMMIT');
   } catch(error) { db.exec('ROLLBACK'); throw error; }
-  return json(res,200,{ok:true},{'Set-Cookie':[cookie('',0),legacyCookie]});
+  return json(res,200,{ok:true},{'Set-Cookie':sessionCookies('',0)});
  }
  if(url.pathname==='/api/teacher/login' && req.method==='POST') {
   limited(req,'login',10,15*60_000);const input=await body(req);const admin=db.prepare('SELECT * FROM admin WHERE id=1').get();
@@ -115,9 +128,9 @@ async function api(req,res,url) {
   if(!admin || input?.username!==admin.username || !equal(supplied,admin.password_hash))throw new Failure(401,'Неверный логин или пароль.');
   const value=token();db.prepare('DELETE FROM teacher_sessions WHERE expires < ?').run(Date.now());
   db.prepare('INSERT INTO teacher_sessions VALUES (?,?)').run(hash(value),Date.now()+8*60*60_000);
-  return json(res,200,{ok:true},{'Set-Cookie':[cookie(value,8*60*60),legacyCookie]});
+  return json(res,200,{ok:true},{'Set-Cookie':sessionCookies(value,8*60*60)});
  }
- if(url.pathname==='/api/teacher/logout' && req.method==='POST') {const session=teacher(req);db.prepare('DELETE FROM teacher_sessions WHERE hash=?').run(session);return json(res,200,{ok:true},{'Set-Cookie':[cookie('',0),legacyCookie]});}
+ if(url.pathname==='/api/teacher/logout' && req.method==='POST') {const session=teacher(req);db.prepare('DELETE FROM teacher_sessions WHERE hash=?').run(session);return json(res,200,{ok:true},{'Set-Cookie':sessionCookies('',0)});}
  if(url.pathname==='/api/student/session' && req.method==='POST') {
   limited(req,'student-session',300,10*60_000);await body(req);
   const id=crypto.randomUUID(),value=token();db.prepare('INSERT INTO students (id,token_hash) VALUES (?,?)').run(id,hash(value));

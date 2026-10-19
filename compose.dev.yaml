@@ -1,0 +1,17 @@
+# Independent local test environment. Does not reuse compose.yaml's database/ports.
+name: chrt-game-dev
+services:
+  game:
+    build: .
+    ports:
+      - "127.0.0.1:8081:3000"
+    environment:
+      APP_ENV: dev
+      NODE_ENV: production
+      COOKIE_SECURE: "false"
+      DATA_DIR: /data
+    volumes:
+      - dev-data:/data
+    restart: unless-stopped
+volumes:
+  dev-data:

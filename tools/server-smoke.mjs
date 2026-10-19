@@ -11,7 +11,7 @@ export async function testServer(extraEnv = {}) {
  const reservation=net.createServer();reservation.listen(0,'127.0.0.1');await once(reservation,'listening');const port=reservation.address().port;await new Promise(r=>reservation.close(r));
  const base=`http://127.0.0.1:${port}`;let processHandle;
  async function start(){
-  processHandle=spawn(process.execPath,['server/app.mjs'],{cwd:resolve('.'),env:{...process.env,TEACHER_SETUP_CODE:undefined,...extraEnv,PORT:String(port),HOST:'127.0.0.1',DATA_DIR:data},stdio:['ignore','pipe','pipe']});
+  processHandle=spawn(process.execPath,['server/app.mjs'],{cwd:resolve('.'),env:{...process.env,APP_ENV:'prod',TEACHER_SETUP_CODE:undefined,TEACHER_RESET_CODE:undefined,...extraEnv,PORT:String(port),HOST:'127.0.0.1',DATA_DIR:data},stdio:['ignore','pipe','pipe']});
   let diagnostic='';processHandle.stderr.on('data',chunk=>{diagnostic+=chunk});
   for(let i=0;i<100;i++){try{const r=await fetch(base+'/api/health');if(r.ok)return;}catch{}if(processHandle.exitCode!==null)throw Error('Server failed: '+diagnostic);await new Promise(r=>setTimeout(r,50));}
   throw Error('Server startup timed out.');
