@@ -1,10 +1,10 @@
 {
-  "note": "Портреты собираются кодом из этих параметров. style — силуэт причёски, fringe — линия роста волос, collar — крой одежды. Эмоции: neutral, smile, joy, worry, stern.",
+  "note": "Рисованные портреты с пятью эмоциями; параметры сохранены для запасного SVG. style — силуэт причёски, fringe — линия роста волос, collar — крой одежды. Эмоции: neutral, smile, joy, worry, stern.",
   "items": [
     {
       "id": "hero-f",
       "name": "{playerName}",
-      "role": "Игрок, женский персонаж",
+      "role": "Выпускница техникума",
       "playable": true,
       "defaultEmotion": "smile",
       "portrait": {
@@ -17,7 +17,7 @@
     {
       "id": "hero-m",
       "name": "{playerName}",
-      "role": "Игрок, мужской персонаж",
+      "role": "Выпускник техникума",
       "playable": true,
       "defaultEmotion": "joy",
       "portrait": {

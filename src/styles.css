@@ -1103,3 +1103,9 @@ html.vision-contrast .environment-banner { background:var(--vision-bg); color:va
 html.vision-contrast :is(.finale,.finale__title,.finale__text,.finale__eyebrow,.finale__ornament) { color: var(--vision-fg)!important; text-shadow: none; }
 html.vision-contrast .finale__rule { background: var(--vision-fg); }
 @media(max-width:600px) { .finale__title { font-size: clamp(36px, 10vw, 60px); } .finale__eyebrow { letter-spacing: .03em; } .finale__rule { margin-block: 22px; } }
+
+.panel__speaker { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 10px; row-gap: 2px; }
+.panel__speaker[hidden] { display: none; }
+.panel__role { font-size: .85em; font-weight: 500; text-transform: none; letter-spacing: .01em; }
+.panel__role::before { content: '·'; margin-right: 10px; }
+.illustrated-portrait { overflow: hidden; }

@@ -1,9 +1,10 @@
+import { illustratedPortrait } from './illustrated-portraits.ts';
 import type { Emotion, Portrait } from '../types.ts';
 
 /**
  * Параметрический портрет. Один SVG собирается из параметров персонажа:
  * силуэт причёски, палитра, крой одежды, аксессуары и эмоция.
- * Растровых портретов в игре нет.
+ * Для одобренных персонажей используется рисованный портрет; SVG остаётся запасным вариантом.
  *
  * `look` — манера отрисовки, общая для всех персонажей:
  *   flat    — плоский вектор без контура (исходная);
@@ -232,6 +233,7 @@ function glasses(c: Ctx): string {
 }
 
 export interface PortraitOptions {
+  characterId?: string;
   /** Компактное превью с теми же пропорциями и полным силуэтом. */
   crop?: boolean;
   /** Нарисовать подложку цвета персонажа. По умолчанию фон прозрачный. */
@@ -241,6 +243,8 @@ export interface PortraitOptions {
 }
 
 export function renderPortrait(p: Portrait, emotion: Emotion, opts: PortraitOptions = {}): string {
+  const illustration = opts.characterId && illustratedPortrait(opts.characterId, emotion, opts.label ?? '', opts.plate ? p.bg : undefined);
+  if (illustration) return illustration;
   const c = ctx(p, emotion, opts.look ?? DEFAULT_LOOK);
   const viewBox = '0 0 300 360';
   const features = sideFeatures(c);

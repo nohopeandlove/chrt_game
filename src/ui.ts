@@ -96,7 +96,7 @@ export class UI {
       return;
     }
     const mood = emotion ?? who.defaultEmotion ?? 'neutral';
-    this.portrait.innerHTML = renderPortrait(who.portrait, mood, { label: `${who.name}` });
+    this.portrait.innerHTML = renderPortrait(who.portrait, mood, { characterId: who.id, label: `${who.name}` });
     this.portrait.classList.add('is-visible');
   }
 
@@ -106,10 +106,11 @@ export class UI {
     this.setPortrait(input.kind === 'say' ? input.who : undefined, input.emotion);
 
     this.panel.hidden = false;
-    this.q('.panel__announcement').textContent = `${input.name ?? input.who?.name ?? ""}. ${input.text}`;
+    this.q('.panel__announcement').textContent = `${input.name ?? input.who?.name ?? ''}${input.who ? `, ${input.who.role}` : ''}. ${input.text}`;
     this.panel.dataset['kind'] = input.kind;
-    this.speaker.textContent =
-      input.kind === 'say' && input.who ? (input.name ?? input.who.name) : '';
+    this.speaker.innerHTML = input.kind === 'say' && input.who
+      ? `<span class="panel__name">${escapeHtml(input.name ?? input.who.name)}</span><span class="panel__role">${escapeHtml(input.who.role)}</span>`
+      : '';
     this.speaker.hidden = !this.speaker.textContent;
 
     return new Promise<void>(resolve => {
@@ -360,7 +361,7 @@ export class UI {
               <span class="hero__art">${renderPortrait(
                 requireCharacter('hero-f'),
                 'smile',
-                { crop: true, plate: true, label: 'Женский персонаж' }
+                { characterId: 'hero-f', crop: true, plate: true, label: 'Женский персонаж' }
               )}</span>
               <span class="hero__label">Героиня</span>
             </label>
@@ -369,7 +370,7 @@ export class UI {
               <span class="hero__art">${renderPortrait(
                 requireCharacter('hero-m'),
                 'joy',
-                { crop: true, plate: true, label: 'Мужской персонаж' }
+                { characterId: 'hero-m', crop: true, plate: true, label: 'Мужской персонаж' }
               )}</span>
               <span class="hero__label">Герой</span>
             </label>
