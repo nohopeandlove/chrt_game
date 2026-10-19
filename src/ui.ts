@@ -273,6 +273,25 @@ export class UI {
     );
   }
 
+  async finale(title: string, text: string): Promise<void> {
+    this.portrait.innerHTML = '';
+    this.overlay.classList.add('overlay--finale');
+    try {
+      await this.curtain(
+        `<section class="finale" aria-labelledby="finale-title">
+          <p class="finale__eyebrow">Первый шаг сделан. Твоя история начинается.</p>
+          <div class="finale__ornament" aria-hidden="true">✦</div>
+          <h1 class="finale__title" id="finale-title">${escapeHtml(title)}</h1>
+          <div class="finale__rule" aria-hidden="true"></div>
+          <p class="finale__text">${escapeHtml(text)}</p>
+        </section>`,
+        'Перейти к итогам'
+      );
+    } finally {
+      this.overlay.classList.remove('overlay--finale');
+    }
+  }
+
   banner(text: string): Promise<void> {
     return this.curtain(
       `<div class="curtain curtain--banner"><p class="curtain__title"><span class="hl">${escapeHtml(text)}</span></p></div>`

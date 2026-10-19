@@ -182,7 +182,7 @@ export interface ResultRow {
 export interface Node {
   id: string;
   type:
-    | 'say' | 'think' | 'narrate' | 'chapter' | 'choice' | 'branch'
+    | 'say' | 'think' | 'narrate' | 'finale' | 'chapter' | 'choice' | 'branch'
     | 'screen' | 'card' | 'quiz' | 'minigame' | 'results' | 'award' | 'goto';
   who?: string;
   emotion?: Emotion;

@@ -80,6 +80,10 @@ export class Engine {
         await this.speak(node.type, node);
         return null;
 
+      case 'finale':
+        await this.ui.finale(this.t(node.title ?? ''), this.t(node.text ?? ''));
+        return null;
+
       case 'chapter': {
         await this.ui.chapter(node.number, this.t(node.title ?? ''), this.t(node.text ?? ''));
         if (node.then?.scene) return { kind: 'scene', id: node.then.scene };

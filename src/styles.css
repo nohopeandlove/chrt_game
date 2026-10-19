@@ -1082,3 +1082,24 @@ html.vision-contrast .environment-banner { background:var(--vision-bg); color:va
 
 .city-reflection { opacity: .16; animation: city-reflection 7s ease-in-out infinite; }
 @keyframes city-reflection { 0%,100% { opacity: .08; transform: translateX(-2px); } 50% { opacity: .35; transform: translateX(2px); } }
+
+/* A quiet cinematic pause before the results, with the night city behind it. */
+.overlay.overlay--finale {
+  background: linear-gradient(180deg, #111e42c9, #172447d9);
+  gap: clamp(24px, 5vh, 52px);
+  padding-inline: clamp(20px, 6vw, 100px);
+  color: #fff9ed;
+}
+.finale { width: min(100%, 1080px); text-align: center; animation: finale-arrive 1.2s ease-out both; }
+.finale__eyebrow { margin: 0 0 22px; font-size: clamp(14px, 1.7vw, 20px); letter-spacing: .08em; color: #e2e8f5; }
+.finale__ornament { color: #ffdb91; font-size: 34px; margin-bottom: 18px; animation: finale-glow 6s ease-in-out infinite; }
+.finale__title { margin: 0; font-size: clamp(42px, 8vw, 112px); font-weight: 900; line-height: 1.12; letter-spacing: -.035em; text-wrap: balance; color: #ffe1a3; text-shadow: 0 4px 28px #ffcb7140, 0 3px 4px #101a35; }
+.finale__rule { width: min(260px, 50%); height: 2px; margin: 32px auto; background: linear-gradient(90deg, transparent, #ffdb91, transparent); }
+.finale__text { margin: 0 auto; max-width: 58ch; color: #f3f5fb; font-size: clamp(17px, 1.8vw, 23px); line-height: 1.7; text-wrap: pretty; }
+.overlay--finale .curtain__go { background: #ffe1a3; color: #192c4b; border-color: #ffe1a3; padding: 16px 30px; }
+.overlay--finale .curtain__go:hover { background: #ffedca; color: #192c4b; }
+@keyframes finale-arrive { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes finale-glow { 0%,100% { opacity: .65; text-shadow: 0 0 12px #ffd58a30; } 50% { opacity: 1; text-shadow: 0 0 26px #ffd58a80; } }
+html.vision-contrast :is(.finale,.finale__title,.finale__text,.finale__eyebrow,.finale__ornament) { color: var(--vision-fg)!important; text-shadow: none; }
+html.vision-contrast .finale__rule { background: var(--vision-fg); }
+@media(max-width:600px) { .finale__title { font-size: clamp(36px, 10vw, 60px); } .finale__eyebrow { letter-spacing: .03em; } .finale__rule { margin-block: 22px; } }

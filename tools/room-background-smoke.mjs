@@ -91,6 +91,25 @@ try {
    await page.screenshot({path:'/tmp/city-night-mobile.png'});
    await page.setViewportSize({width:1440,height:900});
    await page.screenshot({path:'/tmp/city-night-desktop.png'});
+   await page.locator('.panel').click();
+   await page.getByRole('heading',{name:'Я — специалист!',exact:true}).waitFor({state:'visible'});
+   assert.equal(await page.locator('.finale').evaluate(e=>getComputedStyle(e).animationName),'none');
+   await page.screenshot({path:'/tmp/finale-desktop.png'});
+   await page.setViewportSize({width:390,height:844});
+   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+   const titleBox=await page.locator('.finale__title').boundingBox();assert.ok(titleBox.x>=0 && titleBox.x+titleBox.width<=390);
+   await page.screenshot({path:'/tmp/finale-mobile.png'});
+   await page.locator('[data-setting=still]').click();
+   assert.equal(await page.locator('.finale').evaluate(e=>getComputedStyle(e).animationName),'finale-arrive');
+   await page.emulateMedia({reducedMotion:'reduce'});
+   assert.equal(await page.locator('.finale').evaluate(e=>getComputedStyle(e).animationName),'none');
+   await page.getByRole('button',{name:'Версия для слабовидящих',exact:true}).click();
+   await page.locator('[data-vision-key=palette][data-value=dark]').click();
+   assert.equal(await page.locator('.finale__title').evaluate(e=>getComputedStyle(e).color),'rgb(255, 255, 255)');
+   await page.getByRole('button',{name:'Версия для слабовидящих',exact:true}).click();
+   await page.getByRole('button',{name:'Перейти к итогам',exact:true}).click();
+   assert.equal(await page.locator('.overlay--finale').count(),0);
+
 
 
   }

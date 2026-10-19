@@ -50,10 +50,10 @@ const sceneIds = new Set(scenes.map(s => s.data.id));
 
 const EMOTIONS = new Set(['neutral', 'smile', 'joy', 'worry', 'stern']);
 const SCALES = new Set(['energy', 'mood', 'confidence', 'reputation', 'law', 'responsibility', 'awareness', 'risk']);
-const NODE_TYPES = new Set(['say', 'think', 'narrate', 'chapter', 'choice', 'branch', 'screen', 'card', 'quiz', 'minigame', 'results', 'award', 'goto']);
+const NODE_TYPES = new Set(['say', 'think', 'narrate', 'finale', 'chapter', 'choice', 'branch', 'screen', 'card', 'quiz', 'minigame', 'results', 'award', 'goto']);
 const REQUIRED = {
   say: ['who', 'text'], think: ['text'], narrate: ['text'],
-  chapter: ['title', 'text'], choice: ['options'], branch: ['on', 'cases'],
+  finale: ['title', 'text'], chapter: ['title', 'text'], choice: ['options'], branch: ['on', 'cases'],
   screen: ['screen'], card: ['icon', 'title'], quiz: ['questions', 'results'],
   minigame: ['variants', 'options'], results: ['rows'], award: ['achievement'], goto: ['scene']
 };
