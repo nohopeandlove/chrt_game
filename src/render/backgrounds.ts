@@ -1,3 +1,4 @@
+import heroRoomImage from '../../assets/backgrounds/hero-room.webp';
 import crtCampusImage from '../../assets/backgrounds/crt-campus.webp';
 
 /**
@@ -19,6 +20,9 @@ function crtCampus(): string {
   return wrap('crt-campus', 'Челябинский радиотехнический техникум — выпускной у главного входа', `
     <rect width="1600" height="900" fill="#eaf0f8"/>
     <image href="${crtCampusImage}" width="1600" height="900" preserveAspectRatio="xMidYMid slice"/>
+    <g aria-hidden="true" pointer-events="none">${Array.from({length: 12}, (_, i) =>
+      `<rect class="campus-confetti scene-motion" x="${90 + i * 127}" y="-30" width="${i % 2 ? 5 : 7}" height="12" rx="2" fill="${['#e8bd65', '#639cb8', '#c27681'][i % 3]}" style="animation-delay:-${i * 1.7}s;animation-duration:${16 + i % 5}s"/>`
+    ).join('')}</g>
   `);
 }
 
@@ -86,68 +90,27 @@ function assemblyHall(): string {
 }
 
 function heroRoom(): string {
-  const stars: string[] = [];
-  for (let i = 0; i < 22; i++) {
-    const x = 640 + ((i * 71) % 420);
-    const y = 150 + ((i * 53) % 260);
-    const r = i % 4 === 0 ? 3 : 2;
-    stars.push(`<circle class="star" cx="${x}" cy="${y}" r="${r}" fill="#EAE4FF"
-      style="animation-delay:${(i % 7) * 0.6}s"/>`);
-  }
-
-  return wrap('hero-room', 'Комната героя ночью', `
-    <rect width="1600" height="900" fill="#241653"/>
-    <rect width="1600" height="640" fill="#2A1B5E"/>
-    <path d="M1360,0 L1600,0 L1600,900 L1240,900 Z" fill="#1E1145"/>
-    <rect y="640" width="1600" height="260" fill="#1A1038"/>
-
-    <g>
-      <rect x="600" y="110" width="500" height="360" rx="6" fill="#0E0A26"/>
-      <rect x="600" y="110" width="500" height="360" rx="6" fill="url(#sky)"/>
-      ${stars.join('')}
-      <g class="headlights"><rect x="600" y="380" width="500" height="70" fill="#8FA8FF" opacity=".22"/></g>
-      <rect x="588" y="98" width="524" height="384" rx="8" fill="none" stroke="#3B2870" stroke-width="16"/>
-      <path d="M850,110 V470 M600,290 H1100" stroke="#3B2870" stroke-width="12"/>
-      <rect x="556" y="86" width="60" height="410" rx="10" fill="#5B4A9E" opacity=".85"/>
-      <rect x="1084" y="86" width="60" height="410" rx="10" fill="#5B4A9E" opacity=".85"/>
-    </g>
-
-    <rect x="120" y="150" width="26" height="230" rx="13" fill="#F06BA8" class="neon"/>
-    <rect x="250" y="200" width="150" height="120" rx="12" fill="#3B2870"/>
-
-    <g>
-      <rect x="60" y="520" width="480" height="26" rx="6" fill="#3A2A6E"/>
-      <rect x="90" y="546" width="24" height="180" fill="#2E2158"/>
-      <rect x="486" y="546" width="24" height="180" fill="#2E2158"/>
-      <g class="monitor">
-        <rect x="150" y="360" width="300" height="180" rx="10" fill="#0F0A2A"/>
-        <rect x="162" y="372" width="276" height="156" rx="6" fill="#FDF6D8"/>
-        <rect x="286" y="540" width="28" height="30" fill="#2E2158"/>
-        <rect x="250" y="568" width="100" height="12" rx="6" fill="#2E2158"/>
-      </g>
-      <rect x="220" y="492" width="150" height="20" rx="6" fill="#F06BA8" opacity=".7"/>
-    </g>
-
-    <g>
-      <ellipse cx="620" cy="800" rx="90" ry="18" fill="#150C2E"/>
-      <rect x="600" y="640" width="40" height="150" rx="10" fill="#2E2158"/>
-      <rect x="520" y="470" width="200" height="180" rx="42" fill="#6B4BB8"/>
-      <rect x="536" y="560" width="168" height="16" rx="8" fill="#4A3286"/>
-    </g>
-
-    <g>
-      <rect x="1180" y="600" width="440" height="200" rx="16" fill="#2E3E9E" opacity=".55"/>
-      <rect x="1150" y="560" width="200" height="120" rx="30" fill="#3F52C0" opacity=".8"/>
-      <rect x="1180" y="540" width="440" height="80" rx="20" fill="#4A5FD6" opacity=".5"/>
-      <rect x="1160" y="500" width="470" height="60" rx="14" fill="#241653"/>
-    </g>
-
+  const stars = Array.from({length: 14}, (_, i) => {
+    const x = 650 + (i * 67 % 430);
+    const y = 38 + (i * 47 % 240);
+    return `<circle class="room-star scene-motion" cx="${x}" cy="${y}" r="${i % 3 ? 1.6 : 2.5}" fill="#fff0cb" style="animation-delay:-${i * .7}s"/>`;
+  }).join('');
+  return wrap('hero-room', 'Уютная комната с ноутбуком и ночным окном', `
+    <image href="${heroRoomImage}" width="1600" height="900" preserveAspectRatio="xMidYMid slice"/>
     <defs>
-      <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#141033"/>
-        <stop offset="100%" stop-color="#2B2470"/>
-      </linearGradient>
+      <radialGradient id="room-screen-light"><stop stop-color="#b4dbff" stop-opacity=".22"/><stop offset="1" stop-color="#b4dbff" stop-opacity="0"/></radialGradient>
+      <radialGradient id="room-lamp-light"><stop stop-color="#ffcc83" stop-opacity=".18"/><stop offset="1" stop-color="#ffcc83" stop-opacity="0"/></radialGradient>
     </defs>
+    <g aria-hidden="true" pointer-events="none">
+      ${stars}
+      <ellipse class="room-glow scene-motion" cx="312" cy="390" rx="150" ry="112" fill="url(#room-screen-light)"/>
+      <ellipse class="room-lamplight scene-motion" cx="180" cy="365" rx="155" ry="130" fill="url(#room-lamp-light)"/>
+      <g class="room-steam scene-motion" fill="none" stroke="#f4dfd3" stroke-width="2" stroke-linecap="round" opacity=".24">
+        <path d="M421 389 Q413 378 422 367 Q430 355 422 346"/>
+        <path d="M432 391 Q440 381 432 372"/>
+      </g>
+      <path class="room-shooting-star scene-motion" d="M740 90 l65 22" stroke="#d2e8ff" stroke-width="2" stroke-linecap="round" opacity="0"/>
+    </g>
   `);
 }
 

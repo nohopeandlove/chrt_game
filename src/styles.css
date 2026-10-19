@@ -1054,3 +1054,17 @@ html.vision-contrast .environment-banner { background:var(--vision-bg); color:va
 @media(max-width:720px) {
   .stage__portrait { top:calc(var(--learning-tools-height,60px) + 16px); bottom:auto; }
 }
+
+/* Slow decorative motion stays inside the background, clear of the controls.
+   Global a11y-still and reduced-motion rules also disable these animations. */
+.room-star { animation: room-twinkle 5s ease-in-out infinite; }
+.room-glow { animation: room-glow 7s ease-in-out infinite; }
+.room-lamplight { animation: room-glow 9s ease-in-out infinite reverse; }
+.room-steam { animation: room-steam 6s ease-in-out infinite; }
+.room-shooting-star { animation: room-shooting-star 23s linear infinite; }
+.campus-confetti { animation: campus-confetti 18s linear infinite; transform-box: fill-box; transform-origin: center; opacity: .65; }
+@keyframes room-twinkle { 0%,100% { opacity: .2; } 50% { opacity: .9; } }
+@keyframes room-glow { 0%,100% { opacity: .4; } 50% { opacity: 1; } }
+@keyframes room-steam { 0% { opacity: 0; transform: translateY(5px); } 30%,65% { opacity: .24; } 100% { opacity: 0; transform: translateY(-20px); } }
+@keyframes room-shooting-star { 0%,86%,100% { opacity: 0; transform: translate(0,0); } 88% { opacity: .65; } 92% { opacity: 0; transform: translate(180px,60px); } }
+@keyframes campus-confetti { from { transform: translate(-25px,-30px) rotate(0deg); } to { transform: translate(55px,980px) rotate(280deg); } }
