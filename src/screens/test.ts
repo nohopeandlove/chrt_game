@@ -12,19 +12,37 @@ export async function runLetter(ui: UI, state: GameState): Promise<void> {
   await ui.screen(
     host =>
       new Promise<void>(resolve => {
+        const company = state.job?.company ?? 'Работодатель';
+        const vacancy = state.job?.title ?? 'Вакансия';
         host.innerHTML = `
-          <div class="letter">
-            <span class="screen__eyebrow">Новое письмо</span>
-            <div class="letter__paper">
-              <p class="letter__from">От: ${escapeHtml(state.job?.company ?? 'Работодатель')}</p>
-              <p class="letter__subject">Тема: ${escapeHtml(state.job?.title ?? 'Вакансия')} — тестовое задание</p>
-              <p class="letter__body">${escapeHtml(fill(tests.letter, state))}</p>
+          <article class="letter" aria-labelledby="letter-title">
+            <div class="letter__toolbar">
+              <span class="letter__inbox"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m3 7 9 6 9-6"/></svg>Входящие</span>
+              <span class="letter__new">Новое письмо</span>
             </div>
-            <button class="btn btn--primary" type="button" data-go>Перейти к заданию</button>
-          </div>`;
+            <header class="letter__header">
+              <p class="letter__kicker">Ответ на ваш отклик</p>
+              <h2 id="letter-title">Приглашение на следующий этап</h2>
+              <p class="letter__vacancy">${escapeHtml(vacancy)}</p>
+            </header>
+            <div class="letter__sender">
+              <span class="letter__avatar" aria-hidden="true">${escapeHtml(company.slice(0, 1).toLocaleUpperCase('ru'))}</span>
+              <div class="letter__sender-details"><p class="letter__from">${escapeHtml(company)}<span>Команда подбора персонала</span></p>
+              <p class="letter__to">Кому: ${escapeHtml(state.playerName)}</p></div>
+            </div>
+            <div class="letter__paper">
+              <p class="letter__body">${escapeHtml(fill(tests.letter, state))}</p>
+              <div class="letter__next-step">
+                <span class="letter__step-number" aria-hidden="true">01</span>
+                <div><h3>Короткое тестовое задание</h3><p>Следующий шаг перед собеседованием</p><span class="letter__deadline">Срок выполнения — в течение суток</span></div>
+              </div>
+              <p class="letter__signature">С уважением,<br><strong>команда ${escapeHtml(company)}</strong></p>
+            </div>
+            <footer class="letter__footer"><button class="btn btn--primary" type="button" data-go>Перейти к заданию <span aria-hidden="true">→</span></button></footer>
+          </article>`;
         const go = host.querySelector<HTMLButtonElement>('[data-go]');
         go?.addEventListener('click', () => resolve());
-        go?.focus();
+        go?.focus({ preventScroll: true });
       })
   );
 }

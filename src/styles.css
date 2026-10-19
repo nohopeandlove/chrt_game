@@ -1142,3 +1142,33 @@ html.vision-contrast :is(.scene-recap,.scene-metric,.scene-recap__eyebrow) { bac
 html.vision-contrast .scene-metric__total { border-color: var(--vision-fg); }
 html.vision-large .scene-metric__change span, html.vision-large .scene-metric__total { font-size: 1em; }
 @media(max-width:600px) { .scene-recap { border-radius: 20px; } .scene-recap__metrics { margin-top: 22px; } .scene-metric { padding: 18px; } }
+
+/* Employer mail: one clear message surface rather than a nested paper card. */
+.sheet > .letter { display: block; width: min(100%,800px); max-width: 800px; margin: 0 auto; padding: 0; overflow: hidden; animation: finale-arrive .5s ease-out both; }
+.letter__toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 30px; border-bottom: 1px solid #e0e7f0; background: #f7f9fd; font-size: 14px; }
+.letter__inbox { display: inline-flex; align-items: center; gap: 10px; color: var(--ink-2); }
+.letter__new { padding: 3px 10px; border-radius: 999px; color: #78511e; background: #fff0c7; font-size: 13px; font-weight: 650; }
+.letter__header { padding: 30px 36px 24px; }
+.letter__kicker { margin: 0 0 10px; color: var(--ink-2); font-size: 15px; }
+.letter__header h2 { margin: 0; font-size: clamp(26px,3.4vw,36px); line-height: 1.2; color: var(--ink); text-wrap: balance; }
+.letter__vacancy { margin: 12px 0 0; color: var(--ink-2); font-size: 18px; }
+.letter__sender { display: flex; align-items: center; gap: 14px; margin: 0 36px; padding: 20px 0; border-top: 1px solid #e0e7f0; border-bottom: 1px solid #e0e7f0; }
+.letter__avatar { flex: 0 0 46px; display: grid; place-items: center; width: 46px; height: 46px; border-radius: 14px; background: #e9eff8; color: #233f68; font-size: 22px; font-weight: 750; }
+.letter__sender-details { min-width: 0; overflow-wrap: anywhere; }
+.letter__from { color: var(--ink); font-size: 17px; font-weight: 700; }
+.letter__from span { display: block; color: var(--ink-2); font-size: 14px; font-weight: 400; }
+.letter__to { margin: 5px 0 0; font-size: 14px; color: var(--ink-2); }
+.letter__paper { padding: 26px 36px; border: 0; background: transparent; box-shadow: none; gap: 24px; }
+.letter__body { font-size: 18px; line-height: 1.8; color: var(--ink); }
+.letter__next-step { display: flex; align-items: flex-start; gap: 16px; padding: 20px; border: 1px solid #dbe5f2; border-radius: 16px; background: #f5f8fd; }
+.letter__step-number { color: #55739b; font-size: 20px; font-weight: 650; }
+.letter__next-step h3 { margin: 0 0 4px; font-size: 18px; color: var(--ink); }
+.letter__next-step p { margin: 0 0 10px; color: var(--ink-2); font-size: 15px; }
+.letter__deadline { color: var(--ink-2); font-size: 14px; }
+.letter__signature { margin: 0; color: var(--ink-2); font-size: 16px; }
+.letter__signature strong { font-weight: 600; }
+.letter__footer { padding: 0 36px 30px; }
+.letter__footer .btn { display: inline-flex; gap: 20px; align-items: center; justify-content: center; }
+html.vision-contrast :is(.letter__toolbar,.letter__avatar,.letter__new,.letter__next-step) { background: var(--vision-bg); color: var(--vision-fg); border-color: var(--vision-fg); }
+html.vision-large .letter :is(p,span,h3) { font-size: 1em; }
+@media(max-width:600px) { .letter__toolbar { padding: 14px 20px; } .letter__header { padding: 24px 20px 20px; } .letter__sender { margin-inline: 20px; } .letter__paper { padding: 22px 20px; } .letter__next-step { padding: 16px; gap: 10px; } .letter__footer { padding: 0 20px 24px; } .letter__footer .btn { width: 100%; } }

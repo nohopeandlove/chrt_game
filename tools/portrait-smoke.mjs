@@ -103,6 +103,21 @@ try {
  await page.evaluate(()=>{const {ui,characters}=window.portraitTest;ui.setBackground('laptop');void ui.say({kind:'say',who:characters.get('hr'),emotion:'smile',text:'Здравствуйте! Давайте познакомимся.'});});
  await page.evaluate(async()=>{await Promise.all([...document.querySelectorAll('.stage image')].map(async node=>{const image=new Image();image.src=node.getAttribute('href');await image.decode();}));await new Promise(requestAnimationFrame);});
  await page.screenshot({path:'/tmp/hr-portrait-fixed.png'});
+ await page.evaluate(async()=>{
+  const {runLetter}=await import('/src/screens/test.ts');const {newGame}=await import('/src/state.ts');
+  const state=newGame('Александра','f');state.job={company:'Рекламист',title:'Специалист по рекламе'};
+  window.letterDone=false;void runLetter(window.portraitTest.ui,state).then(()=>{window.letterDone=true;});
+ });
+ await page.getByRole('heading',{name:'Приглашение на следующий этап',exact:true}).waitFor({state:'visible'});
+ assert.equal(await page.locator('.letter__to').textContent(),'Кому: Александра');
+ assert.equal(await page.locator('.letter__vacancy').textContent(),'Специалист по рекламе');
+ assert.ok((await page.locator('.letter__body').textContent()).includes('перед собеседованием') || (await page.locator('.letter__body').textContent()).includes('Перед собеседованием'));
+ await page.screenshot({path:'/tmp/employer-mail-desktop.png'});
+ await page.setViewportSize({width:390,height:844});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+ const mailTitle=await page.locator('#letter-title').boundingBox();const tools=await page.locator('.learning-tools').boundingBox();assert.ok(mailTitle.y>=tools.y+tools.height);
+ await page.screenshot({path:'/tmp/employer-mail-mobile.png'});
+ await page.getByRole('button',{name:'Перейти к заданию',exact:false}).click();await page.waitForFunction(()=>window.letterDone===true);
+
  assert.deepEqual(errors,[]);
- console.log('PASS: 7 transparent portraits, 35 expression frames with transparent side margins, clipped menu frames, consistent name and role, mobile fit, grayscale and hidden images preserve speaker role, scene recap metrics and continuation');
+ console.log('PASS: 7 transparent portraits, 35 expression frames with transparent side margins, clipped menu frames, consistent name and role, mobile fit, grayscale and hidden images preserve speaker role, scene recap and employer mail content/continuation');
 }finally{if(browser)await browser.close();await server.close();}
