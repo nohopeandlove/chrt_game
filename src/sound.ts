@@ -34,15 +34,18 @@ function note(frequency: number, start: number, duration: number, level: number,
 function stopMusic(): void { if(timer)clearInterval(timer);timer=null; }
 function ambientChord(): void {
   if(!enabled || !music || document.hidden || !audio || audio.state!=='running')return;
-  const chords=[[130.81,164.81,196],[110,130.81,164.81],[87.31,130.81,174.61],[98,146.83,196]];
+  // A bright major progression with a lilting melody and soft offbeat chords.
+  // Eight beats per phrase at 112 BPM; phrases overlap without gaps.
+  const chords=[[130.81,164.81,196],[174.61,220,261.63],[196,246.94,293.66],[130.81,164.81,196]];
   const notes=chords[chord++%chords.length]!;const start=audio.currentTime;
-  // Overlapping sustained chords and a light melodic pattern keep the soundtrack
-  // audible throughout reading, choices and tasks, without waiting for UI events.
-  notes.forEach((frequency,i)=>note(frequency,start+i*.1,6.5,.035,'sine',true));
-  const pattern=[0,1,2,1,0,2,1,2];
-  pattern.forEach((step,i)=>note(notes[step]!*2,start+.2+i*.68,1.25,.052,'triangle'));
+  const beat=60/112;
+  notes.forEach((frequency)=>note(frequency,start,beat*8+.3,.018,'sine',true));
+  const melody=[0,1,2,1,2,1,0,1,2,2,1,0,1,2,1,0];
+  melody.forEach((step,i)=>note(notes[step]!*2,start+i*beat/2,beat*.72,i%4===0?.043:.032,'triangle'));
+  [0,2,4,6].forEach((step)=>note(notes[0]!/2,start+step*beat,beat*.85,.026,'sine'));
+  [1,3,5,7].forEach((step)=>notes.forEach((frequency)=>note(frequency*2,start+step*beat,beat*.35,.009,'sine')));
 }
-function startMusic(): void { if(timer || !enabled || !music || document.hidden)return;ambientChord();timer=setInterval(ambientChord,6000); }
+function startMusic(): void { if(timer || !enabled || !music || document.hidden)return;ambientChord();timer=setInterval(ambientChord,8*60/112*1000); }
 /** Resume a saved sound preference on any user interaction, including story text. */
 export function resumeSoundtrack(): void {
   if(!enabled || document.hidden)return;
