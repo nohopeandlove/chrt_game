@@ -382,23 +382,16 @@ export class UI {
     this.overlay.hidden = false;
     this.overlay.innerHTML = `
       <form class="menu" novalidate>
+        <div class="menu__campus" role="img" aria-label="Иллюстрация Челябинского радиотехнического техникума"></div>
         <section class="menu__intro" aria-labelledby="menu-title">
           <span class="menu__eyebrow">ГБПОУ «Челябинский радиотехнический техникум»</span>
-          <p class="menu__genre">Интерактивная история о начале карьеры</p>
+          <p class="menu__genre">Визуальная новелла</p>
           <h1 class="menu__title" id="menu-title">Я —<br><span>специалист!</span></h1>
-          <p class="menu__lede">От выпускного до первого рабочего дня.<br>Твой выбор. Твои решения. Твоя история.</p>
-          <ol class="menu__journey" aria-label="Что ждёт в игре"><li>Резюме</li><li>Собеседование</li><li>Первый рабочий день</li></ol>
-          <div class="menu__campus" role="img" aria-label="Иллюстрация Челябинского радиотехнического техникума"><span>Большой путь начинается с первого шага</span></div>
+          <p class="menu__lede">Вчера — выпускной.<br>Сегодня начинается твоя история.</p>
         </section>
         <section class="menu__setup" aria-labelledby="menu-setup-title">
-          <header class="menu__setup-head"><span class="menu__step">Твоя роль — главный герой</span><h2 id="menu-setup-title">Начни свою историю</h2><p>Выбери персонажа и представься.</p></header>
-        ${hasSave ? `<section class="menu__saved" data-saved aria-label="Сохранённая игра">
-          <p>${canResume ? `Сохранённое прохождение: ${escapeHtml(savedTitle)}. Продолжение начнётся с начала этой главы.` : 'Есть начальные данные, но прохождение ещё не началось.'}</p>
-          <p>Прогресс хранится отдельно от кэша браузера. Чтобы начать с чистого листа, удалите сохранение здесь.</p>
-          <div class="menu__actions">${canResume ? '<button class="btn" type="button" data-action="continue">Продолжить</button>' : ''}<button class="btn" type="button" data-action="delete-save">Удалить сохранение</button></div>
-          <p data-delete-status role="status"></p>
-        </section>` : ''}
-        <fieldset class="menu__field">
+          <h2 class="menu__setup-head" id="menu-setup-title">Новая игра</h2>
+        <fieldset class="menu__field menu__cast">
           <legend>Кем играем</legend>
           <div class="heroes">
             <label class="hero">
@@ -422,6 +415,13 @@ export class UI {
           </div>
         </fieldset>
 
+        <div class="menu__entry">
+        ${hasSave ? `<section class="menu__saved" data-saved aria-label="Сохранённая игра">
+          <p>${canResume ? `Сохранённое прохождение: ${escapeHtml(savedTitle)}. Продолжение начнётся с начала этой главы.` : 'Есть начальные данные, но прохождение ещё не началось.'}</p>
+          <p>Прогресс хранится отдельно от кэша браузера. Чтобы начать с чистого листа, удалите сохранение здесь.</p>
+          <div class="menu__actions">${canResume ? '<button class="btn" type="button" data-action="continue">Продолжить</button>' : ''}<button class="btn" type="button" data-action="delete-save">Удалить сохранение</button></div>
+          <p data-delete-status role="status"></p>
+        </section>` : ''}
         <div class="menu__identity"><label class="menu__field">
           <span>Имя или псевдоним</span>
           <input class="menu__input" name="playerName" type="text" maxlength="24"
@@ -434,6 +434,7 @@ export class UI {
         </div>
         <p class="menu__privacy">Начав игру, вы передаёте преподавателю на этот сервер учебный код / псевдоним, группу, ответы и баллы. Для учебного резюме используйте вымышленные контакты: они не отправляются.</p>
         <p class="menu__error" role="alert" hidden>Введите имя — оно будет звучать в репликах.</p>
+        </div>
         </section>
         <footer class="menu__footer"><span>Я — специалист · Учебная игра</span><a href="/about/" target="_blank" rel="noopener noreferrer">Об электронном образовательном ресурсе <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 19 19 5M5 5h14v14"/></svg></a></footer>
       </form>`;

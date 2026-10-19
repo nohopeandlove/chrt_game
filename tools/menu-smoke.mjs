@@ -7,7 +7,7 @@ try {
  browser=await chromium.launch({executablePath:process.env.BROWSER_EXECUTABLE||undefined,args:process.env.BROWSER_NO_SANDBOX==='1'?['--no-sandbox']:[]});
  const page=await browser.newPage({viewport:{width:1440,height:1000}});const errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.route('**/api/**',r=>r.fulfill({status:200,contentType:'application/json',body:JSON.stringify({environment:'dev'})}));
- await page.goto(server.resolvedUrls.local[0]);await page.locator('.menu__setup').waitFor();await page.locator('[data-setting=still]').click();
+ await page.goto(server.resolvedUrls.local[0]);await page.locator('.menu__entry').waitFor();await page.locator('[data-setting=still]').click();
  await page.evaluate(async()=>{await Promise.all([...document.querySelectorAll('.hero__art image')].map(async e=>{const i=new Image();i.src=e.getAttribute('href');await i.decode();}));});
  for(const [width,height] of [[1440,1000],[1024,768],[768,1024],[390,844],[320,700]]){
   await page.setViewportSize({width,height});await page.evaluate(()=>new Promise(requestAnimationFrame));await page.evaluate(()=>document.querySelector('.overlay').scrollTop=0);
@@ -17,7 +17,7 @@ try {
   const campus=await page.locator('.menu__campus').evaluate(e=>getComputedStyle(e).backgroundImage);assert.ok(campus.includes('crt-campus'));
   const url=campus.match(/url\("?([^"\)]+)/)[1];assert.equal((await page.request.get(url)).status(),200);
   if(width===1440)await page.screenshot({path:'/tmp/menu-new-desktop.png'});
-  if(width===390){await page.screenshot({path:'/tmp/menu-new-mobile-cover.png'});await page.locator('.menu__setup').scrollIntoViewIfNeeded();await page.screenshot({path:'/tmp/menu-new-mobile-form.png'});}
+  if(width===390){await page.screenshot({path:'/tmp/menu-new-mobile-cover.png'});await page.locator('.menu__entry').scrollIntoViewIfNeeded();await page.screenshot({path:'/tmp/menu-new-mobile-form.png'});}
  }
  await page.setViewportSize({width:1440,height:1000});
  await page.getByRole('button',{name:'Начать',exact:true}).click();await page.locator('.menu__error').waitFor();assert.equal(await page.locator('[name=playerName]').evaluate(e=>document.activeElement===e),true);
