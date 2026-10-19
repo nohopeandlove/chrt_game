@@ -382,10 +382,16 @@ export class UI {
     this.overlay.hidden = false;
     this.overlay.innerHTML = `
       <form class="menu" novalidate>
-        <span class="menu__eyebrow">ГБПОУ «Челябинский радиотехнический техникум»</span>
-        <h1 class="menu__title">Я — специалист</h1>
-        <p class="menu__lede">От выпускного до первого рабочего дня. Резюме, вакансии, собеседование и первые задачи — как в жизни, только без последствий.</p>
-
+        <section class="menu__intro" aria-labelledby="menu-title">
+          <span class="menu__eyebrow">ГБПОУ «Челябинский радиотехнический техникум»</span>
+          <p class="menu__genre">Интерактивная история о начале карьеры</p>
+          <h1 class="menu__title" id="menu-title">Я —<br><span>специалист!</span></h1>
+          <p class="menu__lede">От выпускного до первого рабочего дня.<br>Твой выбор. Твои решения. Твоя история.</p>
+          <ol class="menu__journey" aria-label="Что ждёт в игре"><li>Резюме</li><li>Собеседование</li><li>Первый рабочий день</li></ol>
+          <div class="menu__campus" role="img" aria-label="Иллюстрация Челябинского радиотехнического техникума"><span>Большой путь начинается с первого шага</span></div>
+        </section>
+        <section class="menu__setup" aria-labelledby="menu-setup-title">
+          <header class="menu__setup-head"><span class="menu__step">Твоя роль — главный герой</span><h2 id="menu-setup-title">Начни свою историю</h2><p>Выбери персонажа и представься.</p></header>
         ${hasSave ? `<section class="menu__saved" data-saved aria-label="Сохранённая игра">
           <p>${canResume ? `Сохранённое прохождение: ${escapeHtml(savedTitle)}. Продолжение начнётся с начала этой главы.` : 'Есть начальные данные, но прохождение ещё не началось.'}</p>
           <p>Прогресс хранится отдельно от кэша браузера. Чтобы начать с чистого листа, удалите сохранение здесь.</p>
@@ -400,36 +406,38 @@ export class UI {
               <span class="hero__art">${renderPortrait(
                 requireCharacter('hero-f'),
                 'smile',
-                { characterId: 'hero-f', crop: true, plate: true, label: 'Женский персонаж' }
+                { characterId: 'hero-f', crop: true, plate: false, label: 'Женский персонаж' }
               )}</span>
-              <span class="hero__label">Героиня</span>
+              <span class="hero__label">Героиня</span><span class="hero__check" aria-hidden="true">✓</span>
             </label>
             <label class="hero">
               <input type="radio" name="gender" value="m">
               <span class="hero__art">${renderPortrait(
                 requireCharacter('hero-m'),
                 'joy',
-                { characterId: 'hero-m', crop: true, plate: true, label: 'Мужской персонаж' }
+                { characterId: 'hero-m', crop: true, plate: false, label: 'Мужской персонаж' }
               )}</span>
-              <span class="hero__label">Герой</span>
+              <span class="hero__label">Герой</span><span class="hero__check" aria-hidden="true">✓</span>
             </label>
           </div>
         </fieldset>
 
-        <label class="menu__field">
-          <span>Как к вам обращаться (можно псевдоним)</span>
+        <div class="menu__identity"><label class="menu__field">
+          <span>Имя или псевдоним</span>
           <input class="menu__input" name="playerName" type="text" maxlength="24"
             placeholder="Псевдоним" autocomplete="off" required>
         </label>
 
-<label class="menu__field"><span>Учебная группа (если есть)</span><input class="menu__input" name="group" maxlength="40" autocomplete="off" placeholder="Например, ИС-21"></label>
+<label class="menu__field"><span>Группа (если есть)</span><input class="menu__input" name="group" maxlength="40" autocomplete="off" placeholder="Например, ИС-21"></label></div>
         <div class="menu__actions">
-          <button class="btn btn--primary" type="submit">Начать</button>
+          <button class="btn btn--primary menu__start" type="submit">Начать <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 19 19 5M5 5h14v14"/></svg></button>
         </div>
         <p class="menu__privacy">Начав игру, вы передаёте преподавателю на этот сервер учебный код / псевдоним, группу, ответы и баллы. Для учебного резюме используйте вымышленные контакты: они не отправляются.</p>
-        <footer class="menu__footer"><a href="/about/" target="_blank" rel="noopener noreferrer">Об электронном образовательном ресурсе</a></footer>
         <p class="menu__error" role="alert" hidden>Введите имя — оно будет звучать в репликах.</p>
+        </section>
+        <footer class="menu__footer"><span>Я — специалист · Учебная игра</span><a href="/about/" target="_blank" rel="noopener noreferrer">Об электронном образовательном ресурсе <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 19 19 5M5 5h14v14"/></svg></a></footer>
       </form>`;
+    this.overlay.scrollTop = 0;
 
     return new Promise<MenuResult | 'continue'>(resolve => {
       const form = this.overlay.querySelector<HTMLFormElement>('.menu');
