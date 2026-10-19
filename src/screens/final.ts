@@ -13,7 +13,7 @@ export async function runFinal(ui: UI, state: GameState, title: string, rows: Re
   if (state.learning.final === null || state.learning.finalForm !== 'transfer-v2') await assessment(ui, state, 'final');
   state.analytics.finishedAt ??= new Date().toISOString();
   save(state);
-  playSound('success');
+  playSound('finale');
   await ui.screen(
     host =>
       new Promise<void>(resolve => {
@@ -21,27 +21,21 @@ export async function runFinal(ui: UI, state: GameState, title: string, rows: Re
         host.innerHTML = `
           <div class="final">
             <header class="final__head">
-              <span class="screen__eyebrow">Финал</span>
+              <span class="screen__eyebrow">Твой путь — твой результат</span>
               <h2 class="screen__title">${escapeHtml(title)}</h2>
               <p class="screen__lede">${escapeHtml(state.playerName)}, вы прошли путь от выпускного до первого рабочего дня. Вот что из этого получилось.</p>
             </header>
-            <table class="results">
-              <tbody>
-                ${rows
-                  .map(
-                    r => `<tr><th scope="row">${escapeHtml(r.label)}</th><td>${escapeHtml(r.value)}</td></tr>`
-                  )
-                  .join('')}
-              </tbody>
-            </table>
+            <div class="final__highlights" aria-label="Итоги пути">
+              ${rows.map((r,i)=>`<section class="final-stat"><span class="final-stat__number" aria-hidden="true">0${i+1}</span><h3>${escapeHtml(r.label)}</h3><p>${escapeHtml(r.value)}</p></section>`).join('')}
+            </div>
             <section class="final__ach">
-              <h3 class="vac__h">Достижения · ${earned.size} из ${achievements.length}</h3>
+              <div class="final__section-head"><h3>Твоя коллекция достижений</h3><span>${earned.size} из ${achievements.length}</span></div><div class="achievement-progress" role="progressbar" aria-label="Полученные достижения" aria-valuemin="0" aria-valuemax="${achievements.length}" aria-valuenow="${earned.size}"><span style="width:${earned.size/achievements.length*100}%"></span></div>
               <ul class="achievements">
                 ${achievements
                   .map(
                     a => `<li class="ach${earned.has(a.id) ? ' is-earned' : ''}">
-                      <span class="ach__icon">${escapeHtml(a.icon ?? '🏆')}</span>
-                      <span class="ach__body"><b>${escapeHtml(a.title)}</b><span>${escapeHtml(a.how)}</span></span>
+                      <span class="ach__icon" aria-hidden="true">${escapeHtml(a.icon ?? '🏆')}</span>
+                      <span class="ach__body"><span class="ach__status">${earned.has(a.id) ? 'Получено' : 'Ещё впереди'}</span><b>${escapeHtml(a.title)}</b><span>${escapeHtml(a.how)}</span></span>
                     </li>`
                   )
                   .join('')}
@@ -56,7 +50,7 @@ export async function runFinal(ui: UI, state: GameState, title: string, rows: Re
           </div>`;
         const restart = host.querySelector<HTMLButtonElement>('[data-restart]');
         restart?.addEventListener('click', () => resolve());
-        restart?.focus();
+        restart?.focus({preventScroll:true});
       })
   );
 }

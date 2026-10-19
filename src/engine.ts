@@ -108,7 +108,7 @@ export class Engine {
         const key = this.resolveBranch(node);
         const chosen = node.cases?.[key];
         if (!chosen) return null;
-        if (chosen.say) await this.speak('say', chosen.say);
+        if (chosen.say) await this.speak(chosen.say.who ? 'say' : 'think', chosen.say);
         if (chosen.banner) await this.ui.banner(this.t(chosen.banner));
         return chosen.goto ? { kind: 'node', id: chosen.goto } : null;
       }
@@ -223,7 +223,7 @@ export class Engine {
     if (!award(this.state, id)) return;
     save(this.state);
     const found = allAchievements.find(a => a.id === id);
-    if (found) await this.ui.achievement(found.icon, found.title);
+    if (found) await this.ui.achievement(found.icon, found.title, found.how);
   }
 
   /**
@@ -249,6 +249,7 @@ export class Engine {
   }
 
   private resolveBranch(node: Node): string {
+    if (node.on === 'testOutcome') return this.state.flags['testPassed'] === true ? 'pass' : 'fail';
     if (node.on === 'testPassed') {
       const passed = this.state.flags['testPassed'] === true;
       if (!passed) this.rejectCurrentJob();

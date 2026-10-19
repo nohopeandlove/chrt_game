@@ -1,3 +1,4 @@
+import { playSound } from '../sound.ts';
 import { shuffledIndices } from '../shuffle.ts';
 import { recordEvent, recordOutcome } from '../reporting.ts';
 import { recordAttempt } from '../learning.ts';
@@ -9,6 +10,7 @@ import { escapeHtml } from './shared.ts';
 
 /** Письмо от работодателя с приглашением на тестовое. */
 export async function runLetter(ui: UI, state: GameState): Promise<void> {
+  playSound('mail');
   await ui.screen(
     host =>
       new Promise<void>(resolve => {
@@ -98,6 +100,7 @@ export async function runTest(ui: UI, state: GameState): Promise<void> {
           recordOutcome(state, 'test', correct, set.questions.length);
           for (const [i, q] of set.questions.entries()) recordEvent(state, { category: 'test', question: q.text, answer: q.options[answers[i] ?? -1] ?? 'Нет ответа', correct: answers[i] === q.correct, feedback: `Верный ответ: ${q.options[q.correct] ?? ''}. ${q.explanation ?? ''}` });
           recordAttempt(state, set.title, correct, set.questions.length);
+          playSound(passed ? 'success' : 'notice');
           const verdict = passed ? set.pass : set.fail;
           host.innerHTML = `
             <div class="curtain curtain--response">

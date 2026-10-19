@@ -1172,3 +1172,87 @@ html.vision-large .scene-metric__change span, html.vision-large .scene-metric__t
 html.vision-contrast :is(.letter__toolbar,.letter__avatar,.letter__new,.letter__next-step) { background: var(--vision-bg); color: var(--vision-fg); border-color: var(--vision-fg); }
 html.vision-large .letter :is(p,span,h3) { font-size: 1em; }
 @media(max-width:600px) { .letter__toolbar { padding: 14px 20px; } .letter__header { padding: 24px 20px 20px; } .letter__sender { margin-inline: 20px; } .letter__paper { padding: 22px 20px; } .letter__next-step { padding: 16px; gap: 10px; } .letter__footer { padding: 0 20px 24px; } .letter__footer .btn { width: 100%; } }
+/* Complete education names, with the same editable value used by the CV preview. */
+.input--school { width:100%; min-width:0; min-height:84px; resize:vertical; line-height:1.5; }
+.block { border:1px solid #d4dfed; border-radius:18px; padding:24px; box-shadow:none; }
+.block__title { border:0; border-radius:8px; padding:6px 12px; font-size:14px; }
+/* Quiet, inline audio preferences: no popup or autoplay. */
+.sound-settings { font-size:14px; }
+.sound-settings summary { cursor:pointer; min-height:44px; display:flex; align-items:center; padding:8px 12px; border:1px solid #d2dce9; border-radius:10px; background:#f7f9fd; }
+.sound-settings[open] { flex:1 0 100%; }
+.sound-settings__body { display:flex; flex-wrap:wrap; align-items:center; gap:16px 28px; padding:14px; border:1px solid #d2dce9; border-radius:12px; background:#fff; }
+.sound-settings__body label { display:flex; align-items:center; gap:10px; }
+.sound-settings__body input { accent-color:#233f68; }
+.sound-settings__body span { color:var(--ink-2); font-size:13px; }
+/* Rewards have a complete illustrated medal composition rather than a plain caption. */
+.overlay--reward { background:radial-gradient(ellipse at 50% 35%,#fff2cd,#f0f4fb 75%); }
+.reward { width:min(100%,820px); position:relative; text-align:center; border:1px solid #e0d4b3; border-radius:30px; padding:clamp(30px,5vw,60px) clamp(20px,4vw,50px); background:linear-gradient(150deg,#fffdf6,#fff 55%,#f4f7fc); box-shadow:0 24px 80px #a4823626; animation:reward-reveal .85s cubic-bezier(.2,.8,.2,1) both; }
+.reward__medal { position:relative; display:grid; place-items:center; width:126px; height:126px; margin:0 auto 28px; border-radius:50%; background:linear-gradient(135deg,#fff1bb,#e5b957); border:7px solid #fff8df; box-shadow:0 0 0 1px #d1a456,0 12px 30px #d0a45140; animation:medal-float 4s ease-in-out infinite; }
+.reward__medal::before { content:''; position:absolute; inset:9px; border:1px solid #b88b334d; border-radius:50%; }
+.reward__medal span { font-size:52px; line-height:1; filter:drop-shadow(0 3px 2px #88642d26); }
+.reward__eyebrow { margin:0 0 12px; font-size:14px; font-weight:700; color:#886122; text-transform:uppercase; letter-spacing:.1em; }
+.reward h2 { position:relative; margin:0; color:var(--ink); font-size:clamp(28px,4vw,46px); line-height:1.2; text-wrap:balance; }
+.reward__description { position:relative; margin:18px auto 0; max-width:48ch; color:var(--ink-2); }
+.reward__rule { height:2px; width:140px; margin:28px auto 0; background:linear-gradient(90deg,transparent,#d5af60,transparent); }
+.reward__sparkles { position:absolute; inset:0; overflow:hidden; border-radius:inherit; pointer-events:none; }
+.reward__sparkles span { position:absolute; left:calc(12% + var(--spark)*10.5%); top:calc(13% + var(--spark-row)*16%); color:#d6ac54; font-size:22px; opacity:.7; animation:reward-spark 3s ease-in-out infinite; animation-delay:calc(var(--spark)*-.35s); }
+.reward--knowledge .reward__medal { background:linear-gradient(135deg,#d8edff,#89b9e6); border-color:#f0f8ff; box-shadow:0 0 0 1px #a0bbd7,0 12px 30px #6d98c13b; }
+@keyframes reward-reveal { from { opacity:0; transform:translateY(28px) scale(.94); } to { opacity:1; transform:translateY(0) scale(1); } }
+@keyframes medal-float { 0%,100% { transform:translateY(0) rotate(-3deg); } 50% { transform:translateY(-9px) rotate(3deg); } }
+@keyframes reward-spark { 0%,100% { opacity:.2; transform:scale(.65) rotate(-10deg); } 50% { opacity:.9; transform:scale(1.2) rotate(20deg); } }
+/* Contract formats remain readable, with a visible open/closed state. */
+.folders { gap:22px; grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr)); }
+.folder { border:1px solid #cddbea; border-radius:20px; box-shadow:0 8px 28px #23344d0b; transition:transform .25s,box-shadow .25s; }
+.folder:hover { transform:translateY(-3px); box-shadow:0 14px 36px #23344d18; }
+.folder__tab { width:100%; border:0; border-bottom:1px solid #dbe4ef; border-radius:0; padding:24px; background:linear-gradient(135deg,#eaf2fc,#f6f9ff); text-align:left; }
+.folder:nth-child(2) .folder__tab { background:linear-gradient(135deg,#fff0ce,#fffaf0); }
+.folder__tab[aria-expanded=true] { background:linear-gradient(135deg,#eaf2fc,#f6f9ff); box-shadow:inset 0 4px 0 #668dbd; }
+.folder:nth-child(2) .folder__tab[aria-expanded=true] { background:linear-gradient(135deg,#eaf2fc,#f6f9ff); box-shadow:inset 0 4px 0 #c59c45; }
+.folder__title { font-size:18px; text-transform:none; letter-spacing:0; color:var(--ink); }
+.folder__law { font-size:15px; color:var(--ink-2); }
+.folder__body { padding:22px 24px 24px 44px; margin:0; }
+.folder__body li { padding-left:4px; margin-bottom:12px; }
+.compare__summary { background:#edf4fd; border-radius:14px; padding:18px 22px; }
+/* A personal result dashboard with an achievement collection. */
+.sheet > .final { max-width:1000px; gap:30px; }
+.final__head { padding:30px; border-radius:20px; background:linear-gradient(125deg,#fff2d0,#eef4fd); border:1px solid #e4e7ee; }
+.final__head .screen__eyebrow { background:transparent; color:#745528; padding:0; }
+.final__head .screen__title { margin:12px 0; }
+.final__highlights { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }
+.final-stat { position:relative; padding:24px; border:1px solid #dbe4ef; border-radius:18px; background:#f8fafe; overflow-wrap:anywhere; animation:finale-arrive .65s ease-out both; }
+.final-stat__number { color:#6e8cb0; font-size:14px; font-weight:700; letter-spacing:.08em; }
+.final-stat h3 { margin:8px 0 10px; color:var(--ink-2); font-size:16px; font-weight:500; }
+.final-stat p { margin:0; color:var(--ink); font-size:21px; line-height:1.45; font-weight:700; }
+.final__section-head { display:flex; justify-content:space-between; align-items:baseline; gap:14px; flex-wrap:wrap; }
+.final__section-head h3 { font-size:24px; margin:0; color:var(--ink); }
+.final__section-head > span { font-size:16px; color:var(--ink-2); }
+.achievement-progress { height:7px; background:#e8eef6; border-radius:20px; overflow:hidden; margin:2px 0 12px; }
+.achievement-progress > span { display:block; height:100%; background:linear-gradient(90deg,#d9ab47,#f0d38b); border-radius:inherit; }
+.achievements { grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr)); gap:16px; }
+.ach { display:flex; align-items:flex-start; gap:16px; opacity:1; padding:22px; border:1px dashed #ccd7e5; border-radius:18px; background:#f5f7fb; box-shadow:none; }
+.ach.is-earned { border:1px solid #dfc78c; background:linear-gradient(135deg,#fffaeb,#fff); box-shadow:0 6px 20px #c6a65c10; }
+.ach__icon { flex:0 0 48px; width:48px; height:48px; display:grid; place-items:center; border-radius:50%; background:#e6ebf2; font-size:25px; filter:grayscale(1); }
+.ach.is-earned .ach__icon { background:linear-gradient(135deg,#ffe8a5,#e5b95d); filter:none; box-shadow:0 0 0 4px #fff6dc; }
+.ach__body { font-size:15px; gap:7px; }
+.ach__body b { font-size:18px; font-weight:700; text-transform:none; line-height:1.35; color:var(--ink); }
+.ach__body span { color:var(--ink-2); }
+.ach__status { font-size:12px; font-weight:650; letter-spacing:.06em; text-transform:uppercase; }
+.ach.is-earned .ach__status { color:#86601e; }
+.final__actions { padding-top:20px; border-top:1px solid #e0e7f0; }
+.final .learning-summary { padding:24px; background:#f8fafe; border:1px solid #dbe4ef; border-radius:18px; }
+/* More legible motion accents, without flashes or obligatory sound. */
+.room-star { filter:drop-shadow(0 0 3px #fff0bd); }
+.room-steam { stroke-width:3; }
+@keyframes room-glow { 0%,100% { opacity:.45; } 50% { opacity:1; } }
+@keyframes room-steam { 0% { opacity:0; transform:translate(0,6px); } 30%,65% { opacity:.65; } 100% { opacity:0; transform:translate(7px,-32px); } }
+@keyframes room-twinkle { 0%,100% { opacity:.2; } 50% { opacity:1; } }
+@keyframes city-reflection { 0%,100% { opacity:.12; transform:translateX(-4px); } 50% { opacity:.6; transform:translateX(4px); } }
+.btn:not(:disabled):hover { transform:translateY(-2px); }
+html.vision-contrast :is(.reward,.reward__medal,.folder,.folder__tab,.compare__summary,.final__head,.final-stat,.ach,.ach.is-earned,.ach__icon,.final .learning-summary,.sound-settings__body,.sound-settings summary) { background:var(--vision-bg); color:var(--vision-fg); border-color:var(--vision-fg); box-shadow:none; }
+html.vision-contrast .reward__sparkles { display:none; }
+html.vision-contrast .achievement-progress > span { background:var(--vision-fg); }
+html.vision-large :is(.reward__description,.final-stat p,.ach__body,.ach__body b,.sound-settings__body span) { font-size:1em; }
+@media(max-width:600px) { .final__highlights { grid-template-columns:1fr; } .final__head { padding:22px; } .final-stat { padding:20px; } .reward__medal { width:105px; height:105px; } .folder__tab { padding:20px; } .sound-settings__body { align-items:stretch; flex-direction:column; } .sound-settings__body input[type=range] { max-width:180px; } }
+
+.campus-confetti { opacity: .85; }
+.panel:not([hidden]), .choices:not([hidden]) { animation: finale-arrive .4s ease-out both; }

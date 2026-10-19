@@ -25,6 +25,13 @@ export async function runResume(ui: UI, state: GameState, form: FormSpec): Promi
           throw new Error('Экран резюме не собрался');
         }
 
+        const school = root.querySelector<HTMLTextAreaElement>('[data-field="school"]');
+        const fitSchool = (): void => {
+          if (school && school.scrollHeight > school.clientHeight + 1) school.style.height = `${school.scrollHeight + 2}px`;
+        };
+        const educationSize = new ResizeObserver(fitSchool);
+        if (school?.parentElement) educationSize.observe(school.parentElement);
+
         const refresh = (): void => {
           const data = collect(root, form);
           const percent = progress(form, root, data);
@@ -33,6 +40,7 @@ export async function runResume(ui: UI, state: GameState, form: FormSpec): Promi
           meterBar.style.setProperty('--value', `${percent}%`);
           meterText.textContent = `${percent}%`;
           preview.innerHTML = document_(data, state);
+          fitSchool();
         };
 
         root.addEventListener('input', refresh);
@@ -61,6 +69,7 @@ export async function runResume(ui: UI, state: GameState, form: FormSpec): Promi
             return;
           }
           refresh();
+          educationSize.disconnect();
           resolve();
         });
 
@@ -129,7 +138,7 @@ function renderBlock(block: FormBlock, state: GameState): string {
 }
 
 function renderField(field: Field, state: GameState): string {
-  const wide = field.type === 'textarea' || field.type === 'chips' || field.type === 'select';
+  const wide = field.id === 'school' || field.type === 'textarea' || field.type === 'chips' || field.type === 'select';
   const toggle = field.toggle
     ? `<label class="switch switch--inline">
          <input type="checkbox" data-toggle="field" data-target="${field.id}">
@@ -149,6 +158,7 @@ function renderField(field: Field, state: GameState): string {
 
 function control(field: Field, state: GameState): string {
   const id = `id="f-${field.id}" data-field="${field.id}"`;
+  if (field.id === 'school') return `<textarea class="input input--school" ${id} rows="2">${escape_(field.default ?? '')}</textarea>`;
   switch (field.type) {
     case 'textarea':
       return `<textarea class="input" ${id} rows="3"></textarea>`;

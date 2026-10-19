@@ -25,8 +25,8 @@ function crtCampus(): string {
   return wrap('crt-campus', 'Челябинский радиотехнический техникум — выпускной у главного входа', `
     <rect width="1600" height="900" fill="#eaf0f8"/>
     <image href="${crtCampusImage}" width="1600" height="900" preserveAspectRatio="xMidYMid slice"/>
-    <g aria-hidden="true" pointer-events="none">${Array.from({length: 12}, (_, i) =>
-      `<rect class="campus-confetti scene-motion" x="${90 + i * 127}" y="-30" width="${i % 2 ? 5 : 7}" height="12" rx="2" fill="${['#e8bd65', '#639cb8', '#c27681'][i % 3]}" style="animation-delay:-${i * 1.7}s;animation-duration:${16 + i % 5}s"/>`
+    <g aria-hidden="true" pointer-events="none">${Array.from({length: 18}, (_, i) =>
+      `<rect class="campus-confetti scene-motion" x="${70 + i * 84}" y="-30" width="${i % 2 ? 7 : 10}" height="12" rx="2" fill="${['#e8bd65', '#639cb8', '#c27681'][i % 3]}" style="animation-delay:-${i * 1.7}s;animation-duration:${12 + i % 5}s"/>`
     ).join('')}</g>
   `);
 }
@@ -98,13 +98,13 @@ function heroRoom(): string {
   const stars = Array.from({length: 14}, (_, i) => {
     const x = 650 + (i * 67 % 430);
     const y = 38 + (i * 47 % 240);
-    return `<circle class="room-star scene-motion" cx="${x}" cy="${y}" r="${i % 3 ? 1.6 : 2.5}" fill="#fff0cb" style="animation-delay:-${i * .7}s"/>`;
+    return `<circle class="room-star scene-motion" cx="${x}" cy="${y}" r="${i % 3 ? 2.3 : 3.2}" fill="#fff0cb" style="animation-delay:-${i * .7}s"/>`;
   }).join('');
   return wrap('hero-room', 'Уютная комната с ноутбуком и ночным окном', `
     <image href="${heroRoomImage}" width="1600" height="900" preserveAspectRatio="xMidYMid slice"/>
     <defs>
       <radialGradient id="room-screen-light"><stop stop-color="#b4dbff" stop-opacity=".22"/><stop offset="1" stop-color="#b4dbff" stop-opacity="0"/></radialGradient>
-      <radialGradient id="room-lamp-light"><stop stop-color="#ffcc83" stop-opacity=".18"/><stop offset="1" stop-color="#ffcc83" stop-opacity="0"/></radialGradient>
+      <radialGradient id="room-lamp-light"><stop stop-color="#ffcc83" stop-opacity=".32"/><stop offset="1" stop-color="#ffcc83" stop-opacity="0"/></radialGradient>
     </defs>
     <g aria-hidden="true" pointer-events="none">
       ${stars}
@@ -123,8 +123,8 @@ function laptop(): string {
   return wrap('laptop', 'Ноутбук с вакансиями на уютном рабочем столе', `
     <image href="${laptopImage}" width="1600" height="900" preserveAspectRatio="xMidYMid slice"/>
     <defs>
-      <radialGradient id="laptop-screen-light"><stop stop-color="#c3d8ff" stop-opacity=".16"/><stop offset="1" stop-color="#c3d8ff" stop-opacity="0"/></radialGradient>
-      <radialGradient id="laptop-lamp-light"><stop stop-color="#ffcb86" stop-opacity=".2"/><stop offset="1" stop-color="#ffcb86" stop-opacity="0"/></radialGradient>
+      <radialGradient id="laptop-screen-light"><stop stop-color="#c3d8ff" stop-opacity=".3"/><stop offset="1" stop-color="#c3d8ff" stop-opacity="0"/></radialGradient>
+      <radialGradient id="laptop-lamp-light"><stop stop-color="#ffcb86" stop-opacity=".34"/><stop offset="1" stop-color="#ffcb86" stop-opacity="0"/></radialGradient>
     </defs>
     <g aria-hidden="true" pointer-events="none">
       <ellipse class="room-glow scene-motion" cx="795" cy="360" rx="340" ry="205" fill="url(#laptop-screen-light)"/>
@@ -149,7 +149,7 @@ function hrOffice(): string {
   return wrap('hr-office', 'Светлый кабинет директора с документами для оформления на работу', `
     <image href="${hrOfficeImage}" width="1600" height="900" preserveAspectRatio="xMidYMid slice"/>
     <defs>
-      <radialGradient id="office-lamp-light"><stop stop-color="#ffe2a5" stop-opacity=".17"/><stop offset="1" stop-color="#ffe2a5" stop-opacity="0"/></radialGradient>
+      <radialGradient id="office-lamp-light"><stop stop-color="#ffe2a5" stop-opacity=".3"/><stop offset="1" stop-color="#ffe2a5" stop-opacity="0"/></radialGradient>
       <linearGradient id="office-daylight" x1="1" y1="0" x2="0" y2="1"><stop stop-color="#ffe7ae" stop-opacity=".1"/><stop offset="1" stop-color="#ffe7ae" stop-opacity="0"/></linearGradient>
       <clipPath id="office-window"><rect x="1045" y="142" width="390" height="270"/></clipPath>
     </defs>
@@ -168,7 +168,7 @@ function openOffice(): string {
   return wrap('open-office', 'Светлый офис команды с рабочими местами и панорамными окнами', `
     <image href="${openOfficeImage}" width="1600" height="900" preserveAspectRatio="xMidYMid slice"/>
     <defs>
-      <radialGradient id="team-screen-light"><stop stop-color="#c3ddff" stop-opacity=".16"/><stop offset="1" stop-color="#c3ddff" stop-opacity="0"/></radialGradient>
+      <radialGradient id="team-screen-light"><stop stop-color="#c3ddff" stop-opacity=".3"/><stop offset="1" stop-color="#c3ddff" stop-opacity="0"/></radialGradient>
       <linearGradient id="team-daylight" x1="1" y1="0" x2="0" y2="1"><stop stop-color="#fff0bc" stop-opacity=".1"/><stop offset="1" stop-color="#fff0bc" stop-opacity="0"/></linearGradient>
       <clipPath id="team-windows"><rect x="480" y="42" width="775" height="170"/></clipPath>
     </defs>
@@ -188,7 +188,7 @@ function kitchen(): string {
   return wrap('kitchen', 'Уютная кухня команды с обеденным столом и зелёными шкафами', `
     <image href="${kitchenImage}" width="1600" height="900" preserveAspectRatio="xMidYMid slice"/>
     <defs>
-      <radialGradient id="kitchen-lamp-light"><stop stop-color="#ffe3a0" stop-opacity=".18"/><stop offset="1" stop-color="#ffe3a0" stop-opacity="0"/></radialGradient>
+      <radialGradient id="kitchen-lamp-light"><stop stop-color="#ffe3a0" stop-opacity=".32"/><stop offset="1" stop-color="#ffe3a0" stop-opacity="0"/></radialGradient>
       <linearGradient id="kitchen-daylight" x1="1" y1="0" x2="0" y2="1"><stop stop-color="#fff0bc" stop-opacity=".1"/><stop offset="1" stop-color="#fff0bc" stop-opacity="0"/></linearGradient>
     </defs>
     <g aria-hidden="true" pointer-events="none">
@@ -213,7 +213,7 @@ function citySunset(): string {
   return wrap('city-sunset', 'Ночной город с огнями и тихой набережной', `
     <image href="${cityNightImage}" width="1600" height="900" preserveAspectRatio="xMidYMid slice"/>
     <defs>
-      <radialGradient id="city-lantern-light"><stop stop-color="#ffd58a" stop-opacity=".2"/><stop offset="1" stop-color="#ffd58a" stop-opacity="0"/></radialGradient>
+      <radialGradient id="city-lantern-light"><stop stop-color="#ffd58a" stop-opacity=".34"/><stop offset="1" stop-color="#ffd58a" stop-opacity="0"/></radialGradient>
     </defs>
     <g aria-hidden="true" pointer-events="none">
       ${stars}

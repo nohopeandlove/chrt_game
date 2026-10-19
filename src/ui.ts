@@ -1,3 +1,4 @@
+import { playSound } from './sound.ts';
 import { shuffledIndices } from './shuffle.ts';
 import { clearSave } from './state.ts';
 import { renderBackground } from './render/backgrounds.ts';
@@ -225,7 +226,9 @@ export class UI {
     const host = this.overlay.querySelector<HTMLElement>('.sheet');
     if (!host) throw new Error('Экран не смонтировался');
     try {
-      return await build(host);
+      const task = build(host);
+      this.overlay.scrollTop = 0;
+      return await task;
     } finally {
       this.overlay.hidden = true;
       this.overlay.classList.remove('overlay--screen');
@@ -264,6 +267,7 @@ export class UI {
   }
 
   chapter(number: number | undefined, title: string, text: string): Promise<void> {
+    playSound('chapter');
     const eyebrow = number ? `Глава ${number}` : 'Дальше';
     return this.curtain(
       `<div class="curtain curtain--chapter">
@@ -277,6 +281,7 @@ export class UI {
 
   async finale(title: string, text: string): Promise<void> {
     this.portrait.innerHTML = '';
+    playSound('finale');
     this.overlay.classList.add('overlay--finale');
     try {
       await this.curtain(
@@ -301,25 +306,32 @@ export class UI {
   }
 
   card(icon: string, title: string): Promise<void> {
-    return this.curtain(
-      `<div class="curtain curtain--card">
-         <span class="curtain__icon">${escapeHtml(icon)}</span>
-         <span class="curtain__eyebrow">Получено знание</span>
-         <h2 class="curtain__title"><span class="hl">${escapeHtml(title)}</span></h2>
-       </div>`,
-      'Забрать'
-    );
+    return this.reward('knowledge', icon, title, '');
   }
 
-  achievement(icon: string | undefined, title: string): Promise<void> {
-    return this.curtain(
-      `<div class="curtain curtain--card">
-         <span class="curtain__icon">${escapeHtml(icon ?? '🏆')}</span>
-         <span class="curtain__eyebrow">Достижение</span>
-         <h2 class="curtain__title"><span class="hl">${escapeHtml(title)}</span></h2>
-       </div>`,
-      'Отлично'
-    );
+  achievement(icon: string | undefined, title: string, description = ''): Promise<void> {
+    return this.reward('achievement', icon ?? '🏆', title, description);
+  }
+
+  private async reward(kind: 'knowledge' | 'achievement', icon: string, title: string, description: string): Promise<void> {
+    this.setPortrait(undefined);
+    playSound(kind);
+    this.overlay.classList.add('overlay--reward');
+    try {
+      await this.curtain(
+        `<section class="reward reward--${kind}" aria-labelledby="reward-title">
+          <div class="reward__sparkles" aria-hidden="true">${Array.from({length:8},(_,i)=>`<span style="--spark:${i};--spark-row:${i%3}">✦</span>`).join('')}</div>
+          <div class="reward__medal" aria-hidden="true"><span>${escapeHtml(icon)}</span></div>
+          <p class="reward__eyebrow">${kind === 'achievement' ? 'Новое достижение' : 'Получено знание'}</p>
+          <h2 id="reward-title">${escapeHtml(title)}</h2>
+          ${description ? `<p class="reward__description">${escapeHtml(description)}</p>` : ''}
+          <div class="reward__rule" aria-hidden="true"></div>
+        </section>`,
+        kind === 'achievement' ? 'Здорово! Продолжить' : 'Продолжить'
+      );
+    } finally {
+      this.overlay.classList.remove('overlay--reward');
+    }
   }
 
   /** Таблица итогов сцены. */

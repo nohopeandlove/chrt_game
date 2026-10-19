@@ -3,7 +3,7 @@ import { shuffledIndices } from './shuffle.ts';
 import { installAccessibility } from './accessibility.ts';
 import { syncStatus } from './sync.ts';
 import { dashboard } from './dashboard.ts';
-import { playSound, setSound, soundEnabled } from './sound.ts';
+import { playSound, setSound, soundEnabled, musicEnabled, setMusic, soundVolume, setSoundVolume } from './sound.ts';
 import { scenes } from './content.ts';
 import { save } from './state.ts';
 import type { GameState } from './types.ts';
@@ -125,7 +125,7 @@ export function installLearningTools(root: HTMLElement, getState: () => GameStat
   const tools = document.createElement('aside');
   tools.className = 'learning-tools';
   tools.setAttribute('aria-label', 'Прогресс и настройки доступности');
-  tools.innerHTML = `<button type="button" data-journal>Кабинет и результаты</button><button type="button" data-vision>Версия для слабовидящих</button><button type="button" data-setting="still" aria-pressed="false">Без анимации</button><button type="button" data-sound aria-pressed="${soundEnabled()}">Звук: ${soundEnabled() ? 'вкл' : 'выкл'}</button><span class="save-warning" role="status" hidden>Сохранение недоступно. Не закрывайте вкладку до завершения.</span>`;
+  tools.innerHTML = `<button type="button" data-journal>Кабинет и результаты</button><button type="button" data-vision>Версия для слабовидящих</button><button type="button" data-setting="still" aria-pressed="false">Без анимации</button><button type="button" data-sound aria-pressed="${soundEnabled()}">Звук: ${soundEnabled() ? 'вкл' : 'выкл'}</button><details class="sound-settings"><summary>Настроить звук</summary><div class="sound-settings__body"><label>Громкость <input type="range" min="0" max="100" value="${Math.round(soundVolume()*100)}" data-volume aria-label="Громкость звука"></label><label><input type="checkbox" data-music ${musicEnabled() ? 'checked' : ''}> Музыкальное сопровождение</label><span>Музыка играет только при включённом звуке.</span></div></details><span class="save-warning" role="status" hidden>Сохранение недоступно. Не закрывайте вкладку до завершения.</span>`;
   root.append(tools);
   void installEnvironmentBadge(tools);
   installAccessibility(root, tools.querySelector<HTMLButtonElement>('[data-vision]')!);
@@ -156,6 +156,8 @@ export function installLearningTools(root: HTMLElement, getState: () => GameStat
       try { localStorage.setItem(`ya-specialist/${setting}`, String(active)); } catch { /* работает без хранилища */ }
     });
   });
+  tools.querySelector<HTMLInputElement>('[data-volume]')?.addEventListener('input',event=>setSoundVolume(Number((event.target as HTMLInputElement).value)/100));
+  tools.querySelector<HTMLInputElement>('[data-music]')?.addEventListener('change',event=>setMusic((event.target as HTMLInputElement).checked));
   tools.querySelector<HTMLButtonElement>('[data-sound]')?.addEventListener('click', event => {
     setSound(!soundEnabled());
     const button = event.currentTarget as HTMLButtonElement;
