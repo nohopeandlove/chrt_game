@@ -1,3 +1,4 @@
+import hrOfficeImage from '../../assets/backgrounds/hr-office.webp';
 import laptopImage from '../../assets/backgrounds/laptop.webp';
 import heroRoomImage from '../../assets/backgrounds/hero-room.webp';
 import crtCampusImage from '../../assets/backgrounds/crt-campus.webp';
@@ -139,44 +140,20 @@ function laptop(): string {
 }
 
 function hrOffice(): string {
-  const blinds: string[] = [];
-  for (let i = 0; i < 9; i++) blinds.push(`<rect x="980" y="${120 + i * 34}" width="420" height="16" rx="3" fill="#E4D9C3"/>`);
-  return wrap('hr-office', 'Отдел кадров', `
-    <rect width="1600" height="900" fill="#F2EDE4"/>
-    <rect width="1600" height="620" fill="#EBE3D4"/>
-    <rect x="960" y="100" width="460" height="330" rx="8" fill="#C9D7E1"/>
-    ${blinds.join('')}
-    <rect x="960" y="100" width="460" height="330" rx="8" fill="none" stroke="#D9CBB0" stroke-width="12"/>
-    <rect y="620" width="1600" height="280" fill="#C9B89A"/>
-    <rect y="620" width="1600" height="14" fill="#B8A483"/>
-
-    <rect x="120" y="520" width="1360" height="34" rx="8" fill="#8B5E3C"/>
-    <rect x="120" y="554" width="1360" height="18" fill="#6E4A2E"/>
-    <rect x="160" y="572" width="36" height="240" fill="#6E4A2E"/>
-    <rect x="1404" y="572" width="36" height="240" fill="#6E4A2E"/>
-
-    <g class="folder-a">
-      <rect x="520" y="440" width="230" height="80" rx="8" fill="#4A5D6E"/>
-      <rect x="520" y="428" width="90" height="22" rx="6" fill="#4A5D6E"/>
-      <rect x="540" y="470" width="150" height="8" rx="4" fill="#DDE6EE" opacity=".8"/>
-    </g>
-    <g class="folder-b">
-      <rect x="820" y="440" width="230" height="80" rx="8" fill="#D9A441"/>
-      <rect x="820" y="428" width="90" height="22" rx="6" fill="#D9A441"/>
-      <rect x="840" y="470" width="150" height="8" rx="4" fill="#FFF4DA" opacity=".9"/>
-    </g>
-
-    <g>
-      <rect x="260" y="380" width="14" height="150" fill="#4A4038"/>
-      <path d="M180,392 L354,392 L320,330 L214,330 Z" fill="#8B5E3C"/>
-      <ellipse class="lamp" cx="267" cy="400" rx="70" ry="10" fill="#FFF0B8" opacity=".55"/>
-    </g>
-    <g>
-      <rect x="1180" y="486" width="200" height="34" fill="#FFFFFF"/>
-      <rect x="1188" y="478" width="200" height="34" fill="#FBF8F2"/>
-      <rect x="1196" y="470" width="200" height="34" fill="#FFFFFF"/>
-      <rect x="1210" y="482" width="120" height="4" fill="#D9CBB0"/>
-      <rect x="1210" y="494" width="90" height="4" fill="#D9CBB0"/>
+  const motes = Array.from({length: 9}, (_, i) =>
+    `<circle class="office-mote scene-motion" cx="${1040 + i * 51 % 400}" cy="${170 + i * 47 % 280}" r="${i % 3 ? 1.8 : 2.6}" fill="#fff4d2" style="animation-delay:-${i * 1.9}s;animation-duration:${13 + i % 4}s"/>`
+  ).join('');
+  return wrap('hr-office', 'Светлый кабинет директора с документами для оформления на работу', `
+    <image href="${hrOfficeImage}" width="1600" height="900" preserveAspectRatio="xMidYMid slice"/>
+    <defs>
+      <radialGradient id="office-lamp-light"><stop stop-color="#ffe2a5" stop-opacity=".17"/><stop offset="1" stop-color="#ffe2a5" stop-opacity="0"/></radialGradient>
+      <linearGradient id="office-daylight" x1="1" y1="0" x2="0" y2="1"><stop stop-color="#ffe7ae" stop-opacity=".1"/><stop offset="1" stop-color="#ffe7ae" stop-opacity="0"/></linearGradient>
+      <clipPath id="office-window"><rect x="1045" y="142" width="390" height="270"/></clipPath>
+    </defs>
+    <g aria-hidden="true" pointer-events="none">
+      <ellipse class="room-lamplight scene-motion" cx="245" cy="370" rx="170" ry="145" fill="url(#office-lamp-light)"/>
+      <path class="office-daylight scene-motion" d="M1035 135 H1490 L1320 700 H760 Z" fill="url(#office-daylight)"/>
+      <g clip-path="url(#office-window)">${motes}</g>
     </g>
   `);
 }
