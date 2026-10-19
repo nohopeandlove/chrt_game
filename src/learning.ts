@@ -1,3 +1,4 @@
+import { shuffledIndices } from './shuffle.ts';
 import { installAccessibility } from './accessibility.ts';
 import { syncStatus } from './sync.ts';
 import { dashboard } from './dashboard.ts';
@@ -74,10 +75,11 @@ export async function orientation(ui: UI, state: GameState): Promise<void> {
 
 export async function assessment(ui: UI, state: GameState, phase: 'baseline' | 'final'): Promise<void> {
   const diagnostic = phase === 'baseline' ? baselineDiagnostic : finalDiagnostic;
+  const orders = diagnostic.map(q => shuffledIndices(q.options.length));
   await ui.screen(host => new Promise<void>(resolve => {
     host.innerHTML = `<form class="diagnostic"><h2 class="screen__title" tabindex="-1">${phase === 'baseline' ? 'Входная' : 'Итоговая'} диагностика</h2>
       <p>Три учебных ситуации. Выберите один ответ в каждой. Ограничения времени нет.</p>
-      ${diagnostic.map((q, i) => `<fieldset class="learning-question"><legend>${i + 1}. ${esc(q.question)}</legend>${q.options.map((o, j) => `<label><input type="radio" name="q${i}" value="${j}" required> ${esc(o)}</label>`).join('')}</fieldset>`).join('')}
+      ${diagnostic.map((q, i) => `<fieldset class="learning-question"><legend>${i + 1}. ${esc(q.question)}</legend>${orders[i]!.map(j => `<label><input type="radio" name="q${i}" value="${j}" required> ${esc(q.options[j]!)}</label>`).join('')}</fieldset>`).join('')}
       <button class="btn btn--primary" type="submit">Проверить ответы</button> <button class="btn" type="button" data-skip>Пропустить</button>
     </form>`;
     host.querySelector<HTMLElement>('h2')?.focus();

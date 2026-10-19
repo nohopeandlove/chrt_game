@@ -1,3 +1,4 @@
+import { shuffledIndices } from '../shuffle.ts';
 import type { UI } from '../ui.ts';
 import type { GameState } from '../types.ts';
 import { applyOption, save } from '../state.ts';
@@ -16,11 +17,12 @@ export const portfolioWorks = [
 export async function runPortfolio(ui: UI, state: GameState): Promise<void> {
   await ui.screen(host => new Promise<void>(resolve => {
     const selected = new Set<string>();
+    const displayWorks = shuffledIndices(portfolioWorks.length).map(i => portfolioWorks[i]!);
     let checked = false;
     let message = '';
     const render = (): void => {
       const card = (w: typeof portfolioWorks[number]): string => `<article class="work-card" draggable="${!checked}" data-work="${w.id}"><span class="screen__eyebrow">${w.kind}</span><h3>${esc(w.title)}</h3><p>${esc(w.text)}</p>${checked ? `<p class="work-feedback">${w.good ? '✓ Подходит' : '△ Требует замены'}: ${esc(w.feedback)}</p>` : `<button type="button" class="btn btn--small" data-toggle="${w.id}">${selected.has(w.id) ? 'Убрать' : 'Добавить'}</button>`}</article>`;
-      host.innerHTML = `<section class="portfolio"><span class="screen__eyebrow">Практикум · Портфолио</span><h2 class="screen__title">Покажите, что вы умеете</h2><p>Соберите три работы для работодателя. Оценивайте доказательства навыков, авторство и описание результата. Перетаскивайте карточки или используйте кнопки «Добавить» и «Убрать».</p><div class="portfolio-board"><section class="portfolio-zone" data-zone="bank" aria-label="Доступные работы"><h3>Материалы на выбор</h3>${portfolioWorks.filter(w => !selected.has(w.id)).map(card).join('')}</section><section class="portfolio-zone portfolio-zone--selected" data-zone="selected" aria-label="Моё портфолио"><h3>Моё портфолио · ${selected.size} из 3</h3>${selected.size ? portfolioWorks.filter(w => selected.has(w.id)).map(card).join('') : '<p>Перенесите сюда три работы</p>'}</section></div><p role="status" aria-live="polite" data-verdict>${esc(message)}</p><button type="button" class="btn btn--primary" data-submit>${checked ? 'Продолжить' : 'Проверить портфолио'}</button></section>`;
+      host.innerHTML = `<section class="portfolio"><span class="screen__eyebrow">Практикум · Портфолио</span><h2 class="screen__title">Покажите, что вы умеете</h2><p>Соберите три работы для работодателя. Оценивайте доказательства навыков, авторство и описание результата. Перетаскивайте карточки или используйте кнопки «Добавить» и «Убрать».</p><div class="portfolio-board"><section class="portfolio-zone" data-zone="bank" aria-label="Доступные работы"><h3>Материалы на выбор</h3>${displayWorks.filter(w => !selected.has(w.id)).map(card).join('')}</section><section class="portfolio-zone portfolio-zone--selected" data-zone="selected" aria-label="Моё портфолио"><h3>Моё портфолио · ${selected.size} из 3</h3>${selected.size ? displayWorks.filter(w => selected.has(w.id)).map(card).join('') : '<p>Перенесите сюда три работы</p>'}</section></div><p role="status" aria-live="polite" data-verdict>${esc(message)}</p><button type="button" class="btn btn--primary" data-submit>${checked ? 'Продолжить' : 'Проверить портфолио'}</button></section>`;
       const toggle = (id: string, add: boolean): void => {
         if (checked || !portfolioWorks.some(w => w.id === id)) return;
         if (add && !selected.has(id) && selected.size >= 3) { host.querySelector('[data-verdict]')!.textContent = 'Можно выбрать только три работы. Сначала уберите одну.'; return; }

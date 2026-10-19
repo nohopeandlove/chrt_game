@@ -1,3 +1,4 @@
+import { shuffledIndices } from '../shuffle.ts';
 import { recordEvent, recordOutcome } from '../reporting.ts';
 import { recordAttempt } from '../learning.ts';
 import { tests } from '../content.ts';
@@ -38,6 +39,7 @@ export async function runTest(ui: UI, state: GameState): Promise<void> {
   if (!set) throw new Error('Нет ни одного набора тестовых заданий');
 
   const answers: number[] = [];
+  const orders = set.questions.map(q => shuffledIndices(q.options.length));
 
   await ui.screen(
     host =>
@@ -45,7 +47,7 @@ export async function runTest(ui: UI, state: GameState): Promise<void> {
         const showQuestion = (index: number): void => {
           const q = set.questions[index];
           if (!q) return showResult();
-          host.innerHTML = question(set, index);
+          host.innerHTML = question(set, index, orders[index]!);
           host.querySelectorAll<HTMLButtonElement>('[data-answer]').forEach(button => {
             button.addEventListener('click', () => {
               answers[index] = Number(button.dataset['answer']);
@@ -59,7 +61,7 @@ export async function runTest(ui: UI, state: GameState): Promise<void> {
           const q = set.questions[index];
           if (!q) return;
           const last = index === set.questions.length - 1;
-          host.innerHTML = question(set, index, answers[index]);
+          host.innerHTML = question(set, index, orders[index]!, answers[index]);
           const hero = host.querySelector<HTMLElement>('.quiz__hero');
           if (hero) hero.hidden = false;
           const next = host.querySelector<HTMLButtonElement>('[data-next]');
@@ -98,7 +100,7 @@ export async function runTest(ui: UI, state: GameState): Promise<void> {
   );
 }
 
-function question(set: TestSet, index: number, picked?: number): string {
+function question(set: TestSet, index: number, order: number[], picked?: number): string {
   const q = set.questions[index];
   if (!q) return '';
   const answered = picked !== undefined;
@@ -110,13 +112,13 @@ function question(set: TestSet, index: number, picked?: number): string {
       </header>
       <p class="quiz__text">${escapeHtml(q.text)}</p>
       <div class="quiz__options">
-        ${q.options
+        ${order
           .map(
-            (text, i) => `
+            (i, position) => `
           <button class="choice${answered ? (i === q.correct ? ' is-right' : i === picked ? ' is-wrong' : '') : ''}" type="button"
             data-answer="${i}" ${answered ? 'disabled' : ''}>
-            <span class="choice__num">${i + 1}</span>
-            <span class="choice__text">${escapeHtml(text)}</span>
+            <span class="choice__num">${position + 1}</span>
+            <span class="choice__text">${escapeHtml(q.options[i]!)}</span>
           </button>`
           )
           .join('')}

@@ -1,3 +1,4 @@
+import { shuffledIndices } from '../shuffle.ts';
 import type { CompareColumn, GameState, QuizResult, TestQuestion } from '../types.ts';
 import type { UI } from '../ui.ts';
 import { escapeHtml } from './shared.ts';
@@ -77,6 +78,7 @@ export async function runQuiz(ui: UI, questions: TestQuestion[], results: QuizRe
         const show = (index: number): void => {
           const q = questions[index];
           if (!q) return resolve();
+          const order = shuffledIndices(q.options.length);
           host.innerHTML = `
             <div class="quiz">
               <header class="quiz__head">
@@ -85,12 +87,12 @@ export async function runQuiz(ui: UI, questions: TestQuestion[], results: QuizRe
               </header>
               <p class="quiz__text">${escapeHtml(q.text)}</p>
               <div class="quiz__options">
-                ${q.options
+                ${order
                   .map(
-                    (text, i) => `
+                    (i, position) => `
                   <button class="choice" type="button" data-answer="${i}">
-                    <span class="choice__num">${i + 1}</span>
-                    <span class="choice__text">${escapeHtml(text)}</span>
+                    <span class="choice__num">${position + 1}</span>
+                    <span class="choice__text">${escapeHtml(q.options[i]!)}</span>
                   </button>`
                   )
                   .join('')}

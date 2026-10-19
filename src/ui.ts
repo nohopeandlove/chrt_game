@@ -1,3 +1,4 @@
+import { shuffledIndices } from './shuffle.ts';
 import { clearSave } from './state.ts';
 import { renderBackground } from './render/backgrounds.ts';
 import { renderPortrait } from './render/portrait.ts';
@@ -167,14 +168,15 @@ export class UI {
 
   /** Выбор варианта. Разрешается индексом выбранного варианта. */
   choice(input: ChoiceInput): Promise<number> {
+    const order = shuffledIndices(input.options.length);
     return new Promise<number>(resolve => {
       this.choices.hidden = false;
-      this.choices.innerHTML = input.options
+      this.choices.innerHTML = order
         .map(
-          (text, i) =>
-            `<button class="choice" type="button" data-index="${i}">
-               <span class="choice__num">${i + 1}</span>
-               <span class="choice__text">${escapeHtml(text)}</span>
+          (index, position) =>
+            `<button class="choice" type="button" data-index="${index}">
+               <span class="choice__num">${position + 1}</span>
+               <span class="choice__text">${escapeHtml(input.options[index]!)}</span>
              </button>`
         )
         .join('');
@@ -184,7 +186,7 @@ export class UI {
         const n = Number(e.key);
         if (Number.isInteger(n) && n >= 1 && n <= input.options.length) {
           e.preventDefault();
-          pick(n - 1);
+          pick(order[n - 1]!);
         }
       };
       const onClick = (e: MouseEvent): void => {
