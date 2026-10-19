@@ -187,15 +187,18 @@ body {
 }
 .panel[data-kind='think'] .panel__line { font-style: italic; font-weight: 400; color: var(--ink-2); }
 
-/* текст от автора — подпись-плашка, как в комиксе */
+/* Авторские сообщения — компактная карточка в общем стиле диалогов. */
 .panel[data-kind='narrate'] {
-  background: var(--yellow);
-  border-radius: 0;
-  margin-left: 0;
-  text-align: center;
+  background: var(--white);
+  border-radius: 20px;
+  width: min(100%, 760px);
+  box-sizing: border-box;
+  margin-inline: auto;
+  min-height: 0;
+  text-align: left;
 }
 .panel[data-kind='narrate']::before { display: none; }
-.panel[data-kind='narrate'] .panel__line { font-weight: 500; padding: 0 clamp(0px, 4vw, 60px); }
+.panel[data-kind='narrate'] .panel__line { font-weight: 500; min-height: 0; padding: 0; }
 
 .panel__hint {
   position: absolute;
