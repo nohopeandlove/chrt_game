@@ -73,6 +73,25 @@ try {
    assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
    await page.waitForFunction(()=>document.querySelector('.stage__portrait').getBoundingClientRect().top>=document.querySelector('.learning-tools').getBoundingClientRect().bottom);
    await page.screenshot({path:'/tmp/kitchen-mobile.png'});
+   for(let step=0;step<12 && await page.locator('.bg--city-sunset').count()===0;step++) {
+    const curtain=page.locator('.curtain__go:visible');
+    if(await curtain.count()) await curtain.click();
+    else await page.locator('.panel').click();
+    await page.waitForTimeout(60);
+   }
+   const city=page.locator('.bg--city-sunset image');await city.waitFor({state:'visible'});
+   const citySrc=await city.getAttribute('href');const cityResponse=await fetch(new URL(citySrc,server.base));assert.equal(cityResponse.status,200);assert.equal(cityResponse.headers.get('content-type'),'image/webp');
+   await page.evaluate(async src=>{const image=new Image();image.src=src;await image.decode();if(image.naturalWidth<1600)throw Error('Night city illustration too small');},citySrc);
+   assert.ok(await page.locator('.bg--city-sunset .scene-motion').evaluateAll(es=>es.length>20 && es.every(e=>getComputedStyle(e).animationName==='none')));
+   await page.emulateMedia({reducedMotion:'no-preference'});
+   assert.ok(await page.locator('.bg--city-sunset .scene-motion').evaluateAll(es=>es.every(e=>e.getAnimations().some(a=>a.playState==='running'))));
+   await page.locator('[data-setting=still]').click();
+   assert.ok(await page.locator('.bg--city-sunset .scene-motion').evaluateAll(es=>es.every(e=>getComputedStyle(e).animationName==='none')));
+   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+   await page.screenshot({path:'/tmp/city-night-mobile.png'});
+   await page.setViewportSize({width:1440,height:900});
+   await page.screenshot({path:'/tmp/city-night-desktop.png'});
+
 
   }
   if(scene==='labor') {
@@ -88,5 +107,5 @@ try {
   }
  }
  assert.deepEqual(errors,[]);
- console.log('PASS: campus, room, laptop, HR office, team office and kitchen WebP load in all relevant scenes, scene animations run, manual and system reduced motion disable every effect, mobile fits, no browser errors');
+ console.log('PASS: campus, room, laptop, HR office, team office, kitchen and night city WebP load in all relevant scenes, scene animations run, manual and system reduced motion disable every effect, mobile fits, no browser errors');
 }finally{if(browser)await browser.close();await server.close();}

@@ -1,3 +1,4 @@
+import cityNightImage from '../../assets/backgrounds/city-night.webp';
 import kitchenImage from '../../assets/backgrounds/kitchen.webp';
 import openOfficeImage from '../../assets/backgrounds/open-office.webp';
 import hrOfficeImage from '../../assets/backgrounds/hr-office.webp';
@@ -202,45 +203,23 @@ function kitchen(): string {
 }
 
 function citySunset(): string {
-  const far: string[] = [];
-  for (let i = 0; i < 14; i++) {
-    const x = i * 118;
-    const h = 120 + ((i * 53) % 160);
-    far.push(`<rect x="${x}" y="${640 - h}" width="96" height="${h + 40}" fill="#B75C8A" opacity=".75"/>`);
-  }
-  const near: string[] = [];
-  for (let i = 0; i < 8; i++) {
-    const x = -40 + i * 220;
-    const h = 200 + ((i * 71) % 220);
-    near.push(`<rect x="${x}" y="${900 - h}" width="160" height="${h}" fill="#4A2A5E"/>`);
-    for (let w = 0; w < 4; w++) {
-      for (let r = 0; r < Math.floor(h / 60); r++) {
-        if ((w + r + i) % 3 === 0) continue;
-        near.push(`<rect x="${x + 22 + w * 34}" y="${900 - h + 24 + r * 60}" width="16" height="24" fill="#FFD98E" opacity=".75"/>`);
-      }
-    }
-  }
-  return wrap('city-sunset', 'Город на закате', `
-    <rect width="1600" height="900" fill="url(#sunset)"/>
-    <g class="sun">
-      <circle cx="800" cy="520" r="120" fill="#FFF1C2" opacity=".35"/>
-      <circle cx="800" cy="520" r="80" fill="#FFF6DC"/>
-    </g>
-    <g class="parallax">${far.join('')}</g>
-    ${near.join('')}
-    <g>
-      <rect x="1200" y="700" width="10" height="200" fill="#2A1638"/>
-      <path d="M1205,700 q0,-40 40,-40" stroke="#2A1638" stroke-width="10" fill="none"/>
-      <circle cx="1248" cy="660" r="10" fill="#FFD98E"/>
-    </g>
+  // Keep the content id stable for existing scenes and saved games.
+  const stars = Array.from({length: 16}, (_, i) =>
+    `<circle class="room-star scene-motion" cx="${400 + i * 71 % 780}" cy="${28 + i * 37 % 170}" r="${i % 4 ? 1.3 : 2}" fill="#e5eaff" style="animation-delay:-${i * .8}s;animation-duration:${5 + i % 4}s"/>`
+  ).join('');
+  const reflections = Array.from({length: 7}, (_, i) =>
+    `<path class="city-reflection scene-motion" d="M${410 + i * 110} ${478 + i % 3 * 8} h${20 + i % 3 * 7} m-18 7 h22" fill="none" stroke="#ffd48e" stroke-width="2" stroke-linecap="round" style="animation-delay:-${i * .8}s;animation-duration:${6 + i % 3}s"/>`
+  ).join('');
+  return wrap('city-sunset', 'Ночной город с огнями и тихой набережной', `
+    <image href="${cityNightImage}" width="1600" height="900" preserveAspectRatio="xMidYMid slice"/>
     <defs>
-      <linearGradient id="sunset" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#7B3F8C"/>
-        <stop offset="45%" stop-color="#E85D75"/>
-        <stop offset="75%" stop-color="#F5A65B"/>
-        <stop offset="100%" stop-color="#FFD98E"/>
-      </linearGradient>
+      <radialGradient id="city-lantern-light"><stop stop-color="#ffd58a" stop-opacity=".2"/><stop offset="1" stop-color="#ffd58a" stop-opacity="0"/></radialGradient>
     </defs>
+    <g aria-hidden="true" pointer-events="none">
+      ${stars}
+      <ellipse class="room-lamplight scene-motion" cx="1393" cy="188" rx="115" ry="125" fill="url(#city-lantern-light)"/>
+      ${reflections}
+    </g>
   `);
 }
 

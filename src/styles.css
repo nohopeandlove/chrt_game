@@ -1079,3 +1079,6 @@ html.vision-contrast .environment-banner { background:var(--vision-bg); color:va
 .office-mote { animation: office-mote 15s ease-in-out infinite; }
 @keyframes office-daylight { 0%,100% { opacity: .35; } 50% { opacity: .85; } }
 @keyframes office-mote { 0% { opacity: 0; transform: translate(0,14px); } 30%,65% { opacity: .4; } 100% { opacity: 0; transform: translate(-18px,-32px); } }
+
+.city-reflection { opacity: .16; animation: city-reflection 7s ease-in-out infinite; }
+@keyframes city-reflection { 0%,100% { opacity: .08; transform: translateX(-2px); } 50% { opacity: .35; transform: translateX(2px); } }
